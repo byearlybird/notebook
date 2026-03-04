@@ -1,4 +1,5 @@
-import { Checkbox, Field, Label } from "@headlessui/react";
+import { Checkbox } from "@base-ui/react/checkbox";
+import { Field } from "@base-ui/react/field";
 import type { Task } from "@app/db";
 import { CheckIcon } from "@phosphor-icons/react";
 
@@ -16,17 +17,19 @@ export function TaskItem({
   };
 
   return (
-    <Field className="flex gap-3 items-center">
-      <Checkbox
-        checked={isComplete}
-        onChange={handleChange}
-        className="group flex size-5 shrink-0 items-center justify-center rounded-full border border-cloud-dark transition-all hover:border-cloud-light data-checked:border-cloud-light"
-      >
-        {isComplete && <CheckIcon className="size-3" weight="bold" />}
-      </Checkbox>
-      <Label className={isComplete ? "text-cloud-medium line-through" : "text-ivory-light"}>
+    <Field.Root>
+      <Field.Label className={`flex items-center gap-3 ${isComplete ? "text-cloud-medium line-through" : "text-ivory-light"}`}>
+        <Checkbox.Root
+          checked={isComplete}
+          onCheckedChange={handleChange}
+          className="group flex size-5 shrink-0 items-center justify-center rounded-full border border-cloud-dark transition-all hover:border-cloud-light data-[checked]:border-cloud-light"
+        >
+          <Checkbox.Indicator>
+            <CheckIcon className="size-3" weight="bold" />
+          </Checkbox.Indicator>
+        </Checkbox.Root>
         {task.content}
-      </Label>
-    </Field>
+      </Field.Label>
+    </Field.Root>
   );
 }
