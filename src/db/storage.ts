@@ -1,4 +1,3 @@
-import { Libsql } from "@capawesome/capacitor-libsql";
 import { CapgoCapacitorDataStorageSqlite } from "@capgo/capacitor-data-storage-sqlite";
 
 export function createStorage({ dbName, tableName }: { dbName: string; tableName: string }) {

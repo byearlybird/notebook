@@ -1,57 +1,36 @@
+import type z from "zod";
 import { storage } from ".";
-import { type Note, type Task, type NewNote, type NewTask, noteSchema, taskSchema } from "./schema";
+import { noteSchema, taskSchema } from "./schema";
 
-const NOTE_PREFIX = "note:";
-const TASK_PREFIX = "task:";
+export const notesRepo = createRepo("note", noteSchema, "id");
+export const tasksRepo = createRepo("task", taskSchema, "id");
 
-export const notesRepo = {
-  async findAll(): Promise<Note[]> {
-    return storage.valuesWithKeyPrefix<Note>(NOTE_PREFIX);
-  },
+function createRepo<T>(key: string, schema: z.ZodSchema<T>, idKey: keyof T) {
+  const prefix = `${key}:`;
+  return {
+    async findAll(): Promise<T[]> {
+      return storage.valuesWithKeyPrefix<T>(prefix);
+    },
 
-  async findById(id: string): Promise<Note | undefined> {
-    return storage.get<Note>(`${NOTE_PREFIX}${id}`);
-  },
+    async findById(id: string): Promise<T | undefined> {
+      return storage.get<T>(`${prefix}${id}`);
+    },
+    async create(item: z.input<typeof schema>): Promise<T> {
+      const newItem = schema.parse(item);
+      await storage.set(`${prefix}${newItem[idKey]}`, newItem);
+      return newItem;
+    },
 
-  async create(note: NewNote): Promise<Note> {
-    const newNote = noteSchema.parse(note);
-    await storage.set(`${NOTE_PREFIX}${newNote.id}`, newNote);
-    return newNote;
-  },
+    async update(id: string, updates: Partial<T>): Promise<T | undefined> {
+      const item = await storage.get<T>(`${prefix}${id}`);
+      if (!item) return undefined;
+      const updatedItem = schema.parse({ ...item, ...updates });
+      await storage.set(`${prefix}${id}`, updatedItem);
+      return updatedItem;
+    },
 
-  async update(id: string, updates: Partial<Note>): Promise<Note | undefined> {
-    const note = await storage.get<Note>(`${NOTE_PREFIX}${id}`);
-    if (!note) return undefined;
-    const updatedNote = noteSchema.parse({ ...note, ...updates });
-    await storage.set(`${NOTE_PREFIX}${id}`, updatedNote);
-    return updatedNote;
-  },
-
-  async delete(_id: string): Promise<void> {},
-};
-
-export const tasksRepo = {
-  async findAll(): Promise<Task[]> {
-    return storage.valuesWithKeyPrefix<Task>(TASK_PREFIX);
-  },
-
-  async findById(id: string): Promise<Task | undefined> {
-    return storage.get<Task>(`${TASK_PREFIX}${id}`);
-  },
-
-  async create(task: NewTask): Promise<Task> {
-    const newTask = taskSchema.parse(task);
-    await storage.set(`${TASK_PREFIX}${newTask.id}`, newTask);
-    return newTask;
-  },
-
-  async update(id: string, updates: Partial<Task>): Promise<Task | undefined> {
-    const task = await storage.get<Task>(`${TASK_PREFIX}${id}`);
-    if (!task) return undefined;
-    const updatedTask = taskSchema.parse({ ...task, ...updates });
-    await storage.set(`${TASK_PREFIX}${id}`, updatedTask);
-    return updatedTask;
-  },
-
-  async delete(_id: string): Promise<void> {},
-};
+    async delete(_id: string): Promise<void> {
+      throw new Error("Not implemented");
+    },
+  };
+}
