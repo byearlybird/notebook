@@ -1,10 +1,9 @@
 import { ErrorComponent, Loading } from "@app/components";
 import { createRootRoute, Outlet } from "@tanstack/react-router";
-import { migrator } from "@app/db";
 import { Dialog } from "@capacitor/dialog";
 import { SplashScreen } from '@capacitor/splash-screen';
 
-let migrated = false;
+let initialized = false;
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -12,9 +11,8 @@ export const Route = createRootRoute({
   errorComponent: AppError,
   pendingComponent: AppLoading,
   beforeLoad: async () => {
-    if (!migrated) {
-      await migrator.migrateToLatest();
-      migrated = true;
+    if (!initialized) {
+      initialized = true;
       await SplashScreen.hide()
     }
   },

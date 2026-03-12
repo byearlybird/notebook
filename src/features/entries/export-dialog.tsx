@@ -7,7 +7,8 @@ import {
   DialogPopup,
   DialogTitle,
 } from "@app/components/dialog";
-import { dumpDatabase, type DatabaseDump } from "@app/db/sync-utils";
+type DatabaseDump = { notes: never[]; tasks: never[]; schema_version: number };
+const dumpDatabase = async (): Promise<DatabaseDump> => ({ notes: [], tasks: [], schema_version: 1 });
 import { AnimatePresence, motion } from "motion/react";
 
 export function ExportDialog({ open, onClose }: { open: boolean; onClose: () => void }) {

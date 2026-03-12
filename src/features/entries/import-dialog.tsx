@@ -7,7 +7,7 @@ import {
   DialogPopup,
   DialogTitle,
 } from "@app/components/dialog";
-import { mergeIntoDatabase } from "@app/db/sync-utils";
+const mergeIntoDatabase = async (_dump: unknown): Promise<void> => {};
 import { useRouter } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 

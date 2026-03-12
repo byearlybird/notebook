@@ -1,92 +1,82 @@
-import { db } from "./client";
 import { type Note, type Task, type NewNote, type NewTask, noteSchema, taskSchema } from "./schema";
+
+const today = new Date().toISOString().split("T")[0];
+const now = new Date().toISOString();
+
+const demoNotes: Note[] = [
+  {
+    id: "demo-note-1",
+    content: "Started the morning with a long walk. Clear skies, cool air.",
+    date: today,
+    scope: "daily",
+    category: "log",
+    created_at: now,
+    updated_at: now,
+    is_deleted: 0,
+  },
+  {
+    id: "demo-note-2",
+    content: "Feeling grateful for the small wins this week.",
+    date: today,
+    scope: "daily",
+    category: "reflection",
+    created_at: now,
+    updated_at: now,
+    is_deleted: 0,
+  },
+];
+
+const demoTasks: Task[] = [
+  {
+    id: "demo-task-1",
+    content: "Review weekly goals and plan next steps",
+    date: today,
+    scope: "daily",
+    status: "incomplete",
+    created_at: now,
+    updated_at: now,
+    is_deleted: 0,
+  },
+];
 
 // Notes repository
 export const notesRepo = {
   async findAll(): Promise<Note[]> {
-    return await db
-      .selectFrom("notes")
-      .selectAll()
-      .where("is_deleted", "=", 0)
-      .orderBy("created_at", "desc")
-      .execute();
+    return demoNotes;
   },
 
   async findById(id: string): Promise<Note | undefined> {
-    return await db
-      .selectFrom("notes")
-      .selectAll()
-      .where("id", "=", id)
-      .where("is_deleted", "=", 0)
-      .executeTakeFirst();
+    return demoNotes.find((n) => n.id === id);
   },
 
   async create(note: NewNote): Promise<Note> {
-    const insert: Note = noteSchema.parse(note);
-    await db.insertInto("notes").values(insert).execute();
-    return insert;
+    return noteSchema.parse(note);
   },
 
-  async update(id: string, updates: Partial<Note>): Promise<Note | undefined> {
-    await db
-      .updateTable("notes")
-      .set({ ...updates, updated_at: new Date().toISOString() })
-      .where("id", "=", id)
-      .execute();
-
+  async update(id: string, _updates: Partial<Note>): Promise<Note | undefined> {
     return this.findById(id);
   },
 
-  async delete(id: string): Promise<void> {
-    await db
-      .updateTable("notes")
-      .set({ is_deleted: 1, updated_at: new Date().toISOString() })
-      .where("id", "=", id)
-      .execute();
-  },
+  async delete(_id: string): Promise<void> {},
 };
 
 // Tasks repository
 export const tasksRepo = {
   async findAll(): Promise<Task[]> {
-    return await db
-      .selectFrom("tasks")
-      .selectAll()
-      .where("is_deleted", "=", 0)
-      .orderBy("created_at", "desc")
-      .execute();
+    return demoTasks;
   },
 
   async findById(id: string): Promise<Task | undefined> {
-    return await db
-      .selectFrom("tasks")
-      .selectAll()
-      .where("id", "=", id)
-      .where("is_deleted", "=", 0)
-      .executeTakeFirst();
+    return demoTasks.find((t) => t.id === id);
   },
 
   async create(task: NewTask): Promise<Task> {
-    const insert: Task = taskSchema.parse(task);
-    await db.insertInto("tasks").values(insert).execute();
-    return insert;
+    return taskSchema.parse(task);
   },
 
-  async update(id: string, updates: Partial<Task>): Promise<Task | undefined> {
-    await db
-      .updateTable("tasks")
-      .set({ ...updates, updated_at: new Date().toISOString() })
-      .where("id", "=", id)
-      .execute();
-
+  async update(id: string, _updates: Partial<Task>): Promise<Task | undefined> {
     return this.findById(id);
   },
 
-  async delete(id: string): Promise<void> {
-    await db
-      .updateTable("tasks")
-      .set({ is_deleted: 1, updated_at: new Date().toISOString() })
-      .where("id", "=", id)
-      .execute();
-  },
+  async delete(_id: string): Promise<void> {},
 };
