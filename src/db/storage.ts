@@ -1,5 +1,7 @@
 import { CapgoCapacitorDataStorageSqlite } from "@capgo/capacitor-data-storage-sqlite";
 
+const DEVICE_ID_KEY = "__deviceId";
+
 export function createStorage({ dbName, tableName }: { dbName: string; tableName: string }) {
   async function init() {
     await CapgoCapacitorDataStorageSqlite.openStore({
@@ -20,26 +22,9 @@ export function createStorage({ dbName, tableName }: { dbName: string; tableName
     await CapgoCapacitorDataStorageSqlite.set({ key, value: stringValue });
   }
 
-  async function values<T>(keys: string[]): Promise<T[]> {
-    const results: T[] = [];
-
-    for (const key of keys) {
-      const value = await get<T>(key);
-      if (!value) continue;
-      results.push(value);
-    }
-
-    return results;
-  }
-
-  async function keys(): Promise<string[]> {
-    const result = await CapgoCapacitorDataStorageSqlite.keys();
-    return result.keys;
-  }
-
-  async function valuesWithKeyPrefix<T>(pfx: string): Promise<T[]> {
+  async function values<T>(prefix: string): Promise<T[]> {
     const result = await CapgoCapacitorDataStorageSqlite.filtervalues({
-      filter: `${pfx}%`,
+      filter: `${prefix}%`,
     });
 
     const values: T[] = [];
@@ -51,5 +36,24 @@ export function createStorage({ dbName, tableName }: { dbName: string; tableName
     return values;
   }
 
-  return { init, get, set, values, keys, valuesWithKeyPrefix };
+  async function getDeviceId(): Promise<string> {
+    const storedDID = await get<string>(DEVICE_ID_KEY);
+    if (!storedDID) {
+      const deviceId = crypto.randomUUID();
+      await set(DEVICE_ID_KEY, deviceId);
+      return deviceId;
+    } else {
+      return storedDID;
+    }
+  }
+
+  return {
+    init,
+    get,
+    set,
+    values,
+    getDeviceId,
+  };
 }
+
+export type Storage = ReturnType<typeof createStorage>;

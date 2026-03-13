@@ -1,106 +1,77 @@
 import type z from "zod";
-import { storage } from ".";
-import { noteSchema, taskSchema } from "./schema";
+import type { Storage } from "./storage";
 import * as crdt from "@byearlybird/crdt";
-
-export const notesRepo = createRepo("note", noteSchema, "id");
-export const tasksRepo = createRepo("task", taskSchema, "id");
+import type { Clock } from "./clock";
 
 function createKeys(key: string) {
   return {
-    all: `${key}:`,
-    byId: (id: string) => `${key}:${id}`,
-    stamp: `__stamp__:${key}`,
-    hash: `__hash__:${key}`,
-    device: `__device__:${key}`,
+    all: `${key}`,
+    id: (id: string) => `${key}:${id}`,
+    repoHash: `__hash:${key}`,
   };
 }
 
-function createRepo<T extends Record<string, unknown>>(
+export function createRepo<T extends Record<string, unknown>>(
+  storage: Storage,
+  clock: Clock,
   key: string,
   schema: z.ZodSchema<T>,
   idKey: keyof T,
 ) {
   const keys = createKeys(key);
-  let clock: crdt.Clock | undefined;
-  let deviceId: string | undefined;
 
-  async function getDeviceId() {
-    if (!deviceId) {
-      deviceId = await storage.get<string>(keys.device);
-      if (!deviceId) {
-        deviceId = crypto.randomUUID();
-        await storage.set(keys.device, deviceId);
-      }
-    }
+  async function mutate<T>(fn: (timestamp: crdt.Stamp) => Promise<T>): Promise<T> {
+    const timestamp = await clock.tick();
+    const result = await fn(timestamp);
 
-    return deviceId;
-  }
-
-  async function getLastStamp() {
-    const lastStamp = await storage.get<crdt.Stamp>(keys.stamp);
-
-    return lastStamp;
-  }
-
-  async function getClock() {
-    if (!clock) {
-      const [deviceId, lastStamp] = await Promise.all([getDeviceId(), getLastStamp()]);
-      clock = crdt.createClock(deviceId, lastStamp);
-    }
-
-    return clock;
-  }
-
-  async function mutate<T>(fn: (clock: crdt.Clock) => Promise<T>): Promise<T> {
-    const clock = await getClock();
-    const result = await fn(clock);
-
-    const allDocs = await storage.valuesWithKeyPrefix<crdt.Doc>(keys.all);
+    const allDocs = await storage.values<crdt.Doc>(keys.all);
     const hash = crdt.reduceItemHashes(allDocs);
-    await storage.set(keys.hash, hash);
-    await storage.set(keys.stamp, clock.latestStamp);
+    await storage.set(keys.repoHash, hash);
 
     return result;
   }
 
   return {
     async findAll(): Promise<T[]> {
-      const docs = await storage.valuesWithKeyPrefix<crdt.Doc>(keys.all);
+      const docs = await storage.values<crdt.Doc>(keys.all);
 
       return docs.map((item) => crdt.makePOJO(item) as T);
     },
 
     async findById(id: string): Promise<T | undefined> {
-      const doc = await storage.get<crdt.Doc>(keys.byId(id));
+      const doc = await storage.get<crdt.Doc>(keys.id(id));
       if (!doc) return undefined;
 
       return crdt.makePOJO(doc) as T;
     },
 
     async create(item: z.input<typeof schema>): Promise<T> {
-      return mutate(async (clock) => {
+      return mutate(async (timestamp) => {
         const newPOJO = schema.parse(item);
-        const data = crdt.makeDataFromPOJO(newPOJO, clock.tick());
+        const id = newPOJO[idKey] as string;
+        const data = crdt.makeDataFromPOJO(newPOJO, timestamp);
         const doc = crdt.makeDoc(data);
-        await storage.set(keys.byId(newPOJO[idKey] as string), doc);
+
+        await storage.set(keys.id(id), doc);
 
         return newPOJO;
       });
     },
 
     async update(id: string, updates: Partial<T>): Promise<T | undefined> {
-      return mutate(async (clock) => {
-        const doc = await storage.get<crdt.Doc>(keys.byId(id));
+      return mutate(async (timestamp) => {
+        const doc = await storage.get<crdt.Doc>(keys.id(id));
+
         if (!doc) return undefined;
 
-        const existingPOJO = crdt.makePOJO(doc);
-        const updatedPOJO = schema.parse({ ...existingPOJO, ...updates }); // validate updates
-        const data = crdt.makeDataFromPOJO(updates, clock.tick());
-        crdt.patchDoc(doc, data);
-        await storage.set(keys.byId(id), doc);
+        const currentItem = crdt.makePOJO(doc);
+        const updatedItem = schema.parse({ ...currentItem, ...updates }); // validate updates
+        const data = crdt.makeDataFromPOJO(updates, timestamp);
 
-        return updatedPOJO;
+        crdt.patchDoc(doc, data);
+        await storage.set(keys.id(id), doc);
+
+        return updatedItem;
       });
     },
 
