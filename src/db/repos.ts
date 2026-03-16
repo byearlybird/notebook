@@ -12,6 +12,16 @@ export const notesRepo = {
       .execute();
   },
 
+  async findByDate(date: string): Promise<Note[]> {
+    return await db
+      .selectFrom("notes")
+      .selectAll()
+      .where("is_deleted", "=", 0)
+      .where("date", "=", date)
+      .orderBy("created_at", "desc")
+      .execute();
+  },
+
   async findById(id: string): Promise<Note | undefined> {
     return await db
       .selectFrom("notes")
@@ -53,6 +63,26 @@ export const tasksRepo = {
       .selectFrom("tasks")
       .selectAll()
       .where("is_deleted", "=", 0)
+      .orderBy("created_at", "desc")
+      .execute();
+  },
+
+  async findByDate(date: string): Promise<Task[]> {
+    return await db
+      .selectFrom("tasks")
+      .selectAll()
+      .where("is_deleted", "=", 0)
+      .where("date", "=", date)
+      .orderBy("created_at", "desc")
+      .execute();
+  },
+
+  async findIncomplete(): Promise<Task[]> {
+    return await db
+      .selectFrom("tasks")
+      .selectAll()
+      .where("is_deleted", "=", 0)
+      .where("status", "=", "incomplete")
       .orderBy("created_at", "desc")
       .execute();
   },

@@ -1,11 +1,11 @@
 PODS:
-  - Capacitor (8.1.0):
+  - Capacitor (8.2.0):
     - CapacitorCordova
-  - CapacitorCommunitySqlite (8.0.0):
+  - CapacitorCommunitySqlite (8.0.1):
     - Capacitor
     - SQLCipher
     - ZIPFoundation
-  - CapacitorCordova (8.1.0)
+  - CapacitorCordova (8.2.0)
   - CapacitorDialog (8.0.1):
     - Capacitor
   - CapacitorKeyboard (8.0.1):
@@ -47,9 +47,9 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/splash-screen"
 
 SPEC CHECKSUMS:
-  Capacitor: 47b825120c6b8b6d6f9f053e9350a8960d436710
-  CapacitorCommunitySqlite: 8a61c1d599927d4321c13b28f132de8ca94b6d95
-  CapacitorCordova: e8b76fd95fc1e157775abc484c59cc0de464095d
+  Capacitor: 49a454e1cdbd520bc106a220adca7913536a4933
+  CapacitorCommunitySqlite: b6bcd768fdd12ef1572aff962c4f128945494ebb
+  CapacitorCordova: a9ac88d84a1f5280f33b349fe50fce1902683ac0
   CapacitorDialog: 854c5dac405081cae697c177ca43bcaa95ae67bf
   CapacitorKeyboard: 867eb4b3c901d9bb5c3d0c93b546185d52484e19
   CapacitorSplashScreen: 4b46c72298db552b3c57ce021ef028b6dc7f1fa7

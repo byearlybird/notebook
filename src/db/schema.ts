@@ -9,7 +9,7 @@ const baseSchema = z.object({
 
 const baseEntrySchema = baseSchema.extend({
   content: z.string().min(1),
-  date: z.iso.date().default(() => new Date().toISOString().split("T")[0]),
+  date: z.iso.date().default(() => new Date().toLocaleDateString("en-CA")), // YYYY-MM-DD
   scope: z.enum(["daily", "weekly", "monthly"]),
 });
 
