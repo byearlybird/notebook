@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { CaretLeftIcon, DownloadSimpleIcon, ExportIcon } from "@phosphor-icons/react";
+import { SwipeBackEdge } from "@/components/swipe-back-edge";
 import { ExportDialog } from "@/features/entries/export-dialog";
 import { ImportDialog } from "@/features/entries/import-dialog";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -32,6 +33,7 @@ function RouteComponent() {
         <div className="size-10 shrink-0" />
       </header>
       <DataSection />
+      <SwipeBackEdge onBack={goBack} />
     </div>
   );
 }

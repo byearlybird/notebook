@@ -8,6 +8,7 @@ import {
   MenuTrigger,
   TextContent,
 } from "@/components";
+import { SwipeBackEdge } from "@/components/swipe-back-edge";
 import { EditTaskDialog, useUpdateTaskStatus } from "@/features/tasks";
 import * as tasksService from "@/services/tasks-service";
 import {
@@ -158,6 +159,7 @@ function RouteComponent() {
         )}
       </section>
       <EditTaskDialog open={editOpen} onClose={() => setEditOpen(false)} task={task} />
+      <SwipeBackEdge onBack={handleBack} />
     </div>
   );
 }

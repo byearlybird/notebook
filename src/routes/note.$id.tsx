@@ -7,6 +7,7 @@ import {
   MenuTrigger,
   TextContent,
 } from "@/components";
+import { SwipeBackEdge } from "@/components/swipe-back-edge";
 import { EditNoteDialog } from "@/features/notes";
 import * as notesService from "@/services/notes-service";
 import { CaretLeftIcon, DotsThreeIcon, PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react";
@@ -101,6 +102,7 @@ function RouteComponent() {
       {/* Content area */}
       <TextContent content={note.content} updatedAt={note.updated_at} createdAt={note.created_at} />
       <EditNoteDialog open={editOpen} onClose={() => setEditOpen(false)} note={note} />
+      <SwipeBackEdge onBack={goBack} />
     </div>
   );
 }
