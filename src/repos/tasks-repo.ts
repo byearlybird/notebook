@@ -1,5 +1,5 @@
-import { db } from "@app/db/client";
-import { type Task, type NewTask, taskSchema } from "@app/db/schema";
+import { db } from "@/db/client";
+import { type Task, type NewTask, taskSchema } from "@/db/schema";
 
 export const tasksRepo = {
   async findAll(): Promise<Task[]> {

@@ -4,8 +4,8 @@ import {
   DialogPortal,
   DialogRoot,
   DialogTitle,
-} from "@app/components/dialog";
-import { Button } from "@app/components/button";
+} from "@/components/dialog";
+import { Button } from "@/components/button";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 

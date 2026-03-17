@@ -1,5 +1,5 @@
-import { TextareaDialog } from "@app/components";
-import type { Note } from "@app/db";
+import { TextareaDialog } from "@/components";
+import type { Note } from "@/db";
 import { useUpdateNote } from "./use-notes";
 
 export function EditNoteDialog({

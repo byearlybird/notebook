@@ -1,4 +1,4 @@
-import { Button } from "@app/components/button";
+import { Button } from "@/components/button";
 import {
   MenuItem,
   MenuPopup,
@@ -7,9 +7,9 @@ import {
   MenuRoot,
   MenuTrigger,
   TextContent,
-} from "@app/components";
-import { EditTaskDialog, useUpdateTaskStatus } from "@app/features/tasks";
-import * as tasksService from "@app/services/tasks-service";
+} from "@/components";
+import { EditTaskDialog, useUpdateTaskStatus } from "@/features/tasks";
+import * as tasksService from "@/services/tasks-service";
 import {
   ArrowCounterClockwiseIcon,
   ArrowSquareRightIcon,

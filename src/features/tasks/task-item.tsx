@@ -1,6 +1,6 @@
 import { Checkbox } from "@base-ui/react/checkbox";
 import { Field } from "@base-ui/react/field";
-import type { Task } from "@app/db";
+import type { Task } from "@/db";
 import { CheckIcon } from "@phosphor-icons/react";
 
 export function TaskItem({

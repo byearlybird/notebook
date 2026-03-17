@@ -1,5 +1,5 @@
-import type { Task } from "@app/db";
-import * as tasksService from "@app/services/tasks-service";
+import type { Task } from "@/db";
+import * as tasksService from "@/services/tasks-service";
 import { useRouter } from "@tanstack/react-router";
 
 export function useCreateTask() {

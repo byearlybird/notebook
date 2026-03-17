@@ -1,4 +1,4 @@
-import type { Task } from "@app/db";
+import type { Task } from "@/db";
 
 type BaseTimelineItem = {
   id: string;

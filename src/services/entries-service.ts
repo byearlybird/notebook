@@ -1,6 +1,6 @@
-import { notesRepo } from "@app/repos/notes-repo";
-import { tasksRepo } from "@app/repos/tasks-repo";
-import type { TimelineItem } from "@app/features/entries/types";
+import { notesRepo } from "@/repos/notes-repo";
+import { tasksRepo } from "@/repos/tasks-repo";
+import type { TimelineItem } from "@/features/entries/types";
 
 export async function getEntriesToday(): Promise<TimelineItem[]> {
   const today = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD

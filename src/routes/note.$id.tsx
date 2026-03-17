@@ -6,9 +6,9 @@ import {
   MenuRoot,
   MenuTrigger,
   TextContent,
-} from "@app/components";
-import { EditNoteDialog } from "@app/features/notes";
-import * as notesService from "@app/services/notes-service";
+} from "@/components";
+import { EditNoteDialog } from "@/features/notes";
+import * as notesService from "@/services/notes-service";
 import { CaretLeftIcon, DotsThreeIcon, PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";

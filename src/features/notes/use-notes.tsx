@@ -1,4 +1,4 @@
-import * as notesService from "@app/services/notes-service";
+import * as notesService from "@/services/notes-service";
 import { useRouter } from "@tanstack/react-router";
 
 export function useCreateNote() {

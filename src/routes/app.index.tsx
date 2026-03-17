@@ -1,7 +1,7 @@
-import { getEntriesToday } from "@app/services/entries-service";
-import { Timeline } from "@app/features/entries/timeline";
-import type { TimelineItem } from "@app/features/entries/types";
-import { formatDayOfWeek, formatMonthDate } from "@app/utils/date-utils";
+import { getEntriesToday } from "@/services/entries-service";
+import { Timeline } from "@/features/entries/timeline";
+import type { TimelineItem } from "@/features/entries/types";
+import { formatDayOfWeek, formatMonthDate } from "@/utils/date-utils";
 import { SlidersHorizontalIcon } from "@phosphor-icons/react";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 

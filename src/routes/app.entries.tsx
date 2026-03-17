@@ -1,6 +1,6 @@
-import { getEntriesGroupedByDate } from "@app/services/entries-service";
-import { DayEntriesItem } from "@app/features/entries";
-import type { TimelineItem } from "@app/features/entries/types";
+import { getEntriesGroupedByDate } from "@/services/entries-service";
+import { DayEntriesItem } from "@/features/entries";
+import type { TimelineItem } from "@/features/entries/types";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/app/entries")({

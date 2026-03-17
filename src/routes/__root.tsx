@@ -1,9 +1,9 @@
-import { ErrorComponent, Loading } from "@app/components";
+import { ErrorComponent, Loading } from "@/components";
 import { createRootRoute, Outlet } from "@tanstack/react-router";
-import { migrator } from "@app/db";
+import { migrator } from "@/db";
 import { Dialog } from "@capacitor/dialog";
 import { SplashScreen } from "@capacitor/splash-screen";
-import { seed } from "@app/db/seed";
+import { seed } from "@/db/seed";
 
 let migrated = false;
 

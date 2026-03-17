@@ -1,5 +1,5 @@
-import type { Task } from "@app/db";
-import { tasksRepo } from "@app/repos/tasks-repo";
+import type { Task } from "@/db";
+import { tasksRepo } from "@/repos/tasks-repo";
 
 export async function createTask(content: string): Promise<Task> {
   return tasksRepo.create({

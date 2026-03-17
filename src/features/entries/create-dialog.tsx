@@ -1,17 +1,17 @@
 import { cx } from "cva";
 import { Button as BaseButton } from "@base-ui/react";
-import { Button } from "@app/components/button";
+import { Button } from "@/components/button";
 import {
   DialogBackdrop,
   DialogRoot,
   DialogPortal,
   DialogPopup,
   DialogTitle,
-} from "@app/components/dialog";
+} from "@/components/dialog";
 import { CircleIcon, SquareIcon } from "@phosphor-icons/react";
 import { useRef, useState } from "react";
-import { useCreateNote } from "@app/features/notes";
-import { useCreateTask } from "@app/features/tasks";
+import { useCreateNote } from "@/features/notes";
+import { useCreateTask } from "@/features/tasks";
 import { AnimatePresence, motion } from "motion/react";
 
 export function CreateDialog({ open, onClose }: { open: boolean; onClose: () => void }) {

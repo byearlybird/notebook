@@ -12,7 +12,7 @@ export default defineConfig({
   plugins: [tanstackRouter(), react(), tailwindcss()],
   resolve: {
     alias: {
-      "@app": path.resolve(dirname, "./src"),
+      "@": path.resolve(dirname, "./src"),
     },
   },
   build: {

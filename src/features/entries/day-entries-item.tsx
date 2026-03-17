@@ -1,5 +1,5 @@
 import type { TimelineItem } from "./types";
-import { formatMonthDate, formatDayOfWeek } from "@app/utils/date-utils";
+import { formatMonthDate, formatDayOfWeek } from "@/utils/date-utils";
 import { Timeline } from "./timeline";
 import { parseISO } from "date-fns";
 

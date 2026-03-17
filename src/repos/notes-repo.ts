@@ -1,5 +1,5 @@
-import { db } from "@app/db/client";
-import { type Note, type NewNote, noteSchema } from "@app/db/schema";
+import { db } from "@/db/client";
+import { type Note, type NewNote, noteSchema } from "@/db/schema";
 
 export const notesRepo = {
   async findAll(): Promise<Note[]> {

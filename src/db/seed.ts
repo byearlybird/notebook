@@ -1,5 +1,5 @@
 import type { NewTask } from "./schema";
-import { tasksRepo } from "@app/repos/tasks-repo";
+import { tasksRepo } from "@/repos/tasks-repo";
 
 const yesterday = new Date(Date.now() - 86_400_000);
 const yesterdayISO: string = yesterday.toISOString();

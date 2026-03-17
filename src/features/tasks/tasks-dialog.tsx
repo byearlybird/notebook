@@ -1,4 +1,4 @@
-import type { Task } from "@app/db";
+import type { Task } from "@/db";
 import {
   DialogBackdrop,
   DialogClose,
@@ -6,11 +6,11 @@ import {
   DialogPortal,
   DialogRoot,
   DialogTitle,
-} from "@app/components/dialog";
+} from "@/components/dialog";
 import { ArrowSquareRightIcon, CheckSquareIcon, XIcon, XSquareIcon } from "@phosphor-icons/react";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useRolloverTask, useUpdateTaskStatus } from "@app/features/tasks";
+import { useRolloverTask, useUpdateTaskStatus } from "@/features/tasks";
 import { formatDistanceToNowStrict, parseISO } from "date-fns";
 
 const UNDO_DELAY_MS = 3000;

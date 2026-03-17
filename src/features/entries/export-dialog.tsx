@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { Button } from "@app/components/button";
+import { Button } from "@/components/button";
 import {
   DialogBackdrop,
   DialogRoot,
   DialogPortal,
   DialogPopup,
   DialogTitle,
-} from "@app/components/dialog";
-import { dumpDatabase, type DatabaseDump } from "@app/db/sync-utils";
+} from "@/components/dialog";
+import { dumpDatabase, type DatabaseDump } from "@/db/sync-utils";
 import { AnimatePresence, motion } from "motion/react";
 
 export function ExportDialog({ open, onClose }: { open: boolean; onClose: () => void }) {

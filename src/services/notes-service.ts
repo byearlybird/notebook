@@ -1,5 +1,5 @@
-import type { Note } from "@app/db";
-import { notesRepo } from "@app/repos/notes-repo";
+import type { Note } from "@/db";
+import { notesRepo } from "@/repos/notes-repo";
 
 export async function createNote(content: string): Promise<Note> {
   return notesRepo.create({

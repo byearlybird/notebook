@@ -1,8 +1,8 @@
-import { ActionNavbar, Navbar, type NavItemData } from "@app/components";
-import { type Task } from "@app/db";
-import { CreateDialog } from "@app/features/entries";
-import { TasksDialog } from "@app/features/tasks";
-import { getIncompleteTasks } from "@app/services/tasks-service";
+import { ActionNavbar, Navbar, type NavItemData } from "@/components";
+import { type Task } from "@/db";
+import { CreateDialog } from "@/features/entries";
+import { TasksDialog } from "@/features/tasks";
+import { getIncompleteTasks } from "@/services/tasks-service";
 import { ListBulletsIcon, SunHorizonIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
