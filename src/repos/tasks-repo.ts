@@ -6,7 +6,6 @@ export const tasksRepo = {
     return await db
       .selectFrom("tasks")
       .selectAll()
-      .where("is_deleted", "=", 0)
       .orderBy("created_at", "desc")
       .execute();
   },
@@ -15,7 +14,6 @@ export const tasksRepo = {
     return await db
       .selectFrom("tasks")
       .selectAll()
-      .where("is_deleted", "=", 0)
       .where("date", "=", date)
       .orderBy("created_at", "desc")
       .execute();
@@ -25,7 +23,6 @@ export const tasksRepo = {
     return await db
       .selectFrom("tasks")
       .selectAll()
-      .where("is_deleted", "=", 0)
       .where("status", "=", "incomplete")
       .orderBy("created_at", "desc")
       .execute();
@@ -36,7 +33,6 @@ export const tasksRepo = {
       .selectFrom("tasks")
       .selectAll()
       .where("id", "=", id)
-      .where("is_deleted", "=", 0)
       .executeTakeFirst();
   },
 
@@ -44,7 +40,6 @@ export const tasksRepo = {
     return await db
       .selectFrom("tasks")
       .selectAll()
-      .where("is_deleted", "=", 0)
       .where("original_id", "=", originalId)
       .orderBy("created_at", "desc")
       .executeTakeFirst();
@@ -67,10 +62,6 @@ export const tasksRepo = {
   },
 
   async delete(id: string): Promise<void> {
-    await db
-      .updateTable("tasks")
-      .set({ is_deleted: 1, updated_at: new Date().toISOString() })
-      .where("id", "=", id)
-      .execute();
+    await db.deleteFrom("tasks").where("id", "=", id).execute();
   },
 };

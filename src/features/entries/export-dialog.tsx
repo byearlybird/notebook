@@ -7,7 +7,7 @@ import {
   DialogPopup,
   DialogTitle,
 } from "@/components/dialog";
-import { dumpDatabase, type DatabaseDump } from "@/db/sync-utils";
+import { dumpDatabase, type DatabaseDump } from "@/db/dump";
 import { AnimatePresence, motion } from "motion/react";
 
 export function ExportDialog({ open, onClose }: { open: boolean; onClose: () => void }) {

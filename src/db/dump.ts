@@ -9,7 +9,6 @@ export interface DatabaseDump {
 
 /**
  * Dumps the entire database (notes and tasks) as a JSON-serializable object.
- * Includes both active and soft-deleted items for sync.
  */
 export async function dumpDatabase(): Promise<DatabaseDump> {
   const [notes, tasks] = await Promise.all([

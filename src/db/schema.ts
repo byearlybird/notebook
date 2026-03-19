@@ -4,7 +4,6 @@ const baseSchema = z.object({
   id: z.uuid().default(() => crypto.randomUUID()),
   created_at: z.iso.datetime().default(() => new Date().toISOString()),
   updated_at: z.iso.datetime().default(() => new Date().toISOString()),
-  is_deleted: z.number().int().min(0).max(1).default(0),
 });
 
 const baseEntrySchema = baseSchema.extend({

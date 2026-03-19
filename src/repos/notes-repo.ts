@@ -6,7 +6,6 @@ export const notesRepo = {
     return await db
       .selectFrom("notes")
       .selectAll()
-      .where("is_deleted", "=", 0)
       .orderBy("created_at", "desc")
       .execute();
   },
@@ -15,7 +14,6 @@ export const notesRepo = {
     return await db
       .selectFrom("notes")
       .selectAll()
-      .where("is_deleted", "=", 0)
       .where("date", "=", date)
       .orderBy("created_at", "desc")
       .execute();
@@ -26,7 +24,6 @@ export const notesRepo = {
       .selectFrom("notes")
       .selectAll()
       .where("id", "=", id)
-      .where("is_deleted", "=", 0)
       .executeTakeFirst();
   },
 
@@ -47,10 +44,6 @@ export const notesRepo = {
   },
 
   async delete(id: string): Promise<void> {
-    await db
-      .updateTable("notes")
-      .set({ is_deleted: 1, updated_at: new Date().toISOString() })
-      .where("id", "=", id)
-      .execute();
+    await db.deleteFrom("notes").where("id", "=", id).execute();
   },
 };

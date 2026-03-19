@@ -4,7 +4,6 @@ import { migrator } from "@/db";
 import { Dialog } from "@capacitor/dialog";
 import { SplashScreen } from "@capacitor/splash-screen";
 import { Keyboard } from "@capacitor/keyboard";
-import { seed } from "@/db/seed";
 import { useEffect } from "react";
 
 let migrated = false;

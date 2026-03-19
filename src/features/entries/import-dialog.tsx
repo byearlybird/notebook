@@ -7,7 +7,7 @@ import {
   DialogPopup,
   DialogTitle,
 } from "@/components/dialog";
-import { mergeIntoDatabase } from "@/db/sync-utils";
+import { mergeIntoDatabase } from "@/db/dump";
 import { useRouter } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 
