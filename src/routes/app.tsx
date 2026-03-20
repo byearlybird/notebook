@@ -1,21 +1,31 @@
 import { ActionNavbar, Navbar, type NavItemData } from "@/components";
 import { type Task } from "@/db";
+import type { MonthlyGoal, MonthlyLog } from "@/db/schema";
 import { CreateDialog } from "@/features/entries";
 import { TasksDialog } from "@/features/tasks";
+import { monthlyGoalRepo } from "@/repos/monthly-goal-repo";
+import { getOrCreateMonthlyLog } from "@/services/monthly-log-service";
 import { getIncompleteTasks } from "@/services/tasks-service";
+import { getCurrentMonth } from "@/utils/date-utils";
 import { ListBulletsIcon, SunHorizonIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/app")({
   component: RouteComponent,
-  loader: () => getIncompleteTasks(),
+  loader: async () => {
+    const tasks = await getIncompleteTasks();
+    const currentMonth = getCurrentMonth();
+    const log = await getOrCreateMonthlyLog(currentMonth);
+    const goals = await monthlyGoalRepo.findByLogId(log.id);
+    return { ...tasks, log, goals };
+  },
 });
 
 function RouteComponent() {
-  const { todayTasks, priorTasks } = Route.useLoaderData();
+  const { todayTasks, priorTasks, log, goals } = Route.useLoaderData();
   return (
-    <AppLayout todayTasks={todayTasks} priorTasks={priorTasks}>
+    <AppLayout todayTasks={todayTasks} priorTasks={priorTasks} log={log} goals={goals}>
       <Outlet />
     </AppLayout>
   );
@@ -25,10 +35,14 @@ function AppLayout({
   children,
   todayTasks,
   priorTasks,
+  log,
+  goals,
 }: {
   children: React.ReactNode;
   todayTasks: Task[];
   priorTasks: Task[];
+  log: MonthlyLog;
+  goals: MonthlyGoal[];
 }) {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isPushpinDialogOpen, setIsPushpinDialogOpen] = useState(false);
@@ -64,6 +78,8 @@ function AppLayout({
       <TasksDialog
         todayTasks={todayTasks}
         priorTasks={priorTasks}
+        log={log}
+        goals={goals}
         open={isPushpinDialogOpen}
         onClose={() => setIsPushpinDialogOpen(false)}
       />

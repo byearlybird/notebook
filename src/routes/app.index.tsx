@@ -1,21 +1,26 @@
+import { Renderer } from "@/components/lexical/renderer";
 import { getEntriesToday } from "@/services/entries-service";
 import { Timeline } from "@/features/entries/timeline";
 import type { TimelineItem } from "@/features/entries/types";
-import { formatDayOfWeek, formatMonthDate } from "@/utils/date-utils";
-import { SlidersHorizontalIcon } from "@phosphor-icons/react";
+import { monthlyLogRepo } from "@/repos/monthly-log-repo";
+import { formatDayOfWeek, formatMonthDate, getCurrentMonth } from "@/utils/date-utils";
+import { FlowerLotusIcon, SlidersHorizontalIcon } from "@phosphor-icons/react";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/app/")({
   component: JournalPage,
   loader: async () => {
-    const entries = await getEntriesToday();
-    return { entries };
+    const [entries, monthlyLog] = await Promise.all([
+      getEntriesToday(),
+      monthlyLogRepo.findByMonth(getCurrentMonth()),
+    ]);
+    return { entries, intention: monthlyLog?.intention ?? null };
   },
 });
 
 function JournalPage() {
   const navigate = useNavigate();
-  const { entries } = Route.useLoaderData();
+  const { entries, intention } = Route.useLoaderData();
   const empty = entries.length === 0;
 
   const handleEntryClick = (entry: TimelineItem) => {
@@ -37,7 +42,7 @@ function JournalPage() {
   };
 
   return (
-    <div className="px-4 py-2 space-y-4">
+    <div className="px-4 py-2 space-y-4 flex flex-col min-h-full">
       <header className="sticky top-0 backdrop-blur-md bg-slate-medium py-1 flex justify-between items-center">
         <div className="flex items-baseline gap-2">
           <span className="text-2xl font-extrabold">{formatMonthDate(new Date())}</span>
@@ -48,8 +53,16 @@ function JournalPage() {
         </Link>
       </header>
       {empty ? (
-        <div className="flex flex-col gap-2">
-          <p className="text-sm text-cloud-light text-center pt-10">No entries yet today</p>
+        <div className="flex-1 flex flex-col items-center justify-center gap-3 -mt-20">
+          {intention && (
+            <div className="flex items-center gap-2 text-cloud-light">
+              <FlowerLotusIcon className="size-4 shrink-0 mt-0.5" />
+              <div className="line-clamp-3">
+                <Renderer content={intention} />
+              </div>
+            </div>
+          )}
+          <p className="text-cloud-light text-xs">No entries yet today</p>
         </div>
       ) : (
         <Timeline entries={entries} onEntryClick={handleEntryClick} />
