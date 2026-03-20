@@ -1,9 +1,11 @@
 import { db } from "./client";
-import type { Note, Task } from "./schema";
+import type { MonthlyGoal, MonthlyLog, Note, Task } from "./schema";
 
 export interface DatabaseDump {
   notes: Note[];
   tasks: Task[];
+  monthly_logs: MonthlyLog[];
+  monthly_goals: MonthlyGoal[];
   schema_version: number;
 }
 
@@ -11,14 +13,18 @@ export interface DatabaseDump {
  * Dumps the entire database (notes and tasks) as a JSON-serializable object.
  */
 export async function dumpDatabase(): Promise<DatabaseDump> {
-  const [notes, tasks] = await Promise.all([
+  const [notes, tasks, monthly_logs, monthly_goals] = await Promise.all([
     db.selectFrom("notes").selectAll().execute(),
     db.selectFrom("tasks").selectAll().execute(),
+    db.selectFrom("monthly_logs").selectAll().execute(),
+    db.selectFrom("monthly_goals").selectAll().execute(),
   ]);
 
   return {
     notes,
     tasks,
+    monthly_logs,
+    monthly_goals,
     schema_version: 1,
   };
 }
@@ -71,6 +77,50 @@ export async function mergeIntoDatabase(dump: DatabaseDump): Promise<void> {
       // Last-write-wins: keep the version with the latest updated_at
       if (remoteTask.updated_at > localTask.updated_at) {
         await trx.updateTable("tasks").set(remoteTask).where("id", "=", remoteTask.id).execute();
+      }
+    }
+
+    // Merge monthly logs
+    for (const remoteLog of dump.monthly_logs) {
+      const localLog = await trx
+        .selectFrom("monthly_logs")
+        .selectAll()
+        .where("id", "=", remoteLog.id)
+        .executeTakeFirst();
+
+      if (!localLog) {
+        await trx.insertInto("monthly_logs").values(remoteLog).execute();
+        continue;
+      }
+
+      if (remoteLog.updated_at > localLog.updated_at) {
+        await trx
+          .updateTable("monthly_logs")
+          .set(remoteLog)
+          .where("id", "=", remoteLog.id)
+          .execute();
+      }
+    }
+
+    // Merge monthly goals
+    for (const remoteGoal of dump.monthly_goals) {
+      const localGoal = await trx
+        .selectFrom("monthly_goals")
+        .selectAll()
+        .where("id", "=", remoteGoal.id)
+        .executeTakeFirst();
+
+      if (!localGoal) {
+        await trx.insertInto("monthly_goals").values(remoteGoal).execute();
+        continue;
+      }
+
+      if (remoteGoal.updated_at > localGoal.updated_at) {
+        await trx
+          .updateTable("monthly_goals")
+          .set(remoteGoal)
+          .where("id", "=", remoteGoal.id)
+          .execute();
       }
     }
   });
