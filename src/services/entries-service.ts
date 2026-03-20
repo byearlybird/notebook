@@ -1,6 +1,7 @@
 import { notesRepo } from "@/repos/notes-repo";
 import { tasksRepo } from "@/repos/tasks-repo";
 import type { TimelineItem } from "@/features/entries/types";
+import { getAllMonthlyLogs } from "@/services/monthly-log-service";
 
 export async function getEntriesToday(): Promise<TimelineItem[]> {
   const today = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
@@ -17,8 +18,14 @@ export async function getEntriesToday(): Promise<TimelineItem[]> {
   return entries.sort((a, b) => b.created_at.localeCompare(a.created_at));
 }
 
-export async function getEntriesGroupedByDate(): Promise<Record<string, TimelineItem[]>> {
-  const [notes, tasks] = await Promise.all([notesRepo.findAll(), tasksRepo.findAll()]);
+export async function getEntriesGroupedByDate(): Promise<
+  Record<string, TimelineItem[]>
+> {
+  const [notes, tasks, allLogs] = await Promise.all([
+    notesRepo.findAll(),
+    tasksRepo.findAll(),
+    getAllMonthlyLogs(),
+  ]);
 
   const noteEntries: TimelineItem[] = notes.map((note) => ({
     ...note,
@@ -30,15 +37,38 @@ export async function getEntriesGroupedByDate(): Promise<Record<string, Timeline
     type: "task" as const,
   }));
 
-  const allEntries = [...noteEntries, ...taskEntries].sort((a, b) =>
-    b.created_at.localeCompare(a.created_at),
+  const intentionEntries: TimelineItem[] = allLogs
+    .filter((log) => log.intention)
+    .map((log) => ({
+      id: log.id,
+      content: log.intention!,
+      created_at: log.created_at,
+      type: "intention" as const,
+    }));
+
+  const goalEntries: TimelineItem[] = allLogs.flatMap((log) =>
+    log.goals.map((goal) => ({
+      id: goal.id,
+      content: goal.content,
+      created_at: goal.created_at,
+      status: goal.status,
+      type: "goal" as const,
+    })),
   );
 
-  const grouped: Record<string, TimelineItem[]> = {};
+  const allEntries = [
+    ...noteEntries,
+    ...taskEntries,
+    ...intentionEntries,
+    ...goalEntries,
+  ].sort((a, b) => b.created_at.localeCompare(a.created_at));
+
+  const entriesByDate: Record<string, TimelineItem[]> = {};
   for (const entry of allEntries) {
     const date = new Date(entry.created_at).toLocaleDateString("en-CA"); // YYYY-MM-DD
-    grouped[date] ??= [];
-    grouped[date].push(entry);
+    entriesByDate[date] ??= [];
+    entriesByDate[date].push(entry);
   }
-  return grouped;
+
+  return entriesByDate;
 }

@@ -2,7 +2,9 @@ import { formatTime } from "@/utils/date-utils";
 import {
   CheckSquareIcon,
   CircleIcon,
+  FlowerLotusIcon,
   SquareIcon,
+  StarIcon,
   XSquareIcon,
   ArrowSquareRightIcon,
 } from "@phosphor-icons/react";
@@ -30,11 +32,7 @@ export function Timeline({
         <div key={entry.id} className="flex gap-3">
           {/* Left side: dot and line */}
           <div className="flex flex-col items-center">
-            {entry.type === "note" ? (
-              <CircleIcon className="size-4 text-cloud-light" />
-            ) : (
-              <TaskIcon status={entry.status} />
-            )}
+            <EntryIcon entry={entry} />
             {index < entries.length - 1 && (
               <div className="w-px flex-1 border-r border-slate-light border-dotted my-1" />
             )}
@@ -64,6 +62,28 @@ export function Timeline({
       ))}
     </div>
   );
+}
+
+function EntryIcon({ entry }: { entry: TimelineItem }) {
+  switch (entry.type) {
+    case "note":
+      return <CircleIcon className="size-4 text-cloud-light" />;
+    case "task":
+      return <TaskIcon status={entry.status} />;
+    case "intention":
+      return <FlowerLotusIcon className="size-4 text-cloud-light" />;
+    case "goal":
+      return (
+        <StarIcon
+          weight={entry.status === "complete" ? "fill" : "regular"}
+          className={
+            entry.status === "complete"
+              ? "size-4 text-gold-light"
+              : "size-4 text-cloud-light"
+          }
+        />
+      );
+  }
 }
 
 function TaskIcon(props: { status: "complete" | "incomplete" | "canceled" | "deferred" }) {

@@ -15,4 +15,17 @@ type TaskTimelineItem = BaseTimelineItem & {
   status: Task["status"];
 };
 
-export type TimelineItem = NoteTimelineItem | TaskTimelineItem;
+type IntentionTimelineItem = BaseTimelineItem & {
+  type: "intention";
+};
+
+type GoalTimelineItem = BaseTimelineItem & {
+  type: "goal";
+  status: "incomplete" | "complete";
+};
+
+export type TimelineItem =
+  | NoteTimelineItem
+  | TaskTimelineItem
+  | IntentionTimelineItem
+  | GoalTimelineItem;
