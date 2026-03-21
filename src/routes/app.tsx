@@ -1,10 +1,10 @@
 import { ActionNavbar, Navbar, type NavItemData } from "@/components";
 import { type Task } from "@/db";
-import type { MonthlyGoal, MonthlyLog } from "@/db/schema";
+import type { Goal, Intention } from "@/db/schema";
 import { CreateDialog } from "@/features/entries";
 import { TasksDialog } from "@/features/tasks";
-import { monthlyGoalRepo } from "@/repos/monthly-goal-repo";
-import { getOrCreateMonthlyLog } from "@/services/monthly-log-service";
+import { goalRepo } from "@/repos/goal-repo";
+import { intentionRepo } from "@/repos/intention-repo";
 import { getIncompleteTasks } from "@/services/tasks-service";
 import { getCurrentMonth } from "@/utils/date-utils";
 import { ListBulletsIcon, SunHorizonIcon } from "@phosphor-icons/react";
@@ -14,18 +14,26 @@ import { createFileRoute, Outlet } from "@tanstack/react-router";
 export const Route = createFileRoute("/app")({
   component: RouteComponent,
   loader: async () => {
-    const tasks = await getIncompleteTasks();
     const currentMonth = getCurrentMonth();
-    const log = await getOrCreateMonthlyLog(currentMonth);
-    const goals = await monthlyGoalRepo.findByLogId(log.id);
-    return { ...tasks, log, goals };
+    const [tasks, intention, goals] = await Promise.all([
+      getIncompleteTasks(),
+      intentionRepo.findByMonth(currentMonth),
+      goalRepo.findByMonth(currentMonth),
+    ]);
+    return { ...tasks, intention: intention ?? null, goals, month: currentMonth };
   },
 });
 
 function RouteComponent() {
-  const { todayTasks, priorTasks, log, goals } = Route.useLoaderData();
+  const { todayTasks, priorTasks, intention, goals, month } = Route.useLoaderData();
   return (
-    <AppLayout todayTasks={todayTasks} priorTasks={priorTasks} log={log} goals={goals}>
+    <AppLayout
+      todayTasks={todayTasks}
+      priorTasks={priorTasks}
+      intention={intention}
+      goals={goals}
+      month={month}
+    >
       <Outlet />
     </AppLayout>
   );
@@ -35,14 +43,16 @@ function AppLayout({
   children,
   todayTasks,
   priorTasks,
-  log,
+  intention,
   goals,
+  month,
 }: {
   children: React.ReactNode;
   todayTasks: Task[];
   priorTasks: Task[];
-  log: MonthlyLog;
-  goals: MonthlyGoal[];
+  intention: Intention | null;
+  goals: Goal[];
+  month: string;
 }) {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isPushpinDialogOpen, setIsPushpinDialogOpen] = useState(false);
@@ -78,8 +88,9 @@ function AppLayout({
       <TasksDialog
         todayTasks={todayTasks}
         priorTasks={priorTasks}
-        log={log}
+        intention={intention}
         goals={goals}
+        month={month}
         open={isPushpinDialogOpen}
         onClose={() => setIsPushpinDialogOpen(false)}
       />

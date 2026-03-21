@@ -77,9 +77,7 @@ function EntryIcon({ entry }: { entry: TimelineItem }) {
         <StarIcon
           weight={entry.status === "complete" ? "fill" : "regular"}
           className={
-            entry.status === "complete"
-              ? "size-4 text-gold-light"
-              : "size-4 text-cloud-light"
+            entry.status === "complete" ? "size-4 text-gold-light" : "size-4 text-cloud-light"
           }
         />
       );

@@ -11,7 +11,7 @@ import {
 } from "@/components";
 import { SwipeBackEdge } from "@/components/swipe-back-edge";
 import { useDeleteGoal, useToggleGoalStatus, useUpdateGoal } from "@/features/monthly-log";
-import { monthlyGoalRepo } from "@/repos/monthly-goal-repo";
+import { goalRepo } from "@/repos/goal-repo";
 import {
   ArrowCounterClockwiseIcon,
   CaretLeftIcon,
@@ -26,7 +26,7 @@ import { useState } from "react";
 export const Route = createFileRoute("/goal/$id")({
   component: RouteComponent,
   loader: async ({ params }) => {
-    const goal = await monthlyGoalRepo.findById(params.id);
+    const goal = await goalRepo.findById(params.id);
     if (!goal) {
       throw notFound();
     }

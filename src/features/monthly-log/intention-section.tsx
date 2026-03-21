@@ -1,15 +1,21 @@
 import { Renderer } from "@/components/lexical/renderer";
 import { TextareaDialog } from "@/components/textarea-dialog";
-import type { MonthlyLog } from "@/db/schema";
+import type { Intention } from "@/db/schema";
 import { useUpdateIntention } from "./use-monthly-log";
 import { useState } from "react";
 import { FlowerLotusIcon } from "@phosphor-icons/react";
 
-export function IntentionSection({ log }: { log: MonthlyLog }) {
+export function IntentionSection({
+  intention,
+  month,
+}: {
+  intention: Intention | null;
+  month: string;
+}) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const updateIntention = useUpdateIntention();
 
-  const hasContent = !!log.intention;
+  const hasContent = !!intention;
 
   return (
     <>
@@ -20,7 +26,7 @@ export function IntentionSection({ log }: { log: MonthlyLog }) {
       >
         <FlowerLotusIcon />
         {hasContent ? (
-          <Renderer content={log.intention!} />
+          <Renderer content={intention.content} />
         ) : (
           <span className="text-sm text-cloud-light">Set an intention</span>
         )}
@@ -29,10 +35,10 @@ export function IntentionSection({ log }: { log: MonthlyLog }) {
       <TextareaDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        onSave={(content) => updateIntention(log.id, content)}
+        onSave={(content) => updateIntention(month, content)}
         title="Monthly intention"
         placeholder="What's your intention for this month?"
-        initialContent={log.intention ?? ""}
+        initialContent={intention?.content ?? ""}
       />
     </>
   );

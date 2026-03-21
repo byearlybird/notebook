@@ -18,29 +18,29 @@ export const taskSchema = baseEntrySchema.extend({
   original_id: z.uuid().nullable().default(null),
 });
 
-export const monthlyLogSchema = baseSchema.extend({
+export const intentionSchema = baseSchema.extend({
   month: z.string().regex(/^\d{4}-\d{2}$/), // YYYY-MM format
-  intention: z.string().nullable().default(null), // Lexical JSON
+  content: z.string().min(1), // Lexical JSON
 });
 
-export const monthlyGoalSchema = baseSchema.extend({
-  monthly_log_id: z.string(), // FK to monthly_logs
+export const goalSchema = baseSchema.extend({
+  month: z.string().regex(/^\d{4}-\d{2}$/), // YYYY-MM format
   content: z.string().min(1), // Lexical JSON
   status: z.enum(["incomplete", "complete"]).default("incomplete"),
 });
 
 export type Note = z.infer<typeof noteSchema>;
 export type Task = z.infer<typeof taskSchema>;
-export type MonthlyLog = z.infer<typeof monthlyLogSchema>;
-export type MonthlyGoal = z.infer<typeof monthlyGoalSchema>;
+export type Intention = z.infer<typeof intentionSchema>;
+export type Goal = z.infer<typeof goalSchema>;
 export type NewNote = z.input<typeof noteSchema>;
 export type NewTask = z.input<typeof taskSchema>;
-export type NewMonthlyLog = z.input<typeof monthlyLogSchema>;
-export type NewMonthlyGoal = z.input<typeof monthlyGoalSchema>;
+export type NewIntention = z.input<typeof intentionSchema>;
+export type NewGoal = z.input<typeof goalSchema>;
 
 export type Database = {
   notes: Note;
   tasks: Task;
-  monthly_logs: MonthlyLog;
-  monthly_goals: MonthlyGoal;
+  intentions: Intention;
+  goals: Goal;
 };

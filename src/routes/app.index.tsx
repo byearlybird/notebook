@@ -2,7 +2,7 @@ import { Renderer } from "@/components/lexical/renderer";
 import { getEntriesToday } from "@/services/entries-service";
 import { Timeline } from "@/features/entries/timeline";
 import type { TimelineItem } from "@/features/entries/types";
-import { monthlyLogRepo } from "@/repos/monthly-log-repo";
+import { intentionRepo } from "@/repos/intention-repo";
 import { formatDayOfWeek, formatMonthDate, getCurrentMonth } from "@/utils/date-utils";
 import { FlowerLotusIcon, SlidersHorizontalIcon } from "@phosphor-icons/react";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -10,11 +10,11 @@ import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 export const Route = createFileRoute("/app/")({
   component: JournalPage,
   loader: async () => {
-    const [entries, monthlyLog] = await Promise.all([
+    const [entries, intention] = await Promise.all([
       getEntriesToday(),
-      monthlyLogRepo.findByMonth(getCurrentMonth()),
+      intentionRepo.findByMonth(getCurrentMonth()),
     ]);
-    return { entries, intention: monthlyLog?.intention ?? null };
+    return { entries, intention: intention?.content ?? null };
   },
 });
 

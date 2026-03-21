@@ -1,7 +1,8 @@
 import { notesRepo } from "@/repos/notes-repo";
 import { tasksRepo } from "@/repos/tasks-repo";
+import { intentionRepo } from "@/repos/intention-repo";
+import { goalRepo } from "@/repos/goal-repo";
 import type { TimelineItem } from "@/features/entries/types";
-import { getAllMonthlyLogs } from "@/services/monthly-log-service";
 
 export async function getEntriesToday(): Promise<TimelineItem[]> {
   const today = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
@@ -18,13 +19,12 @@ export async function getEntriesToday(): Promise<TimelineItem[]> {
   return entries.sort((a, b) => b.created_at.localeCompare(a.created_at));
 }
 
-export async function getEntriesGroupedByDate(): Promise<
-  Record<string, TimelineItem[]>
-> {
-  const [notes, tasks, allLogs] = await Promise.all([
+export async function getEntriesGroupedByDate(): Promise<Record<string, TimelineItem[]>> {
+  const [notes, tasks, intentions, goals] = await Promise.all([
     notesRepo.findAll(),
     tasksRepo.findAll(),
-    getAllMonthlyLogs(),
+    intentionRepo.findAll(),
+    goalRepo.findAll(),
   ]);
 
   const noteEntries: TimelineItem[] = notes.map((note) => ({
@@ -37,31 +37,24 @@ export async function getEntriesGroupedByDate(): Promise<
     type: "task" as const,
   }));
 
-  const intentionEntries: TimelineItem[] = allLogs
-    .filter((log) => log.intention)
-    .map((log) => ({
-      id: log.id,
-      content: log.intention!,
-      created_at: log.created_at,
-      type: "intention" as const,
-    }));
+  const intentionEntries: TimelineItem[] = intentions.map((intention) => ({
+    id: intention.id,
+    content: intention.content,
+    created_at: intention.created_at,
+    type: "intention" as const,
+  }));
 
-  const goalEntries: TimelineItem[] = allLogs.flatMap((log) =>
-    log.goals.map((goal) => ({
-      id: goal.id,
-      content: goal.content,
-      created_at: goal.created_at,
-      status: goal.status,
-      type: "goal" as const,
-    })),
+  const goalEntries: TimelineItem[] = goals.map((goal) => ({
+    id: goal.id,
+    content: goal.content,
+    created_at: goal.created_at,
+    status: goal.status,
+    type: "goal" as const,
+  }));
+
+  const allEntries = [...noteEntries, ...taskEntries, ...intentionEntries, ...goalEntries].sort(
+    (a, b) => b.created_at.localeCompare(a.created_at),
   );
-
-  const allEntries = [
-    ...noteEntries,
-    ...taskEntries,
-    ...intentionEntries,
-    ...goalEntries,
-  ].sort((a, b) => b.created_at.localeCompare(a.created_at));
 
   const entriesByDate: Record<string, TimelineItem[]> = {};
   for (const entry of allEntries) {
