@@ -3,7 +3,7 @@ import { type Task } from "@/db";
 import type { Goal, Intention } from "@/db/schema";
 import { CreateDialog } from "@/features/entries";
 import { TasksDialog } from "@/features/tasks";
-import { goalRepo } from "@/repos/goal-repo";
+import { goalService } from "@/app";
 import { getIncompleteTasks } from "@/services/tasks-service";
 import { getCurrentMonth } from "@/utils/date-utils";
 import { ListBulletsIcon, SunHorizonIcon } from "@phosphor-icons/react";
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/app")({
     const [tasks, intention, goals] = await Promise.all([
       getIncompleteTasks(),
       intentionService.getByMonth(currentMonth),
-      goalRepo.findByMonth(currentMonth),
+      goalService.getByMonth(currentMonth),
     ]);
     return { ...tasks, intention: intention ?? null, goals, month: currentMonth };
   },

@@ -10,7 +10,7 @@ import {
   TextareaDialog,
 } from "@/components";
 import { SwipeBackEdge } from "@/components/swipe-back-edge";
-import { useDeleteGoal, useToggleGoalStatus, useUpdateGoal } from "@/features/monthly-log";
+import { useDeleteGoal, useSetGoalStatus, useUpdateGoal } from "@/features/monthly-log";
 import { goalRepo } from "@/repos/goal-repo";
 import {
   ArrowCounterClockwiseIcon,
@@ -38,7 +38,7 @@ function RouteComponent() {
   const { goal } = Route.useLoaderData();
   const navigate = Route.useNavigate();
   const [editOpen, setEditOpen] = useState(false);
-  const toggleGoalStatus = useToggleGoalStatus();
+  const setGoalStatus = useSetGoalStatus();
   const deleteGoal = useDeleteGoal();
   const updateGoal = useUpdateGoal();
 
@@ -96,12 +96,12 @@ function RouteComponent() {
 
       <section className="flex w-full gap-2 px-4 pb-safe-bottom pt-2">
         {isComplete ? (
-          <Button variant="slate" onClick={() => toggleGoalStatus(goal.id)}>
+          <Button variant="slate" onClick={() => setGoalStatus(goal.id, "incomplete")}>
             <ArrowCounterClockwiseIcon />
             Complete
           </Button>
         ) : (
-          <Button onClick={() => toggleGoalStatus(goal.id)}>
+          <Button onClick={() => setGoalStatus(goal.id, "complete")}>
             <StarIcon />
             Complete
           </Button>
