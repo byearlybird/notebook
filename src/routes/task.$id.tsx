@@ -9,8 +9,8 @@ import {
   TextContent,
 } from "@/components";
 import { SwipeBackEdge } from "@/components/swipe-back-edge";
+import { taskService } from "@/app";
 import { EditTaskDialog, useUpdateTaskStatus } from "@/features/tasks";
-import * as tasksService from "@/services/tasks-service";
 import {
   ArrowCounterClockwiseIcon,
   ArrowSquareRightIcon,
@@ -25,6 +25,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import { useState } from "react";
 import z from "zod";
+import type { Task } from "@/db";
 
 const taskSearchSchema = z.object({
   from: z.enum(["index", "entries"]).optional().catch(undefined),
@@ -35,7 +36,13 @@ export const Route = createFileRoute("/task/$id")({
   validateSearch: (search: Record<string, unknown>) => taskSearchSchema.parse(search),
   loader: async ({ params }) => {
     try {
-      return await tasksService.getTaskWithRolled(params.id);
+      const task = await taskService.get(params.id);
+      let rolledTask: Task | undefined;
+      if (!task) throw notFound();
+      if (task.status === "deferred") {
+        rolledTask = await taskService.getFirstByOriginalId(task.id);
+      }
+      return { task, rolledTask };
     } catch {
       throw notFound();
     }
@@ -62,7 +69,7 @@ function RouteComponent() {
   };
 
   const handleDelete = () => {
-    tasksService.deleteTask(task.id);
+    taskService.delete(task.id);
     handleBack();
   };
 

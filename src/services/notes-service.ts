@@ -11,7 +11,8 @@ export function createNoteService(db: Kysely<Database>) {
       return db.selectFrom("notes").where("id", "=", id).selectAll().executeTakeFirst();
     },
     update: async (id: string, { content }: { content: string }) => {
-      return db.updateTable("notes").set({ content }).where("id", "=", id).execute();
+      const finalUpdates = { content, updated_at: new Date().toLocaleString("en-CA") };
+      return db.updateTable("notes").set(finalUpdates).where("id", "=", id).execute();
     },
     delete: (id: string) => {
       return db.deleteFrom("notes").where("id", "=", id).execute();

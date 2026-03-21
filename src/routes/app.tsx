@@ -3,24 +3,25 @@ import { type Task } from "@/db";
 import type { Goal, Intention } from "@/db/schema";
 import { CreateDialog } from "@/features/entries";
 import { TasksDialog } from "@/features/tasks";
-import { goalService } from "@/app";
-import { getIncompleteTasks } from "@/services/tasks-service";
+import { goalService, intentionService, taskService } from "@/app";
 import { getCurrentMonth } from "@/utils/date-utils";
 import { ListBulletsIcon, SunHorizonIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { intentionService } from "@/app";
 
 export const Route = createFileRoute("/app")({
   component: RouteComponent,
   loader: async () => {
     const currentMonth = getCurrentMonth();
-    const [tasks, intention, goals] = await Promise.all([
-      getIncompleteTasks(),
+    const [incompleteTasks, intention, goals] = await Promise.all([
+      taskService.getByStatus("incomplete"),
       intentionService.getByMonth(currentMonth),
       goalService.getByMonth(currentMonth),
     ]);
-    return { ...tasks, intention: intention ?? null, goals, month: currentMonth };
+    const today = new Date().toLocaleDateString("en-CA");
+    const todayTasks = incompleteTasks.filter((t) => t.date === today);
+    const priorTasks = incompleteTasks.filter((t) => t.date < today);
+    return { todayTasks, priorTasks, intention: intention ?? null, goals, month: currentMonth };
   },
 });
 

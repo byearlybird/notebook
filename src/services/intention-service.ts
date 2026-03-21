@@ -11,7 +11,11 @@ export function createIntentionService(db: Kysely<Database>) {
       await db
         .insertInto("intentions")
         .values(intention)
-        .onConflict((oc) => oc.column("month").doUpdateSet({ content }))
+        .onConflict((oc) =>
+          oc
+            .column("month")
+            .doUpdateSet({ content, updated_at: new Date().toLocaleString("en-CA") }),
+        )
         .execute();
     },
   };

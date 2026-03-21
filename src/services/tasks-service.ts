@@ -1,85 +1,54 @@
-import type { Task } from "@/db";
-import { tasksRepo } from "@/repos/tasks-repo";
+import { taskSchema, type Database, type Task } from "@/db";
+import type { Kysely } from "kysely";
 
-export async function createTask(content: string): Promise<Task> {
-  return tasksRepo.create({
-    content,
-  });
-}
-
-export async function updateTask(
-  id: string,
-  { content }: { content: string },
-): Promise<Task | undefined> {
-  return tasksRepo.update(id, { content });
-}
-
-export async function updateTaskStatus(
-  id: string,
-  status: Task["status"],
-): Promise<Task | undefined> {
-  return tasksRepo.update(id, { status });
-}
-
-export async function deleteTask(id: string): Promise<void> {
-  return tasksRepo.delete(id);
-}
-
-export async function getTaskById(id: string): Promise<Task | undefined> {
-  return tasksRepo.findById(id);
-}
-
-export async function getTaskWithRolled(
-  id: string,
-): Promise<{ task: Task; rolledTask: Task | null }> {
-  const task = await tasksRepo.findById(id);
-  if (!task) {
-    throw new Error("Task not found");
-  }
-  const rolledTask =
-    task.status === "deferred"
-      ? ((await tasksRepo.findByOriginalId(task.original_id ?? task.id)) ?? null)
-      : null;
-  return { task, rolledTask };
-}
-
-export async function getIncompleteTasks(): Promise<{ todayTasks: Task[]; priorTasks: Task[] }> {
-  const incompleteTasks = await tasksRepo.findIncomplete();
-  const today = new Date().toLocaleDateString("en-CA");
-  const todayTasks = incompleteTasks.filter((t) => t.date === today);
-  const priorTasks = incompleteTasks.filter((t) => t.date < today);
-  return { todayTasks, priorTasks };
-}
-
-export async function rolloverTask(
-  taskId: string,
-  targetDate: string,
-): Promise<{ original: Task; rolled: Task }> {
-  const task = await tasksRepo.findById(taskId);
-  if (!task) {
-    throw new Error("Task not found");
-  }
-
-  if (task.status !== "incomplete") {
-    throw new Error("Only incomplete tasks can be rolled over");
-  }
-
-  if (task.date === targetDate) {
-    return { original: task, rolled: task };
-  }
-
-  const deferred = await tasksRepo.update(task.id, { status: "deferred" });
-  if (!deferred) {
-    throw new Error("Failed to defer task");
-  }
-
-  const rolled = await tasksRepo.create({
-    content: deferred.content,
-    date: targetDate,
-    status: "incomplete",
-    // presence of original_id indicates the original task was rolled over before, so keep it's original id
-    original_id: task.original_id ?? deferred.id,
-  });
-
-  return { original: deferred, rolled };
+export function createTaskService(db: Kysely<Database>) {
+  return {
+    async create(content: string) {
+      const task = taskSchema.parse({ content, status: "incomplete" });
+      await db.insertInto("tasks").values(task).execute();
+    },
+    async get(id: string) {
+      return db.selectFrom("tasks").selectAll().where("id", "=", id).executeTakeFirst();
+    },
+    async update(id: string, updates: Partial<Task>) {
+      const finalUpdates: Partial<Task> = {
+        ...updates,
+        updated_at: new Date().toLocaleString("en-CA"),
+      };
+      return db.updateTable("tasks").set(finalUpdates).where("id", "=", id).executeTakeFirst();
+    },
+    async delete(id: string) {
+      return db.deleteFrom("tasks").where("id", "=", id).executeTakeFirst();
+    },
+    async getByStatus(status: Task["status"]) {
+      return db.selectFrom("tasks").selectAll().where("status", "=", status).execute();
+    },
+    async getFirstByOriginalId(originalId: string) {
+      return db
+        .selectFrom("tasks")
+        .selectAll()
+        .where("original_id", "=", originalId)
+        .executeTakeFirst();
+    },
+    async rollover(taskId: string, targetDate: string) {
+      const update: Partial<Task> = {
+        status: "deferred",
+        updated_at: new Date().toLocaleString("en-CA"),
+        date: targetDate,
+      };
+      await db.transaction().execute(async (trx) => {
+        const existingTask = await trx
+          .updateTable("tasks")
+          .set(update)
+          .where("id", "=", taskId)
+          .returningAll()
+          .executeTakeFirstOrThrow();
+        const newTask = taskSchema.parse({
+          content: existingTask?.content,
+          original_id: existingTask.id,
+        });
+        await trx.insertInto("tasks").values(newTask).execute();
+      });
+    },
+  };
 }

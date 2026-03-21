@@ -8,7 +8,8 @@ export function createGoalService(db: Kysely<Database>) {
       await db.insertInto("goals").values(goal).execute();
     },
     update: async (id: string, updates: Partial<Pick<Goal, "content" | "status">>) => {
-      await db.updateTable("goals").set(updates).where("id", "=", id).execute();
+      const finalUpdates = { ...updates, updated_at: new Date().toLocaleString("en-CA") };
+      await db.updateTable("goals").set(finalUpdates).where("id", "=", id).execute();
     },
     delete: async (id: string) => {
       await db.deleteFrom("goals").where("id", "=", id).execute();
