@@ -1,3 +1,4 @@
+import { noteService } from "@/app";
 import {
   MenuItem,
   MenuPopup,
@@ -9,7 +10,6 @@ import {
 } from "@/components";
 import { SwipeBackEdge } from "@/components/swipe-back-edge";
 import { EditNoteDialog } from "@/features/notes";
-import * as notesService from "@/services/notes-service";
 import { CaretLeftIcon, DotsThreeIcon, PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
@@ -24,7 +24,7 @@ export const Route = createFileRoute("/note/$id")({
   component: RouteComponent,
   validateSearch: (search: Record<string, unknown>) => noteSearchSchema.parse(search),
   loader: async ({ params }) => {
-    const note = await notesService.getNoteById(params.id);
+    const note = await noteService.get(params.id);
     if (!note) {
       throw notFound();
     }
@@ -52,7 +52,7 @@ function RouteComponent() {
   };
 
   const handleDelete = () => {
-    notesService.deleteNote(note.id);
+    noteService.delete(note.id);
     goBack();
   };
 
