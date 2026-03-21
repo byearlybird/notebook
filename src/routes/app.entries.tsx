@@ -1,4 +1,4 @@
-import { getEntriesGroupedByDate } from "@/services/entries-service";
+import { entryService } from "@/app";
 import { DayEntriesItem } from "@/features/entries";
 import type { TimelineItem } from "@/features/entries/types";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -6,7 +6,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 export const Route = createFileRoute("/app/entries")({
   component: RouteComponent,
   loader: async () => {
-    return await getEntriesGroupedByDate();
+    return await entryService.getGroupedByDate();
   },
 });
 

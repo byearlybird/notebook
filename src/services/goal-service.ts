@@ -20,5 +20,8 @@ export function createGoalService(db: Kysely<Database>) {
     getByMonth: async (month: string) => {
       return db.selectFrom("goals").where("month", "=", month).selectAll().execute();
     },
+    get: async (id: string) => {
+      return db.selectFrom("goals").selectAll().where("id", "=", id).executeTakeFirst();
+    },
   };
 }
