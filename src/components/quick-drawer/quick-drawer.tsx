@@ -105,7 +105,6 @@ export function QuickDrawer({
                       intention={intention}
                       goals={goals}
                       month={month}
-                      onClose={onClose}
                     />
                   )}
                 </div>

@@ -37,6 +37,20 @@ function JournalPage() {
         search: { from: "index" },
         viewTransition: { types: ["slide-left"] },
       });
+    } else if (entry.type === "goal") {
+      navigate({
+        to: "/goal/$id",
+        params: { id: entry.id },
+        search: { from: "index" },
+        viewTransition: { types: ["slide-left"] },
+      });
+    } else if (entry.type === "intention") {
+      navigate({
+        to: "/intention/$id",
+        params: { id: entry.id },
+        search: { from: "index" },
+        viewTransition: { types: ["slide-left"] },
+      });
     }
   };
 

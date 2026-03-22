@@ -10,11 +10,9 @@ import { useNavigate } from "@tanstack/react-router";
 export function GoalSection({
   goals,
   month,
-  onClose,
 }: {
   goals: Goal[];
   month: string;
-  onClose: () => void;
 }) {
   const mutation = useMutation();
   const navigate = useNavigate();
@@ -29,7 +27,6 @@ export function GoalSection({
             key={goal.id}
             className="flex gap-3 text-left"
             onClick={() => {
-              onClose();
               navigate({
                 to: "/goal/$id",
                 params: { id: goal.id },
