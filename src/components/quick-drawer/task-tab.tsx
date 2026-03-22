@@ -16,7 +16,7 @@ function TaskButton({ onClick, children }: { onClick: () => void; children: Reac
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center gap-1.5 rounded-md bg-slate-light px-2.5 py-1.5 text-xs font-medium text-ivory-light transition-transform active:scale-105"
+      className="flex items-center gap-1.5 rounded-md bg-slate-light px-2.5 py-1.5 text-xs font-medium text-ivory-light transition-transform active:scale-105 [&>svg]:size-3"
     >
       {children}
     </button>
@@ -173,11 +173,11 @@ function TodayTaskItem({
       ) : (
         <div className="flex gap-1">
           <TaskButton onClick={onComplete}>
-            <CheckSquareIcon className="size-3" />
+            <CheckSquareIcon />
             Complete
           </TaskButton>
           <TaskButton onClick={onCancel}>
-            <XSquareIcon className="size-3" />
+            <XSquareIcon />
             Cancel
           </TaskButton>
         </div>
@@ -223,15 +223,15 @@ function PriorTaskItem({
       ) : (
         <div className="flex gap-1">
           <TaskButton onClick={onRollover}>
-            <ArrowSquareRightIcon className="size-3" />
+            <ArrowSquareRightIcon />
             Roll over
           </TaskButton>
           <TaskButton onClick={onComplete}>
-            <CheckSquareIcon className="size-3" />
+            <CheckSquareIcon />
             Complete
           </TaskButton>
           <TaskButton onClick={onCancel}>
-            <XSquareIcon className="size-3" />
+            <XSquareIcon />
             Cancel
           </TaskButton>
         </div>
