@@ -92,20 +92,14 @@ export function TaskTab({
           <div className="flex flex-col">
             <AnimatePresence initial={false}>
               {todayTasks.map((task) => (
-                <motion.div
+                <TodayTaskItem
                   key={task.id}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.25, ease: "easeInOut" }}
-                  className="overflow-hidden py-2 pb-2.5"
-                >
-                  <TodayTaskItem
-                    task={task}
-                    isPending={pendingUpdates.get(task.id) !== undefined}
-                    onComplete={() => handlePendingStatusChange(task.id, "complete")}
-                    onCancel={() => handlePendingStatusChange(task.id, "canceled")}
-                    onUndo={() => handleUndo(task.id)}
-                  />
-                </motion.div>
+                  task={task}
+                  isPending={pendingUpdates.get(task.id) !== undefined}
+                  onComplete={() => handlePendingStatusChange(task.id, "complete")}
+                  onCancel={() => handlePendingStatusChange(task.id, "canceled")}
+                  onUndo={() => handleUndo(task.id)}
+                />
               ))}
             </AnimatePresence>
           </div>
@@ -119,21 +113,15 @@ export function TaskTab({
           <div className="flex flex-col">
             <AnimatePresence initial={false}>
               {priorTasks.map((task) => (
-                <motion.div
+                <PriorTaskItem
                   key={task.id}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.25, ease: "easeInOut" }}
-                  className="overflow-hidden py-2"
-                >
-                  <PriorTaskItem
-                    task={task}
-                    isPending={pendingUpdates.get(task.id) !== undefined}
-                    onRollover={() => handlePendingRollover(task.id)}
-                    onComplete={() => handlePendingStatusChange(task.id, "complete")}
-                    onCancel={() => handlePendingStatusChange(task.id, "canceled")}
-                    onUndo={() => handleUndo(task.id)}
-                  />
-                </motion.div>
+                  task={task}
+                  isPending={pendingUpdates.get(task.id) !== undefined}
+                  onRollover={() => handlePendingRollover(task.id)}
+                  onComplete={() => handlePendingStatusChange(task.id, "complete")}
+                  onCancel={() => handlePendingStatusChange(task.id, "canceled")}
+                  onUndo={() => handleUndo(task.id)}
+                />
               ))}
             </AnimatePresence>
           </div>
@@ -157,7 +145,11 @@ function TodayTaskItem({
   onUndo: () => void;
 }) {
   return (
-    <div className="flex flex-col gap-2">
+    <motion.div
+      exit={{ opacity: 0, height: 0 }}
+      transition={{ duration: 0.25, ease: "easeInOut" }}
+      className="overflow-hidden py-2 pb-2.5 flex flex-col gap-2"
+    >
       <div className={cx("text-sm text-ivory-light", isPending && "line-through opacity-40")}>
         <Renderer content={task.content} />
       </div>
@@ -191,7 +183,7 @@ function TodayTaskItem({
           </button>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
 
@@ -214,7 +206,11 @@ function PriorTaskItem({
   const dateLabel = `${formatDistanceToNowStrict(parseISO(task.date + "T00:00:00"))} ago`;
 
   return (
-    <div className="flex flex-col gap-2">
+    <motion.div
+      exit={{ opacity: 0, height: 0 }}
+      transition={{ duration: 0.25, ease: "easeInOut" }}
+      className="overflow-hidden py-2 flex flex-col gap-2"
+    >
       <div className="flex items-baseline justify-between gap-2">
         <div className={cx("text-sm text-ivory-light", isPending && "line-through opacity-40")}>
           <Renderer content={task.content} />
@@ -259,6 +255,6 @@ function PriorTaskItem({
           </button>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
