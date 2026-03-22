@@ -1,17 +1,17 @@
 import { type Database } from "@/db/schema";
 import { toGoal, type Goal } from "@/models";
-import type { Kysely } from "kysely";
+import { getTodayISODate } from "@/utils/date-utils";
+import { type Kysely, sql } from "kysely";
 
 export function createGoalService(db: Kysely<Database>) {
   return {
     create: async (month: string, content: string) => {
-      // todo: validate month as first day of month
       const now = new Date().toISOString();
       await db
         .insertInto("entries")
         .values({
           id: crypto.randomUUID(),
-          date: month,
+          date: getTodayISODate(),
           content,
           type: "goal",
           status: "incomplete",
@@ -43,10 +43,9 @@ export function createGoalService(db: Kysely<Database>) {
         .execute();
     },
     getByMonth: async (month: string): Promise<Goal[]> => {
-      // todo: validate month as first day of month
       const result = await db
         .selectFrom("entries")
-        .where("date", "=", month)
+        .where(sql`strftime('%Y-%m', date)`, "=", month)
         .where("type", "=", "goal")
         .selectAll()
         .execute();
