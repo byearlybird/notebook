@@ -1,4 +1,5 @@
 import type { Task } from "@/models";
+import type { ReactNode } from "react";
 import { Renderer } from "@/components/lexical";
 import { ArrowSquareRightIcon, CheckSquareIcon, XSquareIcon } from "@phosphor-icons/react";
 import { AnimatePresence, motion } from "motion/react";
@@ -9,6 +10,27 @@ import { formatDistanceToNowStrict, parseISO } from "date-fns";
 import { cx } from "cva";
 
 const UNDO_DELAY_MS = 3000;
+
+function TaskButton({
+  icon,
+  onClick,
+  children,
+}: {
+  icon?: ReactNode;
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex items-center gap-1.5 rounded-md bg-slate-light px-2.5 py-1.5 text-xs font-medium text-ivory-light transition-transform active:scale-105"
+    >
+      {icon}
+      {children}
+    </button>
+  );
+}
 
 type PendingUpdate = { action: "status"; status: Task["status"] } | { action: "rollover" };
 
@@ -155,32 +177,16 @@ function TodayTaskItem({
       </div>
       {isPending ? (
         <div className="flex gap-1">
-          <button
-            type="button"
-            onClick={onUndo}
-            className="rounded-md bg-slate-light px-2.5 py-1.5 text-xs font-medium text-ivory-light transition-transform active:scale-105"
-          >
-            Undo
-          </button>
+          <TaskButton onClick={onUndo}>Undo</TaskButton>
         </div>
       ) : (
         <div className="flex gap-1">
-          <button
-            type="button"
-            onClick={onComplete}
-            className="flex items-center gap-1.5 rounded-md bg-slate-light px-2.5 py-1.5 text-xs font-medium text-ivory-light transition-transform active:scale-105"
-          >
-            <CheckSquareIcon className="size-3" />
+          <TaskButton onClick={onComplete} icon={<CheckSquareIcon className="size-3" />}>
             Complete
-          </button>
-          <button
-            type="button"
-            onClick={onCancel}
-            className="flex items-center gap-1.5 rounded-md bg-slate-light px-2.5 py-1.5 text-xs font-medium text-ivory-light transition-transform active:scale-105"
-          >
-            <XSquareIcon className="size-3" />
+          </TaskButton>
+          <TaskButton onClick={onCancel} icon={<XSquareIcon className="size-3" />}>
             Cancel
-          </button>
+          </TaskButton>
         </div>
       )}
     </motion.div>
@@ -219,40 +225,19 @@ function PriorTaskItem({
       </div>
       {isPending ? (
         <div className="flex gap-1">
-          <button
-            type="button"
-            onClick={onUndo}
-            className="rounded-md bg-slate-light px-2.5 py-1.5 text-xs font-medium text-ivory-light transition-transform active:scale-105"
-          >
-            Undo
-          </button>
+          <TaskButton onClick={onUndo}>Undo</TaskButton>
         </div>
       ) : (
         <div className="flex gap-1">
-          <button
-            type="button"
-            onClick={onRollover}
-            className="flex items-center gap-1.5 rounded-md bg-slate-light px-2.5 py-1.5 text-xs font-medium text-ivory-light transition-transform active:scale-105"
-          >
-            <ArrowSquareRightIcon className="size-3" />
+          <TaskButton onClick={onRollover} icon={<ArrowSquareRightIcon className="size-3" />}>
             Roll over
-          </button>
-          <button
-            type="button"
-            onClick={onComplete}
-            className="flex items-center gap-1.5 rounded-md bg-slate-light px-2.5 py-1.5 text-xs font-medium text-ivory-light transition-transform active:scale-105"
-          >
-            <CheckSquareIcon className="size-3" />
+          </TaskButton>
+          <TaskButton onClick={onComplete} icon={<CheckSquareIcon className="size-3" />}>
             Complete
-          </button>
-          <button
-            type="button"
-            onClick={onCancel}
-            className="flex items-center gap-1.5 rounded-md bg-slate-light px-2.5 py-1.5 text-xs font-medium text-ivory-light transition-transform active:scale-105"
-          >
-            <XSquareIcon className="size-3" />
+          </TaskButton>
+          <TaskButton onClick={onCancel} icon={<XSquareIcon className="size-3" />}>
             Cancel
-          </button>
+          </TaskButton>
         </div>
       )}
     </motion.div>
