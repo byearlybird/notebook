@@ -1,4 +1,3 @@
-import { Button } from "@/components/common/button";
 import {
   MenuItem,
   MenuPopup,
@@ -10,14 +9,12 @@ import {
   TextareaDialog,
 } from "@/components";
 import { SwipeBackEdge } from "@/components/navigation/swipe-back-edge";
-import { goalService } from "@/app";
+import { intentionService } from "@/app";
 import { useMutation } from "@/utils/use-mutation";
 import {
-  ArrowCounterClockwiseIcon,
   CaretLeftIcon,
   DotsThreeIcon,
   PencilSimpleIcon,
-  StarIcon,
   TrashIcon,
 } from "@phosphor-icons/react";
 import { createFileRoute, notFound } from "@tanstack/react-router";
@@ -28,26 +25,24 @@ const searchSchema = z.object({
   from: z.enum(["index", "entries"]).optional().catch(undefined),
 });
 
-export const Route = createFileRoute("/goal/$id")({
+export const Route = createFileRoute("/intention/$id")({
   component: RouteComponent,
   validateSearch: (search: Record<string, unknown>) => searchSchema.parse(search),
   loader: async ({ params }) => {
-    const goal = await goalService.get(params.id);
-    if (!goal) {
+    const intention = await intentionService.get(params.id);
+    if (!intention) {
       throw notFound();
     }
-    return { goal };
+    return { intention };
   },
 });
 
 function RouteComponent() {
-  const { goal } = Route.useLoaderData();
+  const { intention } = Route.useLoaderData();
   const { from } = Route.useSearch();
   const navigate = Route.useNavigate();
   const [editOpen, setEditOpen] = useState(false);
   const mutation = useMutation();
-
-  const isComplete = goal.status === "complete";
 
   const goBack = () => {
     if (from === "entries") {
@@ -69,7 +64,7 @@ function RouteComponent() {
           <CaretLeftIcon className="size-6" />
         </button>
         <div className="flex-1 text-center">
-          <span className="font-medium">Goal</span>
+          <span className="font-medium">Intention</span>
         </div>
         <MenuRoot>
           <MenuTrigger className="flex size-10 shrink-0 items-center justify-center rounded-md transition-transform active:scale-105">
@@ -84,7 +79,7 @@ function RouteComponent() {
                 </MenuItem>
                 <MenuItem
                   onClick={async () => {
-                    await mutation(() => goalService.delete(goal.id));
+                    await mutation(() => intentionService.delete(intention.id));
                     goBack();
                   }}
                   className="text-error flex gap-2"
@@ -98,34 +93,17 @@ function RouteComponent() {
         </MenuRoot>
       </header>
 
-      <TextContent content={goal.content} updatedAt={goal.updatedAt} createdAt={goal.createdAt} />
-
-      <section className="flex w-full gap-2 px-4 pb-safe-bottom pt-2">
-        {isComplete ? (
-          <Button
-            variant="slate"
-            onClick={() => mutation(() => goalService.setStatus(goal.id, "incomplete"))}
-          >
-            <ArrowCounterClockwiseIcon />
-            Complete
-          </Button>
-        ) : (
-          <Button onClick={() => mutation(() => goalService.setStatus(goal.id, "complete"))}>
-            <StarIcon />
-            Complete
-          </Button>
-        )}
-      </section>
+      <TextContent content={intention.content} updatedAt={intention.updatedAt} createdAt={intention.createdAt} />
 
       <TextareaDialog
         open={editOpen}
         onClose={() => setEditOpen(false)}
         onSave={async (content) => {
-          await mutation(() => goalService.update(goal.id, { content }));
+          await mutation(() => intentionService.update(intention.id, { content }));
           setEditOpen(false);
         }}
-        title="Edit goal"
-        initialContent={goal.content}
+        title="Edit intention"
+        initialContent={intention.content}
       />
       <SwipeBackEdge onBack={goBack} />
     </div>

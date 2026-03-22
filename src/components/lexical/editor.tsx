@@ -7,7 +7,13 @@ import {
   LexicalComposerContext,
   createLexicalComposerContext,
 } from "@lexical/react/LexicalComposerContext";
-import { type LexicalEditor, createEditor, $getRoot, $createParagraphNode, $createTextNode } from "lexical";
+import {
+  type LexicalEditor,
+  createEditor,
+  $getRoot,
+  $createParagraphNode,
+  $createTextNode,
+} from "lexical";
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import { Toolbar } from "./toolbar";
 import { theme } from "./theme";

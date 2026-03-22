@@ -23,7 +23,7 @@ export function TextareaDialog({
   onSave: (content: string) => void;
   title: string;
   placeholder?: string;
-  initialContent: string;
+  initialContent?: string;
 }) {
   const editor = useEditor();
   const [isEmpty, setIsEmpty] = useState(!initialContent);

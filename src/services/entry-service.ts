@@ -10,7 +10,6 @@ export function createEntryService(db: Kysely<Database>) {
         .selectFrom("entries")
         .selectAll()
         .where("date", "=", today)
-        .where("type", "in", ["note", "task"])
         .orderBy("createdAt", "desc")
         .execute();
 
@@ -18,19 +17,17 @@ export function createEntryService(db: Kysely<Database>) {
     },
 
     async getGroupedByDate(): Promise<Record<string, Entry[]>> {
-      const entryRows = await db
+      const entries = await db
         .selectFrom("entries")
         .selectAll()
-        .where("type", "in", ["note", "task"])
         .orderBy("createdAt", "desc")
         .execute();
 
-      const entries = entryRows.map(toEntry);
-
       const entriesByDate: Record<string, Entry[]> = {};
+
       for (const entry of entries) {
         entriesByDate[entry.date] ??= [];
-        entriesByDate[entry.date].push(entry);
+        entriesByDate[entry.date].push(toEntry(entry));
       }
 
       return entriesByDate;

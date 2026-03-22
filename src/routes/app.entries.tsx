@@ -36,6 +36,13 @@ function RouteComponent() {
         search: { from: "entries" },
         viewTransition: { types: ["slide-left"] },
       });
+    } else if (entry.type === "intention") {
+      navigate({
+        to: "/intention/$id",
+        params: { id: entry.id },
+        search: { from: "entries" },
+        viewTransition: { types: ["slide-left"] },
+      });
     }
   };
 

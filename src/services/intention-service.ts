@@ -44,5 +44,29 @@ export function createIntentionService(db: Kysely<Database>) {
         }
       });
     },
+    get: async (id: string): Promise<Intention | undefined> => {
+      const result = await db
+        .selectFrom("entries")
+        .selectAll()
+        .where("id", "=", id)
+        .where("type", "=", "intention")
+        .executeTakeFirst();
+
+      return result ? toIntention(result) : undefined;
+    },
+    update: async (id: string, updates: { content: string }): Promise<void> => {
+      await db
+        .updateTable("entries")
+        .set({
+          ...updates,
+          updatedAt: new Date().toISOString(),
+        })
+        .where("id", "=", id)
+        .where("type", "=", "intention")
+        .execute();
+    },
+    delete: async (id: string): Promise<void> => {
+      await db.deleteFrom("entries").where("id", "=", id).where("type", "=", "intention").execute();
+    },
   };
 }
