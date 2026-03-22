@@ -1,13 +1,14 @@
 import type { Database } from "@/db/schema";
 import { toIntention, type Intention } from "@/models";
-import type { Kysely } from "kysely";
+import { getTodayISODate } from "@/utils/date-utils";
+import { type Kysely, sql } from "kysely";
 
 export function createIntentionService(db: Kysely<Database>) {
   return {
     getByMonth: async (month: string): Promise<Intention | undefined> => {
       const result = await db
         .selectFrom("entries")
-        .where("date", "=", month)
+        .where(sql`strftime('%Y-%m', date)`, "=", month)
         .where("type", "=", "intention")
         .selectAll()
         .executeTakeFirst();
@@ -17,7 +18,7 @@ export function createIntentionService(db: Kysely<Database>) {
       await db.transaction().execute(async (tx) => {
         const existing = await tx
           .selectFrom("entries")
-          .where("date", "=", month)
+          .where(sql`strftime('%Y-%m', date)`, "=", month)
           .where("type", "=", "intention")
           .selectAll()
           .executeTakeFirst();
@@ -34,7 +35,7 @@ export function createIntentionService(db: Kysely<Database>) {
             .insertInto("entries")
             .values({
               id: crypto.randomUUID(),
-              date: month,
+              date: getTodayISODate(),
               content,
               type: "intention",
               createdAt: now,
