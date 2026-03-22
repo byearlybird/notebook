@@ -1,7 +1,7 @@
 import { ActionNavbar, Navbar, type NavItemData } from "@/components";
 import type { Goal, Intention, Task } from "@/models";
 import { CreateDialog } from "@/components/entries";
-import { TasksDialog } from "@/components/tasks";
+import { QuickDrawer } from "@/components/quick-drawer";
 import { goalService, intentionService, taskService } from "@/app";
 import { getCurrentMonth } from "@/utils/date-utils";
 import { ListBulletsIcon, SunHorizonIcon } from "@phosphor-icons/react";
@@ -85,7 +85,7 @@ function AppLayout({
         />
       </div>
       <CreateDialog open={isCreateDialogOpen} onClose={() => setIsCreateDialogOpen(false)} />
-      <TasksDialog
+      <QuickDrawer
         todayTasks={todayTasks}
         priorTasks={priorTasks}
         intention={intention}
