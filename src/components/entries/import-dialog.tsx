@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { Button } from "@/components/button";
+import { Button } from "@/components/common/button";
 import {
   DialogBackdrop,
   DialogRoot,
   DialogPortal,
   DialogPopup,
   DialogTitle,
-} from "@/components/dialog";
+} from "@/components/common/dialog";
 import { mergeIntoDatabase } from "@/db/dump";
 import { useRouter } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";

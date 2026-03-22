@@ -1,13 +1,13 @@
 import { cx } from "cva";
 import { Button as BaseButton } from "@base-ui/react";
-import { Button } from "@/components/button";
+import { Button } from "@/components/common/button";
 import {
   DialogBackdrop,
   DialogRoot,
   DialogPortal,
   DialogPopup,
   DialogTitle,
-} from "@/components/dialog";
+} from "@/components/common/dialog";
 import { CircleIcon, SquareIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import { createPortal } from "react-dom";

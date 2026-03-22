@@ -8,7 +8,7 @@ import {
   DialogPortal,
   DialogRoot,
   DialogTitle,
-} from "@/components/dialog";
+} from "@/components/common/dialog";
 import {
   ArrowSquareRightIcon,
   CheckSquareIcon,
@@ -21,7 +21,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { taskService, goalService } from "@/app";
 import { useMutation } from "@/utils/use-mutation";
-import { IntentionSection } from "@/features/monthly-log";
+import { IntentionSection } from "@/components/monthly-log";
 import { useNavigate } from "@tanstack/react-router";
 import { formatDistanceToNowStrict, parseISO } from "date-fns";
 

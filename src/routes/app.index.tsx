@@ -1,6 +1,6 @@
 import { entryService, intentionService } from "@/app";
 import { Renderer } from "@/components/lexical/renderer";
-import { Timeline } from "@/features/entries/timeline";
+import { Timeline } from "@/components/entries/timeline";
 import type { Entry } from "@/models";
 import { formatDayOfWeek, formatMonthDate, getCurrentMonth } from "@/utils/date-utils";
 import { FlowerLotusIcon, SlidersHorizontalIcon } from "@phosphor-icons/react";
