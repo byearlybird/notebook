@@ -7,5 +7,5 @@ export function useMutation() {
     const result = await fn();
     await router.invalidate();
     return result;
-  }
+  };
 }

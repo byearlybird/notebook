@@ -94,7 +94,10 @@ function RouteComponent() {
 
       <section className="flex w-full gap-2 px-4 pb-safe-bottom pt-2">
         {isComplete ? (
-          <Button variant="slate" onClick={() => mutation(() => goalService.setStatus(goal.id, "incomplete"))}>
+          <Button
+            variant="slate"
+            onClick={() => mutation(() => goalService.setStatus(goal.id, "incomplete"))}
+          >
             <ArrowCounterClockwiseIcon />
             Complete
           </Button>
