@@ -1,5 +1,5 @@
 import { Renderer } from "@/components/lexical/renderer";
-import { TextareaDialog } from "@/components/textarea-dialog";
+import { TextareaDialog } from "@/components/entries/textarea-dialog";
 import type { Intention } from "@/models";
 import { intentionService } from "@/app";
 import { useMutation } from "@/utils/use-mutation";

@@ -7,9 +7,10 @@ import {
   MenuRoot,
   MenuTrigger,
   TextContent,
+  TextareaDialog,
 } from "@/components";
-import { SwipeBackEdge } from "@/components/swipe-back-edge";
-import { EditNoteDialog } from "@/features/notes";
+import { SwipeBackEdge } from "@/components/navigation/swipe-back-edge";
+import { useMutation } from "@/utils/use-mutation";
 import { CaretLeftIcon, DotsThreeIcon, PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
@@ -36,6 +37,7 @@ function RouteComponent() {
   const { note } = Route.useLoaderData();
   const { from } = Route.useSearch();
   const navigate = Route.useNavigate();
+  const mutation = useMutation();
   const [editOpen, setEditOpen] = useState(false);
 
   const goBack = () => {
@@ -101,7 +103,14 @@ function RouteComponent() {
       </header>
       {/* Content area */}
       <TextContent content={note.content} updatedAt={note.updatedAt} createdAt={note.createdAt} />
-      <EditNoteDialog open={editOpen} onClose={() => setEditOpen(false)} note={note} />
+      <TextareaDialog
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        onSave={(content) => mutation(() => noteService.update(note.id, { content }))}
+        title="Edit note"
+        placeholder="What's on your mind?"
+        initialContent={note.content}
+      />
       <SwipeBackEdge onBack={goBack} />
     </div>
   );

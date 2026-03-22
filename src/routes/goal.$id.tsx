@@ -1,4 +1,4 @@
-import { Button } from "@/components/button";
+import { Button } from "@/components/common/button";
 import {
   MenuItem,
   MenuPopup,
@@ -9,7 +9,7 @@ import {
   TextContent,
   TextareaDialog,
 } from "@/components";
-import { SwipeBackEdge } from "@/components/swipe-back-edge";
+import { SwipeBackEdge } from "@/components/navigation/swipe-back-edge";
 import { goalService } from "@/app";
 import { useMutation } from "@/utils/use-mutation";
 import {
@@ -94,7 +94,10 @@ function RouteComponent() {
 
       <section className="flex w-full gap-2 px-4 pb-safe-bottom pt-2">
         {isComplete ? (
-          <Button variant="slate" onClick={() => mutation(() => goalService.setStatus(goal.id, "incomplete"))}>
+          <Button
+            variant="slate"
+            onClick={() => mutation(() => goalService.setStatus(goal.id, "incomplete"))}
+          >
             <ArrowCounterClockwiseIcon />
             Complete
           </Button>

@@ -1,4 +1,4 @@
-import { Button } from "@/components/button";
+import { Button } from "@/components/common/button";
 import {
   MenuItem,
   MenuPopup,
@@ -7,10 +7,10 @@ import {
   MenuRoot,
   MenuTrigger,
   TextContent,
+  TextareaDialog,
 } from "@/components";
-import { SwipeBackEdge } from "@/components/swipe-back-edge";
+import { SwipeBackEdge } from "@/components/navigation/swipe-back-edge";
 import { taskService } from "@/app";
-import { EditTaskDialog } from "@/features/tasks";
 import { useMutation } from "@/utils/use-mutation";
 import {
   ArrowCounterClockwiseIcon,
@@ -166,7 +166,14 @@ function RouteComponent() {
           </Button>
         )}
       </section>
-      <EditTaskDialog open={editOpen} onClose={() => setEditOpen(false)} task={task} />
+      <TextareaDialog
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        onSave={(content) => mutation(() => taskService.update(task.id, { content }))}
+        title="Edit task"
+        placeholder="What needs to be done?"
+        initialContent={task.content}
+      />
       <SwipeBackEdge onBack={handleBack} />
     </div>
   );

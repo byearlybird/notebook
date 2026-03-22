@@ -1,5 +1,5 @@
 import { entryService } from "@/app";
-import { DayEntriesItem } from "@/features/entries";
+import { DayEntriesItem } from "@/components/entries";
 import type { Entry } from "@/models";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 

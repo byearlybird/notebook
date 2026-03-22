@@ -43,15 +43,9 @@ export function Timeline({
             nativeButton={false}
             render={<div />}
             onClick={() => handleClick(entry)}
-            className={
-              size === "compact" ? "flex-1 min-w-0 pb-4 min-h-16" : "flex-1 min-w-0 pb-4 min-h-20"
-            }
+            className={cx("flex-1 min-w-0 pb-4", size === "compact" ? "min-h-16" : "min-h-20")}
           >
-            <div
-              className={
-                size === "compact" ? "text-xs text-cloud-medium" : "text-sm text-cloud-medium"
-              }
-            >
+            <div className={cx("text-cloud-medium", size === "compact" ? "text-xs" : "text-sm")}>
               {formatTime(entry.createdAt)}
             </div>
             <div className={cx("mt-2", size === "compact" && "text-sm line-clamp-3")}>
@@ -76,9 +70,10 @@ function EntryIcon({ entry }: { entry: Entry }) {
       return (
         <StarIcon
           weight={entry.status === "complete" ? "fill" : "regular"}
-          className={
-            entry.status === "complete" ? "size-4 text-gold-light" : "size-4 text-cloud-light"
-          }
+          className={cx(
+            "size-4",
+            entry.status === "complete" ? "text-gold-light" : "text-cloud-light",
+          )}
         />
       );
   }

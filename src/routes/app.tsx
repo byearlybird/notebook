@@ -1,7 +1,7 @@
 import { ActionNavbar, Navbar, type NavItemData } from "@/components";
 import type { Goal, Intention, Task } from "@/models";
-import { CreateDialog } from "@/features/entries";
-import { TasksDialog } from "@/features/tasks";
+import { CreateDialog } from "@/components/entries";
+import { TasksDialog } from "@/components/tasks";
 import { goalService, intentionService, taskService } from "@/app";
 import { getCurrentMonth } from "@/utils/date-utils";
 import { ListBulletsIcon, SunHorizonIcon } from "@phosphor-icons/react";

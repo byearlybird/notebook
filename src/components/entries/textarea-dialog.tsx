@@ -4,8 +4,8 @@ import {
   DialogPortal,
   DialogRoot,
   DialogTitle,
-} from "@/components/dialog";
-import { Button } from "@/components/button";
+} from "@/components/common/dialog";
+import { Button } from "@/components/common/button";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { Editor, useEditor, readEditorContent } from "@/components/lexical";

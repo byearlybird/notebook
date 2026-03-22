@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { Button } from "@/components/button";
+import { Button } from "@/components/common/button";
 import {
   DialogBackdrop,
   DialogRoot,
   DialogPortal,
   DialogPopup,
   DialogTitle,
-} from "@/components/dialog";
+} from "@/components/common/dialog";
 import { dumpDatabase, type DatabaseDump } from "@/db/dump";
 import { AnimatePresence, motion } from "motion/react";
 
