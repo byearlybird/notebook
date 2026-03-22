@@ -3,6 +3,7 @@ import { FORMAT_TEXT_COMMAND, type TextFormatType } from "lexical";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { $getSelection, $isRangeSelection } from "lexical";
+import { cx } from "cva";
 import { motion } from "motion/react";
 
 const BOLD = 1;
@@ -72,7 +73,10 @@ function FormatButton({
     <button
       type="button"
       onClick={onClick}
-      className={`flex size-8 items-center justify-center rounded-md transition-colors ${active ? "bg-slate-light text-ivory-light" : "text-cloud-medium hover:text-ivory-light"}`}
+      className={cx(
+        "flex size-8 items-center justify-center rounded-md transition-colors",
+        active ? "bg-slate-light text-ivory-light" : "text-cloud-medium hover:text-ivory-light",
+      )}
     >
       {children}
     </button>

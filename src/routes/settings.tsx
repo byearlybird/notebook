@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { CaretLeftIcon, DownloadSimpleIcon, ExportIcon } from "@phosphor-icons/react";
-import { SwipeBackEdge } from "@/components/swipe-back-edge";
+import { SwipeBackEdge } from "@/components/navigation/swipe-back-edge";
 import { ExportDialog } from "@/components/entries/export-dialog";
 import { ImportDialog } from "@/components/entries/import-dialog";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";

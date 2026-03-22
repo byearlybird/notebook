@@ -2,6 +2,7 @@ import { Checkbox } from "@base-ui/react/checkbox";
 import { Field } from "@base-ui/react/field";
 import type { Task } from "@/models";
 import { CheckIcon } from "@phosphor-icons/react";
+import { cx } from "cva";
 
 export function TaskItem({
   task,
@@ -19,7 +20,10 @@ export function TaskItem({
   return (
     <Field.Root>
       <Field.Label
-        className={`flex items-center gap-3 ${isComplete ? "text-cloud-medium line-through" : "text-ivory-light"}`}
+        className={cx(
+          "flex items-center gap-3",
+          isComplete ? "text-cloud-medium line-through" : "text-ivory-light",
+        )}
       >
         <Checkbox.Root
           checked={isComplete}

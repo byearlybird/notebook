@@ -24,6 +24,7 @@ import { useMutation } from "@/utils/use-mutation";
 import { IntentionSection } from "@/components/monthly-log";
 import { useNavigate } from "@tanstack/react-router";
 import { formatDistanceToNowStrict, parseISO } from "date-fns";
+import { cx } from "cva";
 
 const UNDO_DELAY_MS = 3000;
 
@@ -63,7 +64,8 @@ export function TasksDialog({
     commitTimerRef.current = null;
     const today = new Date().toLocaleDateString("en-CA");
     updates.forEach((update, taskId) => {
-      if (update.action === "status") mutation(() => taskService.update(taskId, { status: update.status }));
+      if (update.action === "status")
+        mutation(() => taskService.update(taskId, { status: update.status }));
       else mutation(() => taskService.rollover(taskId, today));
     });
   }, [mutation]);
@@ -140,14 +142,24 @@ export function TasksDialog({
                       <button
                         type="button"
                         onClick={() => setActiveTab("tasks")}
-                        className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${activeTab === "tasks" ? "bg-slate-light text-ivory-light" : "text-cloud-medium"}`}
+                        className={cx(
+                          "rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors",
+                          activeTab === "tasks"
+                            ? "bg-slate-light text-ivory-light"
+                            : "text-cloud-medium",
+                        )}
                       >
                         Tasks
                       </button>
                       <button
                         type="button"
                         onClick={() => setActiveTab("goals")}
-                        className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${activeTab === "goals" ? "bg-slate-light text-ivory-light" : "text-cloud-medium"}`}
+                        className={cx(
+                          "rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors",
+                          activeTab === "goals"
+                            ? "bg-slate-light text-ivory-light"
+                            : "text-cloud-medium",
+                        )}
                       >
                         Month
                       </button>
@@ -314,7 +326,7 @@ function TodayTaskItem({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <div className={`text-sm text-ivory-light${isPending ? " line-through opacity-40" : ""}`}>
+      <div className={cx("text-sm text-ivory-light", isPending && "line-through opacity-40")}>
         <Renderer content={task.content} />
       </div>
       {isPending ? (
@@ -372,7 +384,7 @@ function PriorTaskItem({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-baseline justify-between gap-2">
-        <div className={`text-sm text-ivory-light${isPending ? " line-through opacity-40" : ""}`}>
+        <div className={cx("text-sm text-ivory-light", isPending && "line-through opacity-40")}>
           <Renderer content={task.content} />
         </div>
         <span className="shrink-0 text-xs text-cloud-dark">{dateLabel}</span>

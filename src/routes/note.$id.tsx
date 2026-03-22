@@ -9,7 +9,7 @@ import {
   TextContent,
   TextareaDialog,
 } from "@/components";
-import { SwipeBackEdge } from "@/components/swipe-back-edge";
+import { SwipeBackEdge } from "@/components/navigation/swipe-back-edge";
 import { useMutation } from "@/utils/use-mutation";
 import { CaretLeftIcon, DotsThreeIcon, PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react";
 import { createFileRoute, notFound } from "@tanstack/react-router";
