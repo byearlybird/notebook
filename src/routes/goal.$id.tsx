@@ -10,8 +10,8 @@ import {
   TextareaDialog,
 } from "@/components";
 import { SwipeBackEdge } from "@/components/swipe-back-edge";
-import { useDeleteGoal, useToggleGoalStatus, useUpdateGoal } from "@/features/monthly-log";
-import { monthlyGoalRepo } from "@/repos/monthly-goal-repo";
+import { goalService } from "@/app";
+import { useMutation } from "@/utils/use-mutation";
 import {
   ArrowCounterClockwiseIcon,
   CaretLeftIcon,
@@ -26,7 +26,7 @@ import { useState } from "react";
 export const Route = createFileRoute("/goal/$id")({
   component: RouteComponent,
   loader: async ({ params }) => {
-    const goal = await monthlyGoalRepo.findById(params.id);
+    const goal = await goalService.get(params.id);
     if (!goal) {
       throw notFound();
     }
@@ -38,9 +38,7 @@ function RouteComponent() {
   const { goal } = Route.useLoaderData();
   const navigate = Route.useNavigate();
   const [editOpen, setEditOpen] = useState(false);
-  const toggleGoalStatus = useToggleGoalStatus();
-  const deleteGoal = useDeleteGoal();
-  const updateGoal = useUpdateGoal();
+  const mutation = useMutation();
 
   const isComplete = goal.status === "complete";
 
@@ -78,7 +76,7 @@ function RouteComponent() {
                 </MenuItem>
                 <MenuItem
                   onClick={async () => {
-                    await deleteGoal(goal.id);
+                    await mutation(() => goalService.delete(goal.id));
                     goBack();
                   }}
                   className="text-error flex gap-2"
@@ -92,16 +90,16 @@ function RouteComponent() {
         </MenuRoot>
       </header>
 
-      <TextContent content={goal.content} updatedAt={goal.updated_at} createdAt={goal.created_at} />
+      <TextContent content={goal.content} updatedAt={goal.updatedAt} createdAt={goal.createdAt} />
 
       <section className="flex w-full gap-2 px-4 pb-safe-bottom pt-2">
         {isComplete ? (
-          <Button variant="slate" onClick={() => toggleGoalStatus(goal.id)}>
+          <Button variant="slate" onClick={() => mutation(() => goalService.setStatus(goal.id, "incomplete"))}>
             <ArrowCounterClockwiseIcon />
             Complete
           </Button>
         ) : (
-          <Button onClick={() => toggleGoalStatus(goal.id)}>
+          <Button onClick={() => mutation(() => goalService.setStatus(goal.id, "complete"))}>
             <StarIcon />
             Complete
           </Button>
@@ -112,7 +110,7 @@ function RouteComponent() {
         open={editOpen}
         onClose={() => setEditOpen(false)}
         onSave={async (content) => {
-          await updateGoal(goal.id, { content });
+          await mutation(() => goalService.update(goal.id, { content }));
           setEditOpen(false);
         }}
         title="Edit goal"

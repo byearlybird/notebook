@@ -11,15 +11,14 @@ import {
 import { CircleIcon, SquareIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { useCreateNote } from "@/features/notes";
-import { useCreateTask } from "@/features/tasks";
+import { noteService, taskService } from "@/app";
+import { useMutation } from "@/utils/use-mutation";
 import { AnimatePresence, motion } from "motion/react";
 import { Editor, useEditor, readEditorContent } from "@/components/lexical";
 import { $getRoot, $createParagraphNode } from "lexical";
 
 export function CreateDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const createNote = useCreateNote();
-  const createTask = useCreateTask();
+  const mutation = useMutation();
   const editor = useEditor();
   const [isEmpty, setIsEmpty] = useState(true);
   const [entryType, setEntryType] = useState<"note" | "task">("note");
@@ -40,9 +39,9 @@ export function CreateDialog({ open, onClose }: { open: boolean; onClose: () => 
     if (!content) return;
 
     if (entryType === "note") {
-      void createNote({ content });
+      void mutation(() => noteService.create(content));
     } else if (entryType === "task") {
-      void createTask({ content });
+      void mutation(() => taskService.create(content));
     }
 
     handleClose();

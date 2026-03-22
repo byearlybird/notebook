@@ -1,74 +1,39 @@
-import { notesRepo } from "@/repos/notes-repo";
-import { tasksRepo } from "@/repos/tasks-repo";
-import type { TimelineItem } from "@/features/entries/types";
-import { getAllMonthlyLogs } from "@/services/monthly-log-service";
+import type { Database } from "@/db/schema";
+import { toEntry, type Entry } from "@/models";
+import type { Kysely } from "kysely";
 
-export async function getEntriesToday(): Promise<TimelineItem[]> {
-  const today = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
-  const [notes, tasks] = await Promise.all([
-    notesRepo.findByDate(today),
-    tasksRepo.findByDate(today),
-  ]);
+export function createEntryService(db: Kysely<Database>) {
+  return {
+    async getToday(): Promise<Entry[]> {
+      const today = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
+      const entries = await db
+        .selectFrom("entries")
+        .selectAll()
+        .where("date", "=", today)
+        .where("type", "in", ["note", "task"])
+        .orderBy("createdAt", "desc")
+        .execute();
 
-  const entries: TimelineItem[] = [
-    ...notes.map((note) => ({ ...note, type: "note" as const })),
-    ...tasks.map((task) => ({ ...task, type: "task" as const })),
-  ];
+      return entries.map(toEntry);
+    },
 
-  return entries.sort((a, b) => b.created_at.localeCompare(a.created_at));
-}
+    async getGroupedByDate(): Promise<Record<string, Entry[]>> {
+      const entryRows = await db
+        .selectFrom("entries")
+        .selectAll()
+        .where("type", "in", ["note", "task"])
+        .orderBy("createdAt", "desc")
+        .execute();
 
-export async function getEntriesGroupedByDate(): Promise<
-  Record<string, TimelineItem[]>
-> {
-  const [notes, tasks, allLogs] = await Promise.all([
-    notesRepo.findAll(),
-    tasksRepo.findAll(),
-    getAllMonthlyLogs(),
-  ]);
+      const entries = entryRows.map(toEntry);
 
-  const noteEntries: TimelineItem[] = notes.map((note) => ({
-    ...note,
-    type: "note" as const,
-  }));
+      const entriesByDate: Record<string, Entry[]> = {};
+      for (const entry of entries) {
+        entriesByDate[entry.date] ??= [];
+        entriesByDate[entry.date].push(entry);
+      }
 
-  const taskEntries: TimelineItem[] = tasks.map((task) => ({
-    ...task,
-    type: "task" as const,
-  }));
-
-  const intentionEntries: TimelineItem[] = allLogs
-    .filter((log) => log.intention)
-    .map((log) => ({
-      id: log.id,
-      content: log.intention!,
-      created_at: log.created_at,
-      type: "intention" as const,
-    }));
-
-  const goalEntries: TimelineItem[] = allLogs.flatMap((log) =>
-    log.goals.map((goal) => ({
-      id: goal.id,
-      content: goal.content,
-      created_at: goal.created_at,
-      status: goal.status,
-      type: "goal" as const,
-    })),
-  );
-
-  const allEntries = [
-    ...noteEntries,
-    ...taskEntries,
-    ...intentionEntries,
-    ...goalEntries,
-  ].sort((a, b) => b.created_at.localeCompare(a.created_at));
-
-  const entriesByDate: Record<string, TimelineItem[]> = {};
-  for (const entry of allEntries) {
-    const date = new Date(entry.created_at).toLocaleDateString("en-CA"); // YYYY-MM-DD
-    entriesByDate[date] ??= [];
-    entriesByDate[date].push(entry);
-  }
-
-  return entriesByDate;
+      return entriesByDate;
+    },
+  };
 }

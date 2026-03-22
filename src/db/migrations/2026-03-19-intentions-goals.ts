@@ -1,20 +1,20 @@
 import { type Kysely, type Migration } from "kysely";
 
-export const Migration20260319MonthlyLog: Migration = {
+export const Migration20260319IntentionsGoals: Migration = {
   async up(db: Kysely<any>) {
     await db.schema
-      .createTable("monthly_logs")
+      .createTable("intentions")
       .addColumn("id", "text", (cb) => cb.primaryKey())
       .addColumn("month", "text", (cb) => cb.unique().notNull())
-      .addColumn("intention", "text")
+      .addColumn("content", "text", (cb) => cb.notNull())
       .addColumn("created_at", "text", (cb) => cb.notNull())
       .addColumn("updated_at", "text", (cb) => cb.notNull())
       .execute();
 
     await db.schema
-      .createTable("monthly_goals")
+      .createTable("goals")
       .addColumn("id", "text", (cb) => cb.primaryKey())
-      .addColumn("monthly_log_id", "text", (cb) => cb.notNull())
+      .addColumn("month", "text", (cb) => cb.notNull())
       .addColumn("content", "text", (cb) => cb.notNull())
       .addColumn("status", "text", (cb) => cb.notNull())
       .addColumn("created_at", "text", (cb) => cb.notNull())
@@ -22,7 +22,7 @@ export const Migration20260319MonthlyLog: Migration = {
       .execute();
   },
   async down(db: Kysely<any>) {
-    await db.schema.dropTable("monthly_goals").execute();
-    await db.schema.dropTable("monthly_logs").execute();
+    await db.schema.dropTable("goals").execute();
+    await db.schema.dropTable("intentions").execute();
   },
 };

@@ -1,3 +1,4 @@
+import { noteService } from "@/app";
 import {
   MenuItem,
   MenuPopup,
@@ -9,7 +10,6 @@ import {
 } from "@/components";
 import { SwipeBackEdge } from "@/components/swipe-back-edge";
 import { EditNoteDialog } from "@/features/notes";
-import * as notesService from "@/services/notes-service";
 import { CaretLeftIcon, DotsThreeIcon, PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
@@ -24,7 +24,7 @@ export const Route = createFileRoute("/note/$id")({
   component: RouteComponent,
   validateSearch: (search: Record<string, unknown>) => noteSearchSchema.parse(search),
   loader: async ({ params }) => {
-    const note = await notesService.getNoteById(params.id);
+    const note = await noteService.get(params.id);
     if (!note) {
       throw notFound();
     }
@@ -52,12 +52,12 @@ function RouteComponent() {
   };
 
   const handleDelete = () => {
-    notesService.deleteNote(note.id);
+    noteService.delete(note.id);
     goBack();
   };
 
   const formattedDate = format(parseISO(note.date), "MMMM d");
-  const createdTime = format(parseISO(note.created_at), "h:mm a");
+  const createdTime = format(parseISO(note.createdAt), "h:mm a");
 
   return (
     <div className="flex min-h-screen flex-col max-w-2xl mx-auto pt-safe-top pb-safe-bottom">
@@ -75,7 +75,7 @@ function RouteComponent() {
           <time className="font-medium" dateTime={note.date}>
             {formattedDate}
           </time>
-          <time className="block text-xs text-cloud-medium" dateTime={note.created_at}>
+          <time className="block text-xs text-cloud-medium" dateTime={note.createdAt}>
             {createdTime}
           </time>
         </div>
@@ -100,7 +100,7 @@ function RouteComponent() {
         </MenuRoot>
       </header>
       {/* Content area */}
-      <TextContent content={note.content} updatedAt={note.updated_at} createdAt={note.created_at} />
+      <TextContent content={note.content} updatedAt={note.updatedAt} createdAt={note.createdAt} />
       <EditNoteDialog open={editOpen} onClose={() => setEditOpen(false)} note={note} />
       <SwipeBackEdge onBack={goBack} />
     </div>

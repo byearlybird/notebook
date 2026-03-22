@@ -8,7 +8,7 @@ import {
   XSquareIcon,
   ArrowSquareRightIcon,
 } from "@phosphor-icons/react";
-import type { TimelineItem } from "./types";
+import type { Entry } from "@/models";
 import { Button as BaseButton } from "@base-ui/react";
 import { cx } from "cva";
 import { Renderer } from "@/components/lexical";
@@ -18,11 +18,11 @@ export function Timeline({
   size = "default",
   onEntryClick,
 }: {
-  entries: TimelineItem[];
+  entries: Entry[];
   size?: "default" | "compact";
-  onEntryClick?: (entry: TimelineItem) => void;
+  onEntryClick?: (entry: Entry) => void;
 }) {
-  const handleClick = (entry: TimelineItem) => {
+  const handleClick = (entry: Entry) => {
     onEntryClick?.(entry);
   };
 
@@ -52,7 +52,7 @@ export function Timeline({
                 size === "compact" ? "text-xs text-cloud-medium" : "text-sm text-cloud-medium"
               }
             >
-              {formatTime(entry.created_at)}
+              {formatTime(entry.createdAt)}
             </div>
             <div className={cx("mt-2", size === "compact" && "text-sm line-clamp-3")}>
               <Renderer content={entry.content} />
@@ -64,7 +64,7 @@ export function Timeline({
   );
 }
 
-function EntryIcon({ entry }: { entry: TimelineItem }) {
+function EntryIcon({ entry }: { entry: Entry }) {
   switch (entry.type) {
     case "note":
       return <CircleIcon className="size-4 text-cloud-light" />;
@@ -77,9 +77,7 @@ function EntryIcon({ entry }: { entry: TimelineItem }) {
         <StarIcon
           weight={entry.status === "complete" ? "fill" : "regular"}
           className={
-            entry.status === "complete"
-              ? "size-4 text-gold-light"
-              : "size-4 text-cloud-light"
+            entry.status === "complete" ? "size-4 text-gold-light" : "size-4 text-cloud-light"
           }
         />
       );

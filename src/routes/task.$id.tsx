@@ -9,8 +9,9 @@ import {
   TextContent,
 } from "@/components";
 import { SwipeBackEdge } from "@/components/swipe-back-edge";
-import { EditTaskDialog, useUpdateTaskStatus } from "@/features/tasks";
-import * as tasksService from "@/services/tasks-service";
+import { taskService } from "@/app";
+import { EditTaskDialog } from "@/features/tasks";
+import { useMutation } from "@/utils/use-mutation";
 import {
   ArrowCounterClockwiseIcon,
   ArrowSquareRightIcon,
@@ -25,6 +26,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import { useState } from "react";
 import z from "zod";
+import type { Task } from "@/models";
 
 const taskSearchSchema = z.object({
   from: z.enum(["index", "entries"]).optional().catch(undefined),
@@ -35,7 +37,13 @@ export const Route = createFileRoute("/task/$id")({
   validateSearch: (search: Record<string, unknown>) => taskSearchSchema.parse(search),
   loader: async ({ params }) => {
     try {
-      return await tasksService.getTaskWithRolled(params.id);
+      const task = await taskService.get(params.id);
+      let rolledTask: Task | undefined;
+      if (!task) throw notFound();
+      if (task.status === "deferred") {
+        rolledTask = await taskService.getFirstByOriginalId(task.id);
+      }
+      return { task, rolledTask };
     } catch {
       throw notFound();
     }
@@ -46,23 +54,23 @@ function RouteComponent() {
   const { task, rolledTask } = Route.useLoaderData();
   const { from } = Route.useSearch();
   const navigate = Route.useNavigate();
-  const updateTaskStatus = useUpdateTaskStatus();
+  const mutation = useMutation();
   const [editOpen, setEditOpen] = useState(false);
 
   const handleComplete = () => {
-    updateTaskStatus({ id: task.id, status: "complete" });
+    mutation(() => taskService.update(task.id, { status: "complete" }));
   };
 
   const handleCancel = () => {
-    updateTaskStatus({ id: task.id, status: "canceled" });
+    mutation(() => taskService.update(task.id, { status: "canceled" }));
   };
 
   const handleReset = () => {
-    updateTaskStatus({ id: task.id, status: "incomplete" });
+    mutation(() => taskService.update(task.id, { status: "incomplete" }));
   };
 
   const handleDelete = () => {
-    tasksService.deleteTask(task.id);
+    taskService.delete(task.id);
     handleBack();
   };
 
@@ -77,7 +85,7 @@ function RouteComponent() {
   };
 
   const formattedDate = format(parseISO(task.date), "MMMM d");
-  const createdTime = format(parseISO(task.created_at), "h:mm a");
+  const createdTime = format(parseISO(task.createdAt), "h:mm a");
 
   return (
     <div className="flex min-h-screen flex-col max-w-2xl mx-auto pt-safe-top pb-safe-bottom">
@@ -95,7 +103,7 @@ function RouteComponent() {
           <time className="font-medium" dateTime={task.date}>
             {formattedDate}
           </time>
-          <time className="block text-xs text-cloud-medium" dateTime={task.created_at}>
+          <time className="block text-xs text-cloud-medium" dateTime={task.createdAt}>
             {createdTime}
           </time>
         </div>
@@ -120,7 +128,7 @@ function RouteComponent() {
         </MenuRoot>
       </header>
       {/* Content area */}
-      <TextContent content={task.content} updatedAt={task.updated_at} createdAt={task.created_at} />
+      <TextContent content={task.content} updatedAt={task.updatedAt} createdAt={task.createdAt} />
       {/* Controls section */}
       <section className="flex w-full gap-2 px-4 pb-safe-bottom pt-2">
         {task.status === "incomplete" ? (

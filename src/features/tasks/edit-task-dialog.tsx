@@ -1,6 +1,7 @@
 import { TextareaDialog } from "@/components";
-import type { Task } from "@/db";
-import { useUpdateTask } from "./use-tasks";
+import type { Task } from "@/models";
+import { taskService } from "@/app";
+import { useMutation } from "@/utils/use-mutation";
 
 export function EditTaskDialog({
   open,
@@ -11,13 +12,13 @@ export function EditTaskDialog({
   onClose: () => void;
   task: Pick<Task, "id" | "content">;
 }) {
-  const updateTask = useUpdateTask();
+  const mutation = useMutation();
 
   return (
     <TextareaDialog
       open={open}
       onClose={onClose}
-      onSave={(content) => updateTask(task.id, { content })}
+      onSave={(content) => mutation(() => taskService.update(task.id, { content }))}
       title="Edit task"
       placeholder="What needs to be done?"
       initialContent={task.content}

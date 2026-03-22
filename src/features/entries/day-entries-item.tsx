@@ -1,4 +1,4 @@
-import type { TimelineItem } from "./types";
+import type { Entry } from "@/models";
 import { formatMonthDate, formatDayOfWeek } from "@/utils/date-utils";
 import { Timeline } from "./timeline";
 import { parseISO } from "date-fns";
@@ -8,9 +8,9 @@ export function DayEntriesItem({
   date,
   onEntryClick,
 }: {
-  entries: TimelineItem[];
+  entries: Entry[];
   date: string;
-  onEntryClick?: (entry: TimelineItem) => void;
+  onEntryClick?: (entry: Entry) => void;
 }) {
   return (
     <article className="flex flex-col gap-4">
