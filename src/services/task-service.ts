@@ -67,7 +67,6 @@ export function createTaskService(db: Kysely<Database>) {
           .set({
             status: "deferred",
             updatedAt: new Date().toISOString(),
-            date: targetDate,
           })
           .where("id", "=", taskId)
           .where("type", "=", "task")
