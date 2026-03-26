@@ -34,7 +34,7 @@ export function IntentionSection({
     <>
       <button
         type="button"
-        className="w-full rounded-lg my-2 -mx-2 px-2 py-4 text-left transition-colors active:bg-slate-light/50 flex items-center gap-2.5"
+        className="w-full rounded-lg -mx-2 px-2 py-2.5 text-left transition-colors active:bg-slate-light/50 flex items-center gap-2.5"
         onClick={handleClick}
       >
         <FlowerLotusIcon />

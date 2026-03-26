@@ -42,5 +42,26 @@ export function createNoteService(db: Kysely<Database>) {
     delete: async (id: string) => {
       await db.deleteFrom("entries").where("id", "=", id).where("type", "=", "note").execute();
     },
+    togglePin: async (id: string, pinned: boolean) => {
+      await db
+        .updateTable("entries")
+        .set({
+          status: pinned ? "pinned" : null,
+          updatedAt: new Date().toISOString(),
+        })
+        .where("id", "=", id)
+        .where("type", "=", "note")
+        .execute();
+    },
+    getPinned: async (): Promise<Note[]> => {
+      const results = await db
+        .selectFrom("entries")
+        .selectAll()
+        .where("type", "=", "note")
+        .where("status", "=", "pinned")
+        .orderBy("updatedAt", "desc")
+        .execute();
+      return results.map(toNote);
+    },
   };
 }

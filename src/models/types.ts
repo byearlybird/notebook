@@ -6,7 +6,7 @@ type BaseEntry = {
   updatedAt: string;
 };
 
-export type Note = BaseEntry & { type: "note" };
+export type Note = BaseEntry & { type: "note"; status: null | "pinned" };
 
 export type Intention = BaseEntry & { type: "intention" };
 

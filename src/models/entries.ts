@@ -20,6 +20,7 @@ export function toNote(row: EntryRow): Note {
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
     type: "note",
+    status: row.status as Note["status"],
   };
 }
 

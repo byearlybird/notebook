@@ -9,7 +9,12 @@ import {
 } from "@/components";
 import { SwipeBackEdge } from "@/components/navigation/swipe-back-edge";
 import { useMutation } from "@/utils/use-mutation";
-import { CaretLeftIcon, PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react";
+import {
+  CaretLeftIcon,
+  PencilSimpleIcon,
+  PushPinSimpleIcon,
+  TrashIcon,
+} from "@phosphor-icons/react";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import { useState } from "react";
@@ -37,6 +42,7 @@ function RouteComponent() {
   const navigate = Route.useNavigate();
   const mutation = useMutation();
   const [editOpen, setEditOpen] = useState(false);
+  const isPinned = note.status === "pinned";
 
   const goBack = () => {
     if (from === "index") {
@@ -79,6 +85,18 @@ function RouteComponent() {
             {createdTime}
           </time>
         </div>
+        <button
+          type="button"
+          onClick={() => mutation(() => noteService.togglePin(note.id, !isPinned))}
+          className="flex size-10 shrink-0 items-center justify-center rounded-md transition-transform active:scale-105"
+          aria-label={isPinned ? "Unpin note" : "Pin note"}
+        >
+          {isPinned ? (
+            <PushPinSimpleIcon className="size-4" weight="fill" />
+          ) : (
+            <PushPinSimpleIcon className="size-4 text-cloud-medium" />
+          )}
+        </button>
         <MenuRoot>
           <MenuButton />
           <MenuContent>

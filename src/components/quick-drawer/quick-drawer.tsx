@@ -1,4 +1,4 @@
-import type { Intention, Task } from "@/models";
+import type { Intention, Note, Task } from "@/models";
 import {
   DrawerContent,
   DrawerRoot,
@@ -16,6 +16,7 @@ export function QuickDrawer({
   priorTasks,
   intention,
   month,
+  pinnedNotes,
   open,
   onClose,
 }: {
@@ -23,6 +24,7 @@ export function QuickDrawer({
   priorTasks: Task[];
   intention: Intention | null;
   month: string;
+  pinnedNotes: Note[];
   open: boolean;
   onClose: () => void;
 }) {
@@ -39,7 +41,7 @@ export function QuickDrawer({
             <TaskTab todayTasks={todayTasks} priorTasks={priorTasks} open={open} />
           </DrawerTabPanel>
           <DrawerTabPanel value="pinned">
-            <PinnedTab intention={intention} month={month} />
+            <PinnedTab intention={intention} month={month} pinnedNotes={pinnedNotes} />
           </DrawerTabPanel>
         </DrawerTabRoot>
       </DrawerContent>
