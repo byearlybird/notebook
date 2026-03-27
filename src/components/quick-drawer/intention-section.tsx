@@ -5,7 +5,7 @@ import { intentionService } from "@/app";
 import { useMutation } from "@/utils/use-mutation";
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { FlowerLotusIcon } from "@phosphor-icons/react";
+import { StarIcon } from "@phosphor-icons/react";
 
 export function IntentionSection({
   intention,
@@ -37,11 +37,11 @@ export function IntentionSection({
         className="w-full rounded-lg -mx-2 px-2 py-2.5 text-left transition-colors active:bg-slate-light/50 flex items-center gap-2.5"
         onClick={handleClick}
       >
-        <FlowerLotusIcon />
+        <StarIcon className="size-4" />
         {intention ? (
           <Renderer content={intention.content} />
         ) : (
-          <span className="text-sm text-cloud-light">Set an intention</span>
+          <span className="text-sm text-cloud-light">Set a monthly intention</span>
         )}
       </button>
 

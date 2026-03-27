@@ -4,6 +4,7 @@ import { cx } from "cva";
 type ActionNavbarProps = {
   hasIncompleteTasks: boolean;
   hasPriorTasks: boolean;
+  missingIntention: boolean;
   onCreateClick: () => void;
   onPushpinClick: () => void;
 };
@@ -11,6 +12,7 @@ type ActionNavbarProps = {
 export function ActionNavbar({
   hasIncompleteTasks,
   hasPriorTasks,
+  missingIntention,
   onCreateClick,
   onPushpinClick,
 }: ActionNavbarProps) {
@@ -24,7 +26,7 @@ export function ActionNavbar({
         >
           <LightningIcon
             className={cx("size-5", hasPriorTasks ? "text-gold-dark" : "text-ivory-light")}
-            weight={hasIncompleteTasks ? "fill" : "regular"}
+            weight={hasIncompleteTasks || missingIntention ? "fill" : "regular"}
           />
         </button>
         <button

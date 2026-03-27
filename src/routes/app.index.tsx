@@ -3,7 +3,7 @@ import { Renderer } from "@/components/lexical/renderer";
 import { Timeline } from "@/components/entries/timeline";
 import type { Entry } from "@/models";
 import { formatDayOfWeek, formatMonthDate, getCurrentMonth } from "@/utils/date-utils";
-import { FlowerLotusIcon, SlidersHorizontalIcon } from "@phosphor-icons/react";
+import { SlidersHorizontalIcon, StarIcon } from "@phosphor-icons/react";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/app/")({
@@ -62,7 +62,7 @@ function JournalPage() {
         <div className="flex-1 flex flex-col items-center justify-center gap-3 -mt-20">
           {intention && (
             <div className="flex items-center gap-2 text-cloud-light">
-              <FlowerLotusIcon className="size-4 shrink-0 mt-0.5" />
+              <StarIcon className="size-4 shrink-0 mt-0.5" />
               <div className="line-clamp-3">
                 <Renderer content={intention} />
               </div>

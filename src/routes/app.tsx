@@ -80,6 +80,7 @@ function AppLayout({
         <ActionNavbar
           hasIncompleteTasks={todayTasks.length > 0 || priorTasks.length > 0}
           hasPriorTasks={priorTasks.length > 0}
+          missingIntention={intention === null}
           onCreateClick={() => setIsCreateDialogOpen(true)}
           onPushpinClick={() => setIsPushpinDialogOpen(true)}
         />

@@ -2,7 +2,7 @@ import { formatTime } from "@/utils/date-utils";
 import {
   CheckSquareIcon,
   CircleIcon,
-  FlowerLotusIcon,
+  StarIcon,
   SquareIcon,
   XSquareIcon,
   ArrowSquareRightIcon,
@@ -64,7 +64,7 @@ function EntryIcon({ entry }: { entry: Entry }) {
     case "task":
       return <TaskIcon status={entry.status} />;
     case "intention":
-      return <FlowerLotusIcon className="size-4 text-cloud-light" />;
+      return <StarIcon className="size-4 text-cloud-light" />;
   }
 }
 
