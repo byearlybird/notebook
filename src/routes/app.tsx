@@ -20,7 +20,13 @@ export const Route = createFileRoute("/app")({
     const today = new Date().toLocaleDateString("en-CA");
     const todayTasks = incompleteTasks.filter((t) => t.date === today);
     const priorTasks = incompleteTasks.filter((t) => t.date < today);
-    return { todayTasks, priorTasks, intention: intention ?? null, month: currentMonth, pinnedNotes };
+    return {
+      todayTasks,
+      priorTasks,
+      intention: intention ?? null,
+      month: currentMonth,
+      pinnedNotes,
+    };
   },
 });
 

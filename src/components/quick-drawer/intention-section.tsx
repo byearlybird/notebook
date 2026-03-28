@@ -42,11 +42,7 @@ export function IntentionSection({
         )}
       </button>
 
-      <IntentionDialog
-        month={month}
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-      />
+      <IntentionDialog month={month} open={dialogOpen} onClose={() => setDialogOpen(false)} />
     </>
   );
 }

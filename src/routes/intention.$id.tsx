@@ -6,10 +6,15 @@ import {
   TextContent,
   TextareaDialog,
 } from "@/components";
-import { SwipeBackEdge } from "@/components/navigation/swipe-back-edge";
+import {
+  DetailPage,
+  DetailPageHeader,
+  DetailPageActions,
+  DetailPageTitle,
+} from "@/components/page/detail-page";
 import { intentionService } from "@/app";
 import { useMutation } from "@/utils/use-mutation";
-import { CaretLeftIcon, PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react";
+import { PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import z from "zod";
@@ -46,39 +51,33 @@ function RouteComponent() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col max-w-2xl mx-auto pt-safe-top pb-safe-bottom">
-      <header className="flex items-center gap-2 px-4 py-2">
-        <button
-          type="button"
-          onClick={goBack}
-          className="flex size-10 shrink-0 items-center justify-center rounded-md transition-transform active:scale-105"
-          aria-label="Go back"
-        >
-          <CaretLeftIcon className="size-6" />
-        </button>
-        <div className="flex-1 text-center">
+    <DetailPage onGoBack={goBack}>
+      <DetailPageHeader>
+        <DetailPageTitle>
           <span className="font-medium">Intention</span>
-        </div>
-        <MenuRoot>
-          <MenuButton />
-          <MenuContent>
-            <MenuItem onClick={() => setEditOpen(true)}>
-              <PencilSimpleIcon className="size-4" />
-              Edit
-            </MenuItem>
-            <MenuItem
-              onClick={async () => {
-                await mutation(() => intentionService.delete(intention.id));
-                goBack();
-              }}
-              variant="destructive"
-            >
-              <TrashIcon className="size-4" />
-              Delete
-            </MenuItem>
-          </MenuContent>
-        </MenuRoot>
-      </header>
+        </DetailPageTitle>
+        <DetailPageActions>
+          <MenuRoot>
+            <MenuButton />
+            <MenuContent>
+              <MenuItem onClick={() => setEditOpen(true)}>
+                <PencilSimpleIcon className="size-4" />
+                Edit
+              </MenuItem>
+              <MenuItem
+                onClick={async () => {
+                  await mutation(() => intentionService.delete(intention.id));
+                  goBack();
+                }}
+                variant="destructive"
+              >
+                <TrashIcon className="size-4" />
+                Delete
+              </MenuItem>
+            </MenuContent>
+          </MenuRoot>
+        </DetailPageActions>
+      </DetailPageHeader>
 
       <TextContent
         content={intention.content}
@@ -96,7 +95,6 @@ function RouteComponent() {
         title="Edit intention"
         initialContent={intention.content}
       />
-      <SwipeBackEdge onBack={goBack} />
-    </div>
+    </DetailPage>
   );
 }

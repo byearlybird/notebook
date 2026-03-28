@@ -38,11 +38,7 @@ export function DrawerCloseButton() {
 
 export const DrawerTabRoot = Tabs.Root;
 
-export function DrawerTabList({
-  children,
-  className,
-  ...props
-}: ComponentProps<typeof Tabs.List>) {
+export function DrawerTabList({ children, className, ...props }: ComponentProps<typeof Tabs.List>) {
   return (
     <div className="sticky top-0 z-10 flex items-center justify-between p-2 bg-slate-medium">
       <Tabs.List className={cx("flex gap-3", className)} {...props}>
@@ -53,18 +49,23 @@ export function DrawerTabList({
   );
 }
 
-export function DrawerTab({
-  className,
-  ...props
-}: ComponentProps<typeof Tabs.Tab>) {
-  return <Tabs.Tab className={cx("px-2.5 py-1.5 rounded-md text-xs font-medium text-cloud-medium transition-colors data-active:bg-slate-light data-active:text-ivory-light", className)} {...props} />;
+export function DrawerTab({ className, ...props }: ComponentProps<typeof Tabs.Tab>) {
+  return (
+    <Tabs.Tab
+      className={cx(
+        "px-2.5 py-1.5 rounded-md text-xs font-medium text-cloud-medium transition-colors data-active:bg-slate-light data-active:text-ivory-light",
+        className,
+      )}
+      {...props}
+    />
+  );
 }
 
-export function DrawerTabPanel({
-  className,
-  ...props
-}: ComponentProps<typeof Tabs.Panel>) {
+export function DrawerTabPanel({ className, ...props }: ComponentProps<typeof Tabs.Panel>) {
   return (
-    <Tabs.Panel className={cx("flex flex-1 flex-col gap-4 overflow-y-auto p-2 px-4", className)} {...props} />
+    <Tabs.Panel
+      className={cx("flex flex-1 flex-col gap-4 overflow-y-auto p-2 px-4", className)}
+      {...props}
+    />
   );
 }

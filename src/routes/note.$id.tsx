@@ -8,13 +8,14 @@ import {
   TextareaDialog,
 } from "@/components";
 import { SwipeBackEdge } from "@/components/navigation/swipe-back-edge";
-import { useMutation } from "@/utils/use-mutation";
 import {
-  CaretLeftIcon,
-  PencilSimpleIcon,
-  PushPinSimpleIcon,
-  TrashIcon,
-} from "@phosphor-icons/react";
+  DetailPage,
+  DetailPageHeader,
+  DetailPageActions,
+  DetailPageTitle,
+} from "@/components/page/detail-page";
+import { useMutation } from "@/utils/use-mutation";
+import { PencilSimpleIcon, PushPinSimpleIcon, TrashIcon } from "@phosphor-icons/react";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import { useState } from "react";
@@ -66,51 +67,45 @@ function RouteComponent() {
   const createdTime = format(parseISO(note.createdAt), "h:mm a");
 
   return (
-    <div className="flex min-h-screen flex-col max-w-2xl mx-auto pt-safe-top pb-safe-bottom">
+    <DetailPage onGoBack={goBack}>
       {/* Header row */}
-      <header className="flex items-center gap-2 px-4 py-2">
-        <button
-          type="button"
-          onClick={goBack}
-          className="flex size-10 shrink-0 items-center justify-center rounded-md transition-transform active:scale-105"
-          aria-label="Go back"
-        >
-          <CaretLeftIcon className="size-6" />
-        </button>
-        <div className="flex-1 text-center flex flex-col justify-between gap-2">
+      <DetailPageHeader>
+        <DetailPageTitle>
           <time className="font-medium" dateTime={note.date}>
             {formattedDate}
           </time>
           <time className="block text-xs text-cloud-medium" dateTime={note.createdAt}>
             {createdTime}
           </time>
-        </div>
-        <button
-          type="button"
-          onClick={() => mutation(() => noteService.togglePin(note.id, !isPinned))}
-          className="flex size-10 shrink-0 items-center justify-center rounded-md transition-transform active:scale-105"
-          aria-label={isPinned ? "Unpin note" : "Pin note"}
-        >
-          {isPinned ? (
-            <PushPinSimpleIcon className="size-4" weight="fill" />
-          ) : (
-            <PushPinSimpleIcon className="size-4 text-cloud-medium" />
-          )}
-        </button>
-        <MenuRoot>
-          <MenuButton />
-          <MenuContent>
-            <MenuItem onClick={() => setEditOpen(true)}>
-              <PencilSimpleIcon className="size-4" />
-              Edit
-            </MenuItem>
-            <MenuItem onClick={handleDelete} variant="destructive">
-              <TrashIcon className="size-4" />
-              Delete
-            </MenuItem>
-          </MenuContent>
-        </MenuRoot>
-      </header>
+        </DetailPageTitle>
+        <DetailPageActions>
+          <button
+            type="button"
+            onClick={() => mutation(() => noteService.togglePin(note.id, !isPinned))}
+            className="flex size-10 shrink-0 items-center justify-center rounded-md transition-transform active:scale-105"
+            aria-label={isPinned ? "Unpin note" : "Pin note"}
+          >
+            {isPinned ? (
+              <PushPinSimpleIcon className="size-4" weight="fill" />
+            ) : (
+              <PushPinSimpleIcon className="size-4 text-cloud-medium" />
+            )}
+          </button>
+          <MenuRoot>
+            <MenuButton />
+            <MenuContent>
+              <MenuItem onClick={() => setEditOpen(true)}>
+                <PencilSimpleIcon className="size-4" />
+                Edit
+              </MenuItem>
+              <MenuItem onClick={handleDelete} variant="destructive">
+                <TrashIcon className="size-4" />
+                Delete
+              </MenuItem>
+            </MenuContent>
+          </MenuRoot>
+        </DetailPageActions>
+      </DetailPageHeader>
       {/* Content area */}
       <TextContent content={note.content} updatedAt={note.updatedAt} createdAt={note.createdAt} />
       <TextareaDialog
@@ -122,6 +117,6 @@ function RouteComponent() {
         initialContent={note.content}
       />
       <SwipeBackEdge onBack={goBack} />
-    </div>
+    </DetailPage>
   );
 }

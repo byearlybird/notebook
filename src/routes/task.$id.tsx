@@ -7,13 +7,17 @@ import {
   TextContent,
   TextareaDialog,
 } from "@/components";
-import { SwipeBackEdge } from "@/components/navigation/swipe-back-edge";
+import {
+  DetailPage,
+  DetailPageHeader,
+  DetailPageActions,
+  DetailPageTitle,
+} from "@/components/page/detail-page";
 import { taskService } from "@/app";
 import { useMutation } from "@/utils/use-mutation";
 import {
   ArrowCounterClockwiseIcon,
   ArrowSquareRightIcon,
-  CaretLeftIcon,
   CheckSquareIcon,
   PencilSimpleIcon,
   TrashIcon,
@@ -85,39 +89,33 @@ function RouteComponent() {
   const createdTime = format(parseISO(task.createdAt), "h:mm a");
 
   return (
-    <div className="flex min-h-screen flex-col max-w-2xl mx-auto pt-safe-top pb-safe-bottom">
+    <DetailPage onGoBack={handleBack}>
       {/* Header row */}
-      <header className="flex items-center gap-2 px-4 py-2">
-        <button
-          type="button"
-          onClick={handleBack}
-          className="flex size-10 shrink-0 items-center justify-center rounded-md transition-transform active:scale-105"
-          aria-label="Go back"
-        >
-          <CaretLeftIcon className="size-6" />
-        </button>
-        <div className="flex-1 text-center flex flex-col justify-between gap-2">
+      <DetailPageHeader>
+        <DetailPageTitle>
           <time className="font-medium" dateTime={task.date}>
             {formattedDate}
           </time>
           <time className="block text-xs text-cloud-medium" dateTime={task.createdAt}>
             {createdTime}
           </time>
-        </div>
-        <MenuRoot>
-          <MenuButton />
-          <MenuContent>
-            <MenuItem onClick={() => setEditOpen(true)}>
-              <PencilSimpleIcon className="size-4" />
-              Edit
-            </MenuItem>
-            <MenuItem onClick={handleDelete} variant="destructive">
-              <TrashIcon className="size-4" />
-              Delete
-            </MenuItem>
-          </MenuContent>
-        </MenuRoot>
-      </header>
+        </DetailPageTitle>
+        <DetailPageActions>
+          <MenuRoot>
+            <MenuButton />
+            <MenuContent>
+              <MenuItem onClick={() => setEditOpen(true)}>
+                <PencilSimpleIcon className="size-4" />
+                Edit
+              </MenuItem>
+              <MenuItem onClick={handleDelete} variant="destructive">
+                <TrashIcon className="size-4" />
+                Delete
+              </MenuItem>
+            </MenuContent>
+          </MenuRoot>
+        </DetailPageActions>
+      </DetailPageHeader>
       {/* Content area */}
       <TextContent content={task.content} updatedAt={task.updatedAt} createdAt={task.createdAt} />
       {/* Controls section */}
@@ -165,7 +163,6 @@ function RouteComponent() {
         placeholder="What needs to be done?"
         initialContent={task.content}
       />
-      <SwipeBackEdge onBack={handleBack} />
-    </div>
+    </DetailPage>
   );
 }

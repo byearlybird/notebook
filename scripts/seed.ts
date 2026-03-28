@@ -79,11 +79,7 @@ function task(
   });
 }
 
-function note(
-  date: string,
-  text: string,
-  opts?: { hour?: number; pinned?: boolean },
-): EntryRow {
+function note(date: string, text: string, opts?: { hour?: number; pinned?: boolean }): EntryRow {
   const hour = opts?.hour ?? 10;
   const e = entry({
     date,
@@ -114,10 +110,7 @@ const caseStudyId4 = "seed-cs-4";
 
 const entries: EntryRow[] = [
   // === March 12 (Thursday) — Intention + busy day ===
-  intention(
-    "2026-03-12",
-    "Ship the portfolio and find a rhythm that sticks.",
-  ),
+  intention("2026-03-12", "Ship the portfolio and find a rhythm that sticks."),
   task("2026-03-12", "Client logo revisions", "complete", { hour: 9 }),
   task("2026-03-12", "Reply to Sarah's text", "complete", { hour: 10 }),
   task("2026-03-12", "Grocery run — out of coffee and eggs", "complete", {
@@ -181,12 +174,7 @@ const entries: EntryRow[] = [
     id: caseStudyId3,
     originId: caseStudyId2,
   }),
-  task(
-    "2026-03-16",
-    "Sign up for that coworking membership",
-    "canceled",
-    { hour: 10 },
-  ),
+  task("2026-03-16", "Sign up for that coworking membership", "canceled", { hour: 10 }),
   task("2026-03-16", "Finish reading that typography article", "complete", {
     hour: 11,
   }),
@@ -201,12 +189,11 @@ const entries: EntryRow[] = [
 
   // === March 17 (Tuesday) — productive ===
   task("2026-03-17", "Sketch ideas for the rebrand project", "complete", { hour: 9 }),
-  task(
-    "2026-03-17",
-    "Write case study for the wayfinding project",
-    "complete",
-    { hour: 14, id: caseStudyId4, originId: caseStudyId3 },
-  ),
+  task("2026-03-17", "Write case study for the wayfinding project", "complete", {
+    hour: 14,
+    id: caseStudyId4,
+    originId: caseStudyId3,
+  }),
   task("2026-03-17", "Email final deliverables to the wayfinding client", "complete", {
     hour: 15,
   }),
@@ -351,11 +338,10 @@ const entries: EntryRow[] = [
     hour: 8,
     pinned: true,
   }),
-  note(
-    "2026-03-12",
-    "Morning = design. Afternoon = admin. Protect the morning.",
-    { hour: 8, pinned: true },
-  ),
+  note("2026-03-12", "Morning = design. Afternoon = admin. Protect the morning.", {
+    hour: 8,
+    pinned: true,
+  }),
 ];
 
 const dump: DatabaseDump = {
