@@ -7,8 +7,15 @@ export type EntryRow = {
   type: "note" | "task" | "intention";
   status: string | null;
   originId: string | null;
+  labelId: string | null;
+};
+
+export type LabelRow = {
+  id: string;
+  name: string;
 };
 
 export type Database = {
   entries: EntryRow;
+  labels: LabelRow;
 };

@@ -1,20 +1,23 @@
 import type { Database } from "@/db/schema";
 import { toTask, type Task } from "@/models";
 import type { Kysely } from "kysely";
+import { fetchLabelMap } from "./label-helpers";
 
 export function createTaskService(db: Kysely<Database>) {
   return {
-    async create(content: string) {
+    async create(content: string, labelId?: string | null) {
+      const id = crypto.randomUUID();
       const now = new Date().toISOString();
       await db
         .insertInto("entries")
         .values({
-          id: crypto.randomUUID(),
+          id,
           date: new Date().toLocaleDateString("en-CA"),
           content,
           type: "task",
           status: "incomplete",
           originId: null,
+          labelId: labelId ?? null,
           createdAt: now,
           updatedAt: now,
         })
@@ -27,7 +30,9 @@ export function createTaskService(db: Kysely<Database>) {
         .where("id", "=", id)
         .where("type", "=", "task")
         .executeTakeFirst();
-      return result ? toTask(result) : undefined;
+      if (!result) return undefined;
+      const labelMap = await fetchLabelMap(db, [result.labelId]);
+      return toTask(result, result.labelId ? (labelMap.get(result.labelId) ?? null) : null);
     },
     async update(id: string, updates: Partial<Pick<Task, "content" | "status">>) {
       await db
@@ -44,13 +49,14 @@ export function createTaskService(db: Kysely<Database>) {
       await db.deleteFrom("entries").where("id", "=", id).where("type", "=", "task").execute();
     },
     async getByStatus(status: Task["status"]): Promise<Task[]> {
-      const result = await db
+      const results = await db
         .selectFrom("entries")
         .selectAll()
         .where("type", "=", "task")
         .where("status", "=", status)
         .execute();
-      return result.map(toTask);
+      const labelMap = await fetchLabelMap(db, results.map((r) => r.labelId));
+      return results.map((r) => toTask(r, r.labelId ? (labelMap.get(r.labelId) ?? null) : null));
     },
     async getFirstByOriginalId(originId: string): Promise<Task | undefined> {
       const result = await db
@@ -58,7 +64,9 @@ export function createTaskService(db: Kysely<Database>) {
         .selectAll()
         .where("originId", "=", originId)
         .executeTakeFirst();
-      return result ? toTask(result) : undefined;
+      if (!result) return undefined;
+      const labelMap = await fetchLabelMap(db, [result.labelId]);
+      return toTask(result, result.labelId ? (labelMap.get(result.labelId) ?? null) : null);
     },
     async rollover(taskId: string, targetDate: string) {
       await db.transaction().execute(async (trx) => {
@@ -82,11 +90,20 @@ export function createTaskService(db: Kysely<Database>) {
             type: "task",
             status: "incomplete",
             originId: existingTask.id,
+            labelId: null,
             createdAt: now,
             updatedAt: now,
           })
           .execute();
       });
+    },
+    async setLabel(taskId: string, labelId: string | null) {
+      await db
+        .updateTable("entries")
+        .set({ labelId })
+        .where("id", "=", taskId)
+        .where("type", "=", "task")
+        .execute();
     },
   };
 }

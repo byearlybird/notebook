@@ -1,6 +1,7 @@
 import type { Database } from "@/db/schema";
 import { toEntry, type Entry } from "@/models";
 import type { Kysely } from "kysely";
+import { fetchLabelMap } from "./label-helpers";
 
 export function createEntryService(db: Kysely<Database>) {
   return {
@@ -13,7 +14,8 @@ export function createEntryService(db: Kysely<Database>) {
         .orderBy("createdAt", "desc")
         .execute();
 
-      return entries.map(toEntry);
+      const labelMap = await fetchLabelMap(db, entries.map((e) => e.labelId));
+      return entries.map((e) => toEntry(e, e.labelId ? (labelMap.get(e.labelId) ?? null) : null));
     },
 
     async getGroupedByDate(): Promise<Record<string, Entry[]>> {
@@ -23,11 +25,15 @@ export function createEntryService(db: Kysely<Database>) {
         .orderBy("createdAt", "desc")
         .execute();
 
+      const labelMap = await fetchLabelMap(db, entries.map((e) => e.labelId));
+
       const entriesByDate: Record<string, Entry[]> = {};
 
       for (const entry of entries) {
         entriesByDate[entry.date] ??= [];
-        entriesByDate[entry.date].push(toEntry(entry));
+        entriesByDate[entry.date].push(
+          toEntry(entry, entry.labelId ? (labelMap.get(entry.labelId) ?? null) : null),
+        );
       }
 
       return entriesByDate;

@@ -5,10 +5,10 @@ import type { ComponentProps, ReactNode } from "react";
 
 export const MenuRoot = Menu.Root;
 
-export function MenuButton() {
+export function MenuButton({ className, ...props }: ComponentProps<typeof Menu.Trigger>) {
   return (
-    <Menu.Trigger className="flex items-center justify-center size-10 shrink-0 rounded-md transition-transform active:scale-105">
-      <DotsThreeIcon className="size-6" />
+    <Menu.Trigger className={cx("flex items-center justify-center  shrink-0 rounded-md transition-transform active:scale-105", className)} {...props}>
+      <DotsThreeIcon className="size-4" />
     </Menu.Trigger>
   );
 }

@@ -4,6 +4,7 @@ import {
   MenuContent,
   MenuItem,
   MenuRoot,
+  LabelPicker,
   TextContent,
   TextareaDialog,
 } from "@/components";
@@ -13,7 +14,7 @@ import {
   DetailPageActions,
   DetailPageTitle,
 } from "@/components/page/detail-page";
-import { taskService } from "@/app";
+import { labelService, taskService } from "@/app";
 import { useMutation } from "@/utils/use-mutation";
 import {
   ArrowCounterClockwiseIcon,
@@ -44,7 +45,8 @@ export const Route = createFileRoute("/task/$id")({
       if (task.status === "deferred") {
         rolledTask = await taskService.getFirstByOriginalId(task.id);
       }
-      return { task, rolledTask };
+      const allLabels = await labelService.getAll();
+      return { task, rolledTask, allLabels };
     } catch {
       throw notFound();
     }
@@ -52,7 +54,7 @@ export const Route = createFileRoute("/task/$id")({
 });
 
 function RouteComponent() {
-  const { task, rolledTask } = Route.useLoaderData();
+  const { task, rolledTask, allLabels } = Route.useLoaderData();
   const { from } = Route.useSearch();
   const navigate = Route.useNavigate();
   const mutation = useMutation();
@@ -79,7 +81,7 @@ function RouteComponent() {
     if (from === "index") {
       navigate({ to: "/app", viewTransition: { types: ["slide-right"] } });
     } else if (from === "entries") {
-      navigate({ to: "/app/entries", viewTransition: { types: ["slide-right"] } });
+      navigate({ to: "/app", search: { view: "entries" }, viewTransition: { types: ["slide-right"] } });
     } else {
       navigate({ to: "/app", viewTransition: { types: ["slide-right"] } });
     }
@@ -118,6 +120,14 @@ function RouteComponent() {
       </DetailPageHeader>
       {/* Content area */}
       <TextContent content={task.content} updatedAt={task.updatedAt} createdAt={task.createdAt} />
+      {/* Label picker */}
+      <div className="mt-auto flex justify-center px-4 pt-2 pb-3">
+        <LabelPicker
+          allLabels={allLabels}
+          selectedLabelId={task.label?.id ?? null}
+          onChange={(labelId) => mutation(() => taskService.setLabel(task.id, labelId))}
+        />
+      </div>
       {/* Controls section */}
       <section className="flex w-full gap-2 px-4 pb-safe-bottom pt-2">
         {task.status === "incomplete" ? (

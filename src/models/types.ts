@@ -1,14 +1,20 @@
+export type Label = {
+  id: string;
+  name: string;
+};
+
 type BaseEntry = {
   id: string;
   date: string;
   content: string;
   createdAt: string;
   updatedAt: string;
+  label: Label | null;
 };
 
 export type Note = BaseEntry & { type: "note"; status: null | "pinned" };
 
-export type Intention = BaseEntry & { type: "intention" };
+export type Intention = Omit<BaseEntry, "label"> & { type: "intention" };
 
 export type Task = BaseEntry & {
   type: "task";

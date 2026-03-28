@@ -1,10 +1,11 @@
 import { ActionNavbar, Navbar, type NavItemData } from "@/components";
-import type { Intention, Note, Task } from "@/models";
+import type { Intention, Label, Note, Task } from "@/models";
 import { CreateDialog } from "@/components/entries";
 import { QuickDrawer } from "@/components/quick-drawer";
-import { intentionService, noteService, taskService } from "@/app";
+import { intentionService, noteService, labelService, taskService } from "@/app";
 import { getCurrentMonth } from "@/utils/date-utils";
-import { ListBulletsIcon, SunHorizonIcon } from "@phosphor-icons/react";
+import { LabelFilterContext } from "@/contexts/label-filter-context";
+import { BookOpenIcon, GearSixIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
@@ -12,10 +13,11 @@ export const Route = createFileRoute("/app")({
   component: RouteComponent,
   loader: async () => {
     const currentMonth = getCurrentMonth();
-    const [incompleteTasks, intention, pinnedNotes] = await Promise.all([
+    const [incompleteTasks, intention, pinnedNotes, allLabels] = await Promise.all([
       taskService.getByStatus("incomplete"),
       intentionService.getByMonth(currentMonth),
       noteService.getPinned(),
+      labelService.getAll(),
     ]);
     const today = new Date().toLocaleDateString("en-CA");
     const todayTasks = incompleteTasks.filter((t) => t.date === today);
@@ -26,12 +28,13 @@ export const Route = createFileRoute("/app")({
       intention: intention ?? null,
       month: currentMonth,
       pinnedNotes,
+      allLabels,
     };
   },
 });
 
 function RouteComponent() {
-  const { todayTasks, priorTasks, intention, month, pinnedNotes } = Route.useLoaderData();
+  const { todayTasks, priorTasks, intention, month, pinnedNotes, allLabels } = Route.useLoaderData();
   return (
     <AppLayout
       todayTasks={todayTasks}
@@ -39,6 +42,7 @@ function RouteComponent() {
       intention={intention}
       month={month}
       pinnedNotes={pinnedNotes}
+      allLabels={allLabels}
     >
       <Outlet />
     </AppLayout>
@@ -52,6 +56,7 @@ function AppLayout({
   intention,
   month,
   pinnedNotes,
+  allLabels,
 }: {
   children: React.ReactNode;
   todayTasks: Task[];
@@ -59,27 +64,29 @@ function AppLayout({
   intention: Intention | null;
   month: string;
   pinnedNotes: Note[];
+  allLabels: Label[];
 }) {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isPushpinDialogOpen, setIsPushpinDialogOpen] = useState(false);
+  const [filterLabelId, setFilterLabelId] = useState<string | null>(null);
 
   const navItems: NavItemData[] = [
     {
       href: "/app",
-      label: "Today",
-      icon: SunHorizonIcon,
+      label: "Journal",
+      icon: BookOpenIcon,
     },
     {
-      href: "/app/entries",
-      label: "All Entries",
-      icon: ListBulletsIcon,
+      href: "/app/settings",
+      label: "Settings",
+      icon: GearSixIcon,
     },
   ];
 
   return (
-    <>
+    <LabelFilterContext.Provider value={[filterLabelId, setFilterLabelId]}>
       <div className="flex h-screen flex-col max-w-2xl mx-auto pt-safe-top">
-        <div className="flex-1 overflow-y-auto pb-20">{children}</div>
+        <div className="flex-1 overflow-hidden">{children}</div>
         <div className="fixed left-[max(var(--safe-left),1rem)] bottom-[max(var(--safe-bottom),1rem)]">
           <Navbar navItems={navItems} />
         </div>
@@ -91,7 +98,7 @@ function AppLayout({
           onPushpinClick={() => setIsPushpinDialogOpen(true)}
         />
       </div>
-      <CreateDialog open={isCreateDialogOpen} onClose={() => setIsCreateDialogOpen(false)} />
+      <CreateDialog open={isCreateDialogOpen} onClose={() => setIsCreateDialogOpen(false)} allLabels={allLabels} />
       <QuickDrawer
         todayTasks={todayTasks}
         priorTasks={priorTasks}
@@ -101,6 +108,6 @@ function AppLayout({
         open={isPushpinDialogOpen}
         onClose={() => setIsPushpinDialogOpen(false)}
       />
-    </>
+    </LabelFilterContext.Provider>
   );
 }

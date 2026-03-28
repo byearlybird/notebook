@@ -40,7 +40,7 @@ export function Toolbar() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="fixed left-2 z-50 flex items-center gap-1 border rounded-lg bg-slate-medium px-2 py-1"
-      style={{ bottom: "calc(var(--keyboard-height) + var(--spacing)*3)" }}
+      style={{ bottom: "calc(max(var(--keyboard-height), env(safe-area-inset-bottom, 0px)) + var(--spacing)*3)" }}
       onMouseDown={(e) => e.preventDefault()}
     >
       <FormatButton active={!!(formats & BOLD)} onClick={() => handleFormat("bold")}>

@@ -109,6 +109,12 @@ export function Editor({
   placeholder?: string;
 }) {
   useEffect(() => {
+    const handler = () => editor.focus();
+    window.addEventListener("editor:refocus", handler);
+    return () => window.removeEventListener("editor:refocus", handler);
+  }, [editor]);
+
+  useEffect(() => {
     if (!onEmptyChange) return;
     return editor.registerUpdateListener(({ editorState }) => {
       editorState.read(() => {

@@ -1,9 +1,10 @@
-import { noteService } from "@/app";
+import { noteService, labelService } from "@/app";
 import {
   MenuButton,
   MenuContent,
   MenuItem,
   MenuRoot,
+  LabelPicker,
   TextContent,
   TextareaDialog,
 } from "@/components";
@@ -33,12 +34,13 @@ export const Route = createFileRoute("/note/$id")({
     if (!note) {
       throw notFound();
     }
-    return { note };
+    const allLabels = await labelService.getAll();
+    return { note, allLabels };
   },
 });
 
 function RouteComponent() {
-  const { note } = Route.useLoaderData();
+  const { note, allLabels } = Route.useLoaderData();
   const { from } = Route.useSearch();
   const navigate = Route.useNavigate();
   const mutation = useMutation();
@@ -50,7 +52,8 @@ function RouteComponent() {
       navigate({ to: "/app", viewTransition: { types: ["slide-right"] } });
     } else if (from === "entries") {
       navigate({
-        to: "/app/entries",
+        to: "/app",
+        search: { view: "entries" },
         viewTransition: { types: ["slide-right"] },
       });
     } else {
@@ -108,6 +111,14 @@ function RouteComponent() {
       </DetailPageHeader>
       {/* Content area */}
       <TextContent content={note.content} updatedAt={note.updatedAt} createdAt={note.createdAt} />
+      {/* Label picker */}
+      <div className="mt-auto flex justify-center px-4 pt-2">
+        <LabelPicker
+          allLabels={allLabels}
+          selectedLabelId={note.label?.id ?? null}
+          onChange={(labelId) => mutation(() => noteService.setLabel(note.id, labelId))}
+        />
+      </div>
       <TextareaDialog
         open={editOpen}
         onClose={() => setEditOpen(false)}

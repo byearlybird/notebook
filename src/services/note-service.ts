@@ -1,19 +1,22 @@
 import type { Database } from "@/db/schema";
 import { toNote, type Note } from "@/models";
 import type { Kysely } from "kysely";
+import { fetchLabelMap } from "./label-helpers";
 
 export function createNoteService(db: Kysely<Database>) {
   return {
-    create: async (content: string) => {
+    create: async (content: string, labelId?: string | null) => {
+      const id = crypto.randomUUID();
       const now = new Date().toISOString();
       await db
         .insertInto("entries")
         .values({
-          id: crypto.randomUUID(),
+          id,
           date: new Date().toLocaleDateString("en-CA"),
           content,
           type: "note",
           status: null,
+          labelId: labelId ?? null,
           createdAt: now,
           updatedAt: now,
         })
@@ -26,7 +29,9 @@ export function createNoteService(db: Kysely<Database>) {
         .where("id", "=", id)
         .where("type", "=", "note")
         .executeTakeFirst();
-      return result ? toNote(result) : undefined;
+      if (!result) return undefined;
+      const labelMap = await fetchLabelMap(db, [result.labelId]);
+      return toNote(result, result.labelId ? (labelMap.get(result.labelId) ?? null) : null);
     },
     update: async (id: string, { content }: { content: string }) => {
       await db
@@ -61,7 +66,16 @@ export function createNoteService(db: Kysely<Database>) {
         .where("status", "=", "pinned")
         .orderBy("updatedAt", "desc")
         .execute();
-      return results.map(toNote);
+      const labelMap = await fetchLabelMap(db, results.map((r) => r.labelId));
+      return results.map((r) => toNote(r, r.labelId ? (labelMap.get(r.labelId) ?? null) : null));
+    },
+    setLabel: async (noteId: string, labelId: string | null) => {
+      await db
+        .updateTable("entries")
+        .set({ labelId })
+        .where("id", "=", noteId)
+        .where("type", "=", "note")
+        .execute();
     },
   };
 }

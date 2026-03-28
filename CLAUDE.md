@@ -43,7 +43,7 @@ No automated test setup is currently configured. If adding tests, prefer vitest 
 
 TypeScript path aliases configured in `vite.config.ts`:
 
-- `@app/*` → `./src/*`
+- `@/*` → `./src/*`
 
 ### TypeScript Configuration
 

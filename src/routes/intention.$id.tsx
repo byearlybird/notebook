@@ -44,7 +44,7 @@ function RouteComponent() {
 
   const goBack = () => {
     if (from === "entries") {
-      navigate({ to: "/app/entries", viewTransition: { types: ["slide-right"] } });
+      navigate({ to: "/app", search: { view: "entries" }, viewTransition: { types: ["slide-right"] } });
     } else {
       navigate({ to: "/app", viewTransition: { types: ["slide-right"] } });
     }
