@@ -14,7 +14,15 @@ import type { Label } from "@/models";
 import { Editor, useEditor, readEditorContent } from "@/components/lexical";
 import { $getRoot, $createParagraphNode } from "lexical";
 
-export function CreateDialog({ open, onClose, allLabels }: { open: boolean; onClose: () => void; allLabels: Label[] }) {
+export function CreateDialog({
+  open,
+  onClose,
+  allLabels,
+}: {
+  open: boolean;
+  onClose: () => void;
+  allLabels: Label[];
+}) {
   const mutation = useMutation();
   const editor = useEditor();
   const [isEmpty, setIsEmpty] = useState(true);
@@ -82,7 +90,10 @@ export function CreateDialog({ open, onClose, allLabels }: { open: boolean; onCl
         createPortal(
           <div
             className="fixed right-2 z-50 flex items-center gap-1 rounded-lg border bg-slate-medium px-2 py-1"
-            style={{ bottom: "calc(max(var(--keyboard-height), env(safe-area-inset-bottom, 0px)) + var(--spacing)*3)" }}
+            style={{
+              bottom:
+                "calc(max(var(--keyboard-height), env(safe-area-inset-bottom, 0px)) + var(--spacing)*3)",
+            }}
             onMouseDown={(e) => e.preventDefault()}
           >
             <EntryTypeToggle entryType={entryType} onEntryTypeChange={setEntryType} />

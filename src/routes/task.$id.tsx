@@ -81,7 +81,11 @@ function RouteComponent() {
     if (from === "index") {
       navigate({ to: "/app", viewTransition: { types: ["slide-right"] } });
     } else if (from === "entries") {
-      navigate({ to: "/app", search: { view: "entries" }, viewTransition: { types: ["slide-right"] } });
+      navigate({
+        to: "/app",
+        search: { view: "entries" },
+        viewTransition: { types: ["slide-right"] },
+      });
     } else {
       navigate({ to: "/app", viewTransition: { types: ["slide-right"] } });
     }

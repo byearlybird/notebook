@@ -72,7 +72,10 @@ export function createTaskService(db: Kysely<Database>) {
         .where("type", "=", "task")
         .where("status", "=", status)
         .execute();
-      const labelMap = await fetchLabelMap(db, results.map((r) => r.labelId));
+      const labelMap = await fetchLabelMap(
+        db,
+        results.map((r) => r.labelId),
+      );
       return results.map((r) => toTask(r, r.labelId ? (labelMap.get(r.labelId) ?? null) : null));
     },
     async getFirstByOriginalId(originId: string): Promise<Task | undefined> {

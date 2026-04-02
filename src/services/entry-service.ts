@@ -14,7 +14,10 @@ export function createEntryService(db: Kysely<Database>) {
         .orderBy("createdAt", "desc")
         .execute();
 
-      const labelMap = await fetchLabelMap(db, entries.map((e) => e.labelId));
+      const labelMap = await fetchLabelMap(
+        db,
+        entries.map((e) => e.labelId),
+      );
       return entries.map((e) => toEntry(e, e.labelId ? (labelMap.get(e.labelId) ?? null) : null));
     },
 
@@ -25,7 +28,10 @@ export function createEntryService(db: Kysely<Database>) {
         .orderBy("createdAt", "desc")
         .execute();
 
-      const labelMap = await fetchLabelMap(db, entries.map((e) => e.labelId));
+      const labelMap = await fetchLabelMap(
+        db,
+        entries.map((e) => e.labelId),
+      );
 
       const entriesByDate: Record<string, Entry[]> = {};
 
@@ -37,6 +43,23 @@ export function createEntryService(db: Kysely<Database>) {
       }
 
       return entriesByDate;
+    },
+
+    async search(query: string, limit = 10): Promise<Entry[]> {
+      const entries = await db
+        .selectFrom("entries")
+        .innerJoin("entrySearchMeta", "entrySearchMeta.entryId", "entries.id")
+        .selectAll("entries")
+        .where("entrySearchMeta.plainText", "like", `%${query}%`)
+        .orderBy("entries.createdAt", "desc")
+        .limit(limit)
+        .execute();
+
+      const labelMap = await fetchLabelMap(
+        db,
+        entries.map((e) => e.labelId),
+      );
+      return entries.map((e) => toEntry(e, e.labelId ? (labelMap.get(e.labelId) ?? null) : null));
     },
   };
 }

@@ -7,7 +7,13 @@ export const MenuRoot = Menu.Root;
 
 export function MenuButton({ className, ...props }: ComponentProps<typeof Menu.Trigger>) {
   return (
-    <Menu.Trigger className={cx("flex items-center justify-center  shrink-0 rounded-md transition-transform active:scale-105", className)} {...props}>
+    <Menu.Trigger
+      className={cx(
+        "flex items-center justify-center  shrink-0 rounded-md transition-transform active:scale-105",
+        className,
+      )}
+      {...props}
+    >
       <DotsThreeIcon className="size-4" />
     </Menu.Trigger>
   );

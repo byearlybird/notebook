@@ -54,7 +54,9 @@ export function createNoteService(db: Kysely<Database>) {
         await trx
           .insertInto("entrySearchMeta")
           .values({ entryId: id, plainText: extractPlainText(content) })
-          .onConflict((oc) => oc.column("entryId").doUpdateSet({ plainText: extractPlainText(content) }))
+          .onConflict((oc) =>
+            oc.column("entryId").doUpdateSet({ plainText: extractPlainText(content) }),
+          )
           .execute();
       });
     },
@@ -80,7 +82,10 @@ export function createNoteService(db: Kysely<Database>) {
         .where("status", "=", "pinned")
         .orderBy("updatedAt", "desc")
         .execute();
-      const labelMap = await fetchLabelMap(db, results.map((r) => r.labelId));
+      const labelMap = await fetchLabelMap(
+        db,
+        results.map((r) => r.labelId),
+      );
       return results.map((r) => toNote(r, r.labelId ? (labelMap.get(r.labelId) ?? null) : null));
     },
     setLabel: async (noteId: string, labelId: string | null) => {

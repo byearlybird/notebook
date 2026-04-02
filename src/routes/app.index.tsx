@@ -1,13 +1,14 @@
 import { entryService, intentionService, labelService } from "@/app";
 import { Renderer } from "@/components/lexical/renderer";
 import { IntentionDialog } from "@/components/entries/intention-dialog";
+import { SearchDrawer } from "@/components/entries/search-drawer";
 import { LabelFilter } from "@/components/entries/label-filter";
 import { DayEntriesItem } from "@/components/entries";
 import { Timeline } from "@/components/entries/timeline";
 import type { Entry } from "@/models";
 import { LabelFilterContext } from "@/contexts/label-filter-context";
 import { formatDayOfWeek, formatMonthDate, getCurrentMonth } from "@/utils/date-utils";
-import { PlusIcon, StarIcon } from "@phosphor-icons/react";
+import { MagnifyingGlassIcon, PlusIcon, StarIcon } from "@phosphor-icons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import z from "zod";
@@ -36,6 +37,7 @@ function JournalPage() {
   const { view } = Route.useSearch();
   const [filterLabelId, setFilterLabelId] = useContext(LabelFilterContext);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const filterEntries = (items: Entry[]) =>
@@ -123,12 +125,25 @@ function JournalPage() {
           <header className="sticky top-0 backdrop-blur-md bg-slate-medium py-1">
             <div className="flex items-baseline gap-2">
               <span className="text-2xl font-extrabold">{formatMonthDate(new Date())}</span>
-              <span className="font-bold text-sm text-cloud-light">{formatDayOfWeek(new Date())}</span>
-              {allLabels.length > 0 && (
-                <div className="ml-auto">
-                  <LabelFilter allLabels={allLabels} selectedLabelId={filterLabelId} onChange={setFilterLabelId} />
-                </div>
-              )}
+              <span className="font-bold text-sm text-cloud-light">
+                {formatDayOfWeek(new Date())}
+              </span>
+              <div className="ml-auto flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSearchOpen(true)}
+                  className="flex items-center text-cloud-light"
+                >
+                  <MagnifyingGlassIcon className="size-4" />
+                </button>
+                {allLabels.length > 0 && (
+                  <LabelFilter
+                    allLabels={allLabels}
+                    selectedLabelId={filterLabelId}
+                    onChange={setFilterLabelId}
+                  />
+                )}
+              </div>
             </div>
           </header>
           {empty ? (
@@ -184,6 +199,7 @@ function JournalPage() {
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
       />
+      <SearchDrawer open={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
 }

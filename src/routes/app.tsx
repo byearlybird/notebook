@@ -34,7 +34,8 @@ export const Route = createFileRoute("/app")({
 });
 
 function RouteComponent() {
-  const { todayTasks, priorTasks, intention, month, pinnedNotes, allLabels } = Route.useLoaderData();
+  const { todayTasks, priorTasks, intention, month, pinnedNotes, allLabels } =
+    Route.useLoaderData();
   return (
     <AppLayout
       todayTasks={todayTasks}
@@ -98,7 +99,11 @@ function AppLayout({
           onPushpinClick={() => setIsPushpinDialogOpen(true)}
         />
       </div>
-      <CreateDialog open={isCreateDialogOpen} onClose={() => setIsCreateDialogOpen(false)} allLabels={allLabels} />
+      <CreateDialog
+        open={isCreateDialogOpen}
+        onClose={() => setIsCreateDialogOpen(false)}
+        allLabels={allLabels}
+      />
       <QuickDrawer
         todayTasks={todayTasks}
         priorTasks={priorTasks}

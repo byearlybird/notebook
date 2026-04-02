@@ -50,10 +50,7 @@ export function createIntentionService(db: Kysely<Database>) {
               updatedAt: now,
             })
             .execute();
-          await tx
-            .insertInto("entrySearchMeta")
-            .values({ entryId: id, plainText })
-            .execute();
+          await tx.insertInto("entrySearchMeta").values({ entryId: id, plainText }).execute();
         }
       });
     },

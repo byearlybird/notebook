@@ -13,10 +13,7 @@ export function LabelFilter({ allLabels, selectedLabelId, onChange }: LabelFilte
   const selectedLabel = allLabels.find((l) => l.id === selectedLabelId) ?? null;
 
   return (
-    <Select.Root
-      value={selectedLabelId ?? ""}
-      onValueChange={(val) => onChange(val || null)}
-    >
+    <Select.Root value={selectedLabelId ?? ""} onValueChange={(val) => onChange(val || null)}>
       <Select.Trigger
         className={`flex cursor-default items-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm outline-none transition-colors data-popup-open:border-cloud-dark focus-visible:border-cloud-dark ${active ? "text-ivory-dark" : "text-cloud-medium"}`}
       >

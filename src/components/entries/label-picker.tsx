@@ -10,7 +10,12 @@ type LabelPickerProps = {
   side?: "top" | "bottom";
 };
 
-export function LabelPicker({ allLabels, selectedLabelId, onChange, side = "top" }: LabelPickerProps) {
+export function LabelPicker({
+  allLabels,
+  selectedLabelId,
+  onChange,
+  side = "top",
+}: LabelPickerProps) {
   const [optimisticLabelId, setOptimisticLabelId] = useOptimistic(selectedLabelId);
   const selectedLabel = allLabels.find((l) => l.id === optimisticLabelId) ?? null;
 
