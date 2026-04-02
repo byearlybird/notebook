@@ -1,5 +1,6 @@
 import type { Database } from "@/db/schema";
 import { toIntention, type Intention } from "@/models";
+import { extractPlainText } from "@/utils/extract-plain-text";
 import { getTodayISODate } from "@/utils/date-utils";
 import { type Kysely, sql } from "kysely";
 
@@ -23,24 +24,35 @@ export function createIntentionService(db: Kysely<Database>) {
           .selectAll()
           .executeTakeFirst();
 
+        const plainText = extractPlainText(content);
         if (existing) {
           await tx
             .updateTable("entries")
             .set({ content, updatedAt: new Date().toISOString() })
             .where("id", "=", existing.id)
             .execute();
+          await tx
+            .insertInto("entrySearchMeta")
+            .values({ entryId: existing.id, plainText })
+            .onConflict((oc) => oc.column("entryId").doUpdateSet({ plainText }))
+            .execute();
         } else {
           const now = new Date().toISOString();
+          const id = crypto.randomUUID();
           await tx
             .insertInto("entries")
             .values({
-              id: crypto.randomUUID(),
+              id,
               date: getTodayISODate(),
               content,
               type: "intention",
               createdAt: now,
               updatedAt: now,
             })
+            .execute();
+          await tx
+            .insertInto("entrySearchMeta")
+            .values({ entryId: id, plainText })
             .execute();
         }
       });
@@ -56,15 +68,23 @@ export function createIntentionService(db: Kysely<Database>) {
       return result ? toIntention(result) : undefined;
     },
     update: async (id: string, updates: { content: string }): Promise<void> => {
-      await db
-        .updateTable("entries")
-        .set({
-          ...updates,
-          updatedAt: new Date().toISOString(),
-        })
-        .where("id", "=", id)
-        .where("type", "=", "intention")
-        .execute();
+      await db.transaction().execute(async (trx) => {
+        await trx
+          .updateTable("entries")
+          .set({
+            ...updates,
+            updatedAt: new Date().toISOString(),
+          })
+          .where("id", "=", id)
+          .where("type", "=", "intention")
+          .execute();
+        const plainText = extractPlainText(updates.content);
+        await trx
+          .insertInto("entrySearchMeta")
+          .values({ entryId: id, plainText })
+          .onConflict((oc) => oc.column("entryId").doUpdateSet({ plainText }))
+          .execute();
+      });
     },
     delete: async (id: string): Promise<void> => {
       await db.deleteFrom("entries").where("id", "=", id).where("type", "=", "intention").execute();

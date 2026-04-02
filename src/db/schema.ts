@@ -15,7 +15,13 @@ export type LabelRow = {
   name: string;
 };
 
+export type EntrySearchMetaRow = {
+  entryId: string;
+  plainText: string;
+};
+
 export type Database = {
   entries: EntryRow;
   labels: LabelRow;
+  entrySearchMeta: EntrySearchMetaRow;
 };

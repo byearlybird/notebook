@@ -1,5 +1,6 @@
 import type { Database } from "@/db/schema";
 import { toTask, type Task } from "@/models";
+import { extractPlainText } from "@/utils/extract-plain-text";
 import type { Kysely } from "kysely";
 import { fetchLabelMap } from "./label-helpers";
 
@@ -8,20 +9,26 @@ export function createTaskService(db: Kysely<Database>) {
     async create(content: string, labelId?: string | null) {
       const id = crypto.randomUUID();
       const now = new Date().toISOString();
-      await db
-        .insertInto("entries")
-        .values({
-          id,
-          date: new Date().toLocaleDateString("en-CA"),
-          content,
-          type: "task",
-          status: "incomplete",
-          originId: null,
-          labelId: labelId ?? null,
-          createdAt: now,
-          updatedAt: now,
-        })
-        .execute();
+      await db.transaction().execute(async (trx) => {
+        await trx
+          .insertInto("entries")
+          .values({
+            id,
+            date: new Date().toLocaleDateString("en-CA"),
+            content,
+            type: "task",
+            status: "incomplete",
+            originId: null,
+            labelId: labelId ?? null,
+            createdAt: now,
+            updatedAt: now,
+          })
+          .execute();
+        await trx
+          .insertInto("entrySearchMeta")
+          .values({ entryId: id, plainText: extractPlainText(content) })
+          .execute();
+      });
     },
     async get(id: string): Promise<Task | undefined> {
       const result = await db
@@ -35,15 +42,25 @@ export function createTaskService(db: Kysely<Database>) {
       return toTask(result, result.labelId ? (labelMap.get(result.labelId) ?? null) : null);
     },
     async update(id: string, updates: Partial<Pick<Task, "content" | "status">>) {
-      await db
-        .updateTable("entries")
-        .set({
-          ...updates,
-          updatedAt: new Date().toISOString(),
-        })
-        .where("id", "=", id)
-        .where("type", "=", "task")
-        .execute();
+      await db.transaction().execute(async (trx) => {
+        await trx
+          .updateTable("entries")
+          .set({
+            ...updates,
+            updatedAt: new Date().toISOString(),
+          })
+          .where("id", "=", id)
+          .where("type", "=", "task")
+          .execute();
+        if (updates.content !== undefined) {
+          const plainText = extractPlainText(updates.content);
+          await trx
+            .insertInto("entrySearchMeta")
+            .values({ entryId: id, plainText })
+            .onConflict((oc) => oc.column("entryId").doUpdateSet({ plainText }))
+            .execute();
+        }
+      });
     },
     async delete(id: string) {
       await db.deleteFrom("entries").where("id", "=", id).where("type", "=", "task").execute();
@@ -81,10 +98,11 @@ export function createTaskService(db: Kysely<Database>) {
           .returningAll()
           .executeTakeFirstOrThrow();
         const now = new Date().toISOString();
+        const newId = crypto.randomUUID();
         await trx
           .insertInto("entries")
           .values({
-            id: crypto.randomUUID(),
+            id: newId,
             date: targetDate,
             content: existingTask.content,
             type: "task",
@@ -94,6 +112,10 @@ export function createTaskService(db: Kysely<Database>) {
             createdAt: now,
             updatedAt: now,
           })
+          .execute();
+        await trx
+          .insertInto("entrySearchMeta")
+          .values({ entryId: newId, plainText: extractPlainText(existingTask.content) })
           .execute();
       });
     },
