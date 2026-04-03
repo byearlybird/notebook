@@ -1,134 +1,65 @@
-import type { Database } from "@/db/schema";
-import { toTask, type Task } from "@/models";
-import { extractPlainText } from "@/utils/extract-plain-text";
-import type { Kysely } from "kysely";
-import { fetchLabelMap } from "./label-helpers";
+import { toTask, toTasks, type Task } from "@/models";
+import type { EntryRepo } from "@/repos/entry-repo";
+import type { LabelRepo } from "@/repos/label-repo";
 
-export function createTaskService(db: Kysely<Database>) {
+export function createTaskService(entryRepo: EntryRepo, labelRepo: LabelRepo) {
   return {
     async create(content: string, labelId?: string | null) {
-      const id = crypto.randomUUID();
-      const now = new Date().toISOString();
-      await db.transaction().execute(async (trx) => {
-        await trx
-          .insertInto("entries")
-          .values({
-            id,
-            date: new Date().toLocaleDateString("en-CA"),
-            content,
-            type: "task",
-            status: "incomplete",
-            originId: null,
-            labelId: labelId ?? null,
-            createdAt: now,
-            updatedAt: now,
-          })
-          .execute();
-        await trx
-          .insertInto("entrySearchMeta")
-          .values({ entryId: id, plainText: extractPlainText(content) })
-          .execute();
+      await entryRepo.create({
+        date: new Date().toLocaleDateString("en-CA"),
+        content,
+        type: "task",
+        status: "incomplete",
+        originId: null,
+        labelId: labelId ?? null,
       });
     },
     async get(id: string): Promise<Task | undefined> {
-      const result = await db
-        .selectFrom("entries")
-        .selectAll()
-        .where("id", "=", id)
-        .where("type", "=", "task")
-        .executeTakeFirst();
-      if (!result) return undefined;
-      const labelMap = await fetchLabelMap(db, [result.labelId]);
-      return toTask(result, result.labelId ? (labelMap.get(result.labelId) ?? null) : null);
+      const result = await entryRepo.get(id);
+      if (!result || result.type !== "task") return undefined;
+      const label = result.labelId ? ((await labelRepo.get(result.labelId)) ?? null) : null;
+      return toTask(result, label);
     },
     async update(id: string, updates: Partial<Pick<Task, "content" | "status">>) {
-      await db.transaction().execute(async (trx) => {
-        await trx
-          .updateTable("entries")
-          .set({
-            ...updates,
-            updatedAt: new Date().toISOString(),
-          })
-          .where("id", "=", id)
-          .where("type", "=", "task")
-          .execute();
-        if (updates.content !== undefined) {
-          const plainText = extractPlainText(updates.content);
-          await trx
-            .insertInto("entrySearchMeta")
-            .values({ entryId: id, plainText })
-            .onConflict((oc) => oc.column("entryId").doUpdateSet({ plainText }))
-            .execute();
-        }
-      });
+      await entryRepo.update(id, updates);
     },
     async delete(id: string) {
-      await db.deleteFrom("entries").where("id", "=", id).where("type", "=", "task").execute();
+      await entryRepo.delete(id);
     },
     async getByStatus(status: Task["status"]): Promise<Task[]> {
-      const results = await db
-        .selectFrom("entries")
-        .selectAll()
-        .where("type", "=", "task")
-        .where("status", "=", status)
-        .execute();
-      const labelMap = await fetchLabelMap(
-        db,
-        results.map((r) => r.labelId),
-      );
-      return results.map((r) => toTask(r, r.labelId ? (labelMap.get(r.labelId) ?? null) : null));
+      const results = await entryRepo.getByStatus("task", status);
+      const ids = results.map((r) => r.labelId).filter((id): id is string => id != null);
+      return toTasks(results, await labelRepo.getByIds(ids));
     },
     async getFirstByOriginalId(originId: string): Promise<Task | undefined> {
-      const result = await db
-        .selectFrom("entries")
-        .selectAll()
-        .where("originId", "=", originId)
-        .executeTakeFirst();
+      const result = await entryRepo.getByOriginId(originId);
       if (!result) return undefined;
-      const labelMap = await fetchLabelMap(db, [result.labelId]);
-      return toTask(result, result.labelId ? (labelMap.get(result.labelId) ?? null) : null);
+      const label = result.labelId ? ((await labelRepo.get(result.labelId)) ?? null) : null;
+      return toTask(result, label);
     },
     async rollover(taskId: string, targetDate: string) {
-      await db.transaction().execute(async (trx) => {
-        const existingTask = await trx
-          .updateTable("entries")
-          .set({
-            status: "deferred",
-            updatedAt: new Date().toISOString(),
-          })
-          .where("id", "=", taskId)
-          .where("type", "=", "task")
-          .returningAll()
-          .executeTakeFirstOrThrow();
-        const now = new Date().toISOString();
-        const newId = crypto.randomUUID();
-        await trx
-          .insertInto("entries")
-          .values({
-            id: newId,
+      const existingTask = await entryRepo.get(taskId);
+      if (!existingTask || existingTask.type !== "task") {
+        throw new Error(`Task ${taskId} not found`);
+      }
+
+      await entryRepo.transaction(async (trx) => {
+        await entryRepo.update(taskId, { status: "deferred" }, trx);
+        await entryRepo.create(
+          {
             date: targetDate,
             content: existingTask.content,
             type: "task",
             status: "incomplete",
             originId: existingTask.id,
             labelId: null,
-            createdAt: now,
-            updatedAt: now,
-          })
-          .execute();
-        await trx
-          .insertInto("entrySearchMeta")
-          .values({ entryId: newId, plainText: extractPlainText(existingTask.content) })
-          .execute();
+          },
+          trx,
+        );
       });
     },
     async setLabel(taskId: string, labelId: string | null) {
-      await db
-        .updateTable("entries")
-        .set({ labelId })
-        .where("id", "=", taskId)
-        .where("type", "=", "task")
-        .execute();
+      await entryRepo.update(taskId, { labelId });
     },
   };
 }

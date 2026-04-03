@@ -1,25 +1,20 @@
-import type { Database } from "@/db/schema";
 import type { Label } from "@/models";
-import type { Kysely } from "kysely";
+import type { LabelRepo } from "@/repos/label-repo";
 
-export function createLabelService(db: Kysely<Database>) {
+export function createLabelService(labelRepo: LabelRepo) {
   return {
     async getAll(): Promise<Label[]> {
-      return db.selectFrom("labels").select(["id", "name"]).orderBy("name", "asc").execute();
+      return await labelRepo.getAll();
     },
     async create(name: string): Promise<Label> {
-      const label = { id: crypto.randomUUID(), name };
-      await db.insertInto("labels").values(label).execute();
-      return label;
+      const id = await labelRepo.create({ name });
+      return { id, name };
     },
     async update(id: string, name: string): Promise<void> {
-      await db.updateTable("labels").set({ name }).where("id", "=", id).execute();
+      await labelRepo.update(id, { name });
     },
     async delete(id: string): Promise<void> {
-      await db.transaction().execute(async (trx) => {
-        await trx.updateTable("entries").set({ labelId: null }).where("labelId", "=", id).execute();
-        await trx.deleteFrom("labels").where("id", "=", id).execute();
-      });
+      await labelRepo.delete(id);
     },
   };
 }

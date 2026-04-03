@@ -59,6 +59,29 @@ export function toTask(row: EntryRow, label: Label | null = null): Task {
   };
 }
 
+function toLabelMap(labels: Label[]): Map<string, Label> {
+  return new Map(labels.map((l) => [l.id, l]));
+}
+
+function resolveLabel(row: EntryRow, labelMap: Map<string, Label>): Label | null {
+  return row.labelId ? (labelMap.get(row.labelId) ?? null) : null;
+}
+
+export function toEntries(rows: EntryRow[], labels: Label[]): Entry[] {
+  const labelMap = toLabelMap(labels);
+  return rows.map((row) => toEntry(row, resolveLabel(row, labelMap)));
+}
+
+export function toNotes(rows: EntryRow[], labels: Label[]): Note[] {
+  const labelMap = toLabelMap(labels);
+  return rows.map((row) => toNote(row, resolveLabel(row, labelMap)));
+}
+
+export function toTasks(rows: EntryRow[], labels: Label[]): Task[] {
+  const labelMap = toLabelMap(labels);
+  return rows.map((row) => toTask(row, resolveLabel(row, labelMap)));
+}
+
 export function toEntry(row: EntryRow, label: Label | null = null): Entry {
   switch (row.type) {
     case "note":
