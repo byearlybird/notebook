@@ -19,7 +19,7 @@ import { allLabelsQueryOptions, noteQueryOptions } from "@/queries";
 import { useMutation } from "@/utils/use-mutation";
 import { PencilSimpleIcon, PushPinSimpleIcon, TrashIcon } from "@phosphor-icons/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import { useState } from "react";
 import z from "zod";
@@ -32,11 +32,10 @@ export const Route = createFileRoute("/note/$id")({
   component: RouteComponent,
   validateSearch: (search: Record<string, unknown>) => noteSearchSchema.parse(search),
   loader: async ({ params, context: { queryClient } }) => {
-    const [note] = await Promise.all([
+    await Promise.all([
       queryClient.ensureQueryData(noteQueryOptions(params.id)),
       queryClient.ensureQueryData(allLabelsQueryOptions()),
     ]);
-    if (!note) throw notFound();
   },
 });
 
@@ -48,9 +47,6 @@ function RouteComponent() {
   const navigate = Route.useNavigate();
   const mutation = useMutation();
   const [editOpen, setEditOpen] = useState(false);
-
-  if (!note) return null;
-
   const isPinned = note.status === "pinned";
 
   const goBack = () => {

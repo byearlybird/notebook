@@ -26,7 +26,7 @@ import {
   XSquareIcon,
 } from "@phosphor-icons/react";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import { useState } from "react";
 import z from "zod";
@@ -43,7 +43,6 @@ export const Route = createFileRoute("/task/$id")({
       queryClient.ensureQueryData(taskQueryOptions(params.id)),
       queryClient.ensureQueryData(allLabelsQueryOptions()),
     ]);
-    if (!task) throw notFound();
     if (task.status === "deferred") {
       await queryClient.ensureQueryData(rolledTaskQueryOptions(task.id));
     }
@@ -55,15 +54,13 @@ function RouteComponent() {
   const { data: task } = useSuspenseQuery(taskQueryOptions(id));
   const { data: allLabels } = useSuspenseQuery(allLabelsQueryOptions());
   const { data: rolledTask } = useQuery({
-    ...rolledTaskQueryOptions(task?.id ?? ""),
-    enabled: task?.status === "deferred",
+    ...rolledTaskQueryOptions(task.id),
+    enabled: task.status === "deferred",
   });
   const { from } = Route.useSearch();
   const navigate = Route.useNavigate();
   const mutation = useMutation();
   const [editOpen, setEditOpen] = useState(false);
-
-  if (!task) return null;
 
   const handleComplete = () => {
     mutation(() => taskService.update(task.id, { status: "complete" }));

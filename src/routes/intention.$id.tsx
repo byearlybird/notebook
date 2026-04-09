@@ -17,7 +17,7 @@ import { intentionQueryOptions } from "@/queries";
 import { useMutation } from "@/utils/use-mutation";
 import { PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import z from "zod";
 
@@ -29,8 +29,7 @@ export const Route = createFileRoute("/intention/$id")({
   component: RouteComponent,
   validateSearch: (search: Record<string, unknown>) => searchSchema.parse(search),
   loader: async ({ params, context: { queryClient } }) => {
-    const intention = await queryClient.ensureQueryData(intentionQueryOptions(params.id));
-    if (!intention) throw notFound();
+    await queryClient.ensureQueryData(intentionQueryOptions(params.id));
   },
 });
 
@@ -41,8 +40,6 @@ function RouteComponent() {
   const navigate = Route.useNavigate();
   const [editOpen, setEditOpen] = useState(false);
   const mutation = useMutation();
-
-  if (!intention) return null;
 
   const goBack = () => {
     if (from === "entries") {

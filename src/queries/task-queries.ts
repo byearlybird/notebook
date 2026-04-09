@@ -1,11 +1,16 @@
 import { taskService } from "@/app";
+import { notFound } from "@tanstack/react-router";
 import type { Task } from "@/models";
 import { queryOptions } from "@tanstack/react-query";
 
 export const taskQueryOptions = (id: string) =>
   queryOptions({
     queryKey: ["entries", "tasks", id],
-    queryFn: () => taskService.get(id),
+    queryFn: async (): Promise<Task> => {
+      const task = await taskService.get(id);
+      if (!task) throw notFound();
+      return task;
+    },
   });
 
 export const tasksByStatusQueryOptions = (status: Task["status"]) =>
