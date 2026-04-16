@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useReactiveQuery } from "sqlocal/react";
 import { db, sqlocal } from "../db/client";
+import { fullSync } from "../sync";
 
 export const Route = createFileRoute("/")({
   component: IndexPage,
@@ -56,6 +57,12 @@ function IndexPage() {
         onClick={logSyncChanges}
       >
         Log sync_changes
+      </button>
+      <button
+        className="mt-4 ml-2 rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600"
+        onClick={fullSync}
+      >
+        Sync
       </button>
       <ul className="mt-4 space-y-2">
         {notes?.map((note) => (

@@ -9,6 +9,7 @@ export const M001_init: Migration = {
     await sql`
       CREATE TABLE IF NOT EXISTS client_state (
         id      INTEGER PRIMARY KEY CHECK (id = 1),
+        last_server_seq INTEGER NOT NULL DEFAULT 0,
         clock   INTEGER NOT NULL DEFAULT 0,
         node_id TEXT    NOT NULL DEFAULT (hex(randomblob(16)))
       )
@@ -22,6 +23,7 @@ export const M001_init: Migration = {
       .ifNotExists()
       .addColumn("table_name", "text", (cb) => cb.notNull())
       .addColumn("row_id", "text", (cb) => cb.notNull())
+      .addColumn("clock", "integer", (cb) => cb.notNull())
       .addPrimaryKeyConstraint("sync_changes_pk", ["table_name", "row_id"])
       .execute();
 

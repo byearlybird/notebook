@@ -38,9 +38,9 @@ export async function createSyncTable(
          SET clock   = (SELECT clock   FROM client_state WHERE id = 1),
              node_id   = (SELECT node_id FROM client_state WHERE id = 1)
        WHERE id = NEW.id;
-      INSERT INTO sync_changes (table_name, row_id)
-        VALUES (${sql.lit(tableName)}, NEW.id)
-        ON CONFLICT(table_name, row_id) DO NOTHING;
+      INSERT INTO sync_changes (table_name, row_id, clock)
+        VALUES (${sql.lit(tableName)}, NEW.id, (SELECT clock FROM client_state WHERE id = 1))
+        ON CONFLICT(table_name, row_id) DO UPDATE SET clock = excluded.clock;
     END
   `.execute(db);
 
@@ -54,9 +54,9 @@ export async function createSyncTable(
          SET clock   = (SELECT clock   FROM client_state WHERE id = 1),
              node_id   = (SELECT node_id FROM client_state WHERE id = 1)
        WHERE id = NEW.id;
-      INSERT INTO sync_changes (table_name, row_id)
-        VALUES (${sql.lit(tableName)}, NEW.id)
-        ON CONFLICT(table_name, row_id) DO NOTHING;
+      INSERT INTO sync_changes (table_name, row_id, clock)
+        VALUES (${sql.lit(tableName)}, NEW.id, (SELECT clock FROM client_state WHERE id = 1))
+        ON CONFLICT(table_name, row_id) DO UPDATE SET clock = excluded.clock;
     END
   `.execute(db);
 
