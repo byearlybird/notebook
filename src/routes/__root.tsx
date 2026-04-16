@@ -23,26 +23,25 @@ function RootComponent() {
   }
 
   return (
-    <div className="min-h-screen">
-      <nav className="flex items-center gap-4 border-b p-4">
-        <Link to="/" className="[&.active]:font-bold">
-          Index
+    <div className="h-screen flex flex-col">
+      <nav className="flex items-center border-b px-4 py-3 shrink-0">
+        <Link to="/" className="text-sm font-semibold">
+          Todos
         </Link>
-        <Link to="/other" className="[&.active]:font-bold">
-          Other
-        </Link>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-3">
           <Show when="signed-out">
             <SignInButton />
             <SignUpButton />
           </Show>
           <Show when="signed-in">
             <UserButton />
-            <button onClick={handleSignOut}>Sign out</button>
+            <button className="text-sm" onClick={handleSignOut}>
+              Sign out
+            </button>
           </Show>
         </div>
       </nav>
-      <main className="p-4">
+      <main className="flex-1 overflow-hidden">
         <Outlet />
       </main>
     </div>

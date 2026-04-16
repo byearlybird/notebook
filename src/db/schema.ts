@@ -11,11 +11,16 @@ export type SyncableRow = {
   is_deleted: number;
 };
 
-type Note = SyncableRow & {
+type Todo = SyncableRow & {
   content: string;
+  completed: number;
+  category_id: string | null;
   created_at: string;
-  edited_at: string | null;
-  status: "pinned" | null;
+};
+
+type Category = SyncableRow & {
+  name: string;
+  created_at: string;
 };
 
 type SyncChanges = {
@@ -25,7 +30,8 @@ type SyncChanges = {
 };
 
 export type DBSchema = {
-  notes: Note;
+  todos: Todo;
+  categories: Category;
   sync_changes: SyncChanges;
   client_state: ClientState;
 };

@@ -28,14 +28,22 @@ export const M001_init: Migration = {
       .addPrimaryKeyConstraint("sync_changes_pk", ["table_name", "row_id"])
       .execute();
 
-    // 3. notes
-    await createSyncTable(db, "notes", (t) =>
+    // 3. categories
+    await createSyncTable(db, "categories", (t) =>
+      t
+        .addColumn("id", "text", (cb) => cb.primaryKey())
+        .addColumn("name", "text", (cb) => cb.notNull())
+        .addColumn("created_at", "text", (cb) => cb.notNull()),
+    );
+
+    // 4. todos
+    await createSyncTable(db, "todos", (t) =>
       t
         .addColumn("id", "text", (cb) => cb.primaryKey())
         .addColumn("content", "text", (cb) => cb.notNull())
-        .addColumn("created_at", "text", (cb) => cb.notNull())
-        .addColumn("edited_at", "text", (cb) => cb.defaultTo(null))
-        .addColumn("status", "text", (cb) => cb.defaultTo(null)),
+        .addColumn("completed", "integer", (cb) => cb.notNull().defaultTo(0))
+        .addColumn("category_id", "text", (cb) => cb.defaultTo(null))
+        .addColumn("created_at", "text", (cb) => cb.notNull()),
     );
   },
 };

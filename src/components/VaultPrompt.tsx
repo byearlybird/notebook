@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { api } from "../api";
 import { setupVault, unlockVault } from "../vault";
 
@@ -55,18 +55,15 @@ export function VaultPrompt({ onUnlocked }: Props) {
   const title = mode === "create" ? "Create vault password" : "Enter vault password";
   const description =
     mode === "create"
-      ? "Your notes are encrypted before syncing. Choose a vault password to protect them."
+      ? "Your todos are encrypted before syncing. Choose a vault password to protect them."
       : "Enter your vault password to enable sync.";
   const submitLabel = mode === "create" ? "Create" : "Unlock";
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex w-72 flex-col gap-3 rounded-lg border bg-white p-4 shadow-lg"
-    >
+    <form onSubmit={handleSubmit} className="flex w-64 flex-col gap-3 border bg-white p-4 shadow-md">
       <div>
         <p className="text-sm font-semibold">{title}</p>
-        <p className="mt-0.5 text-xs text-gray-500">{description}</p>
+        <p className="mt-0.5 text-xs text-neutral-500">{description}</p>
       </div>
       <input
         ref={inputRef}
@@ -76,13 +73,13 @@ export function VaultPrompt({ onUnlocked }: Props) {
         placeholder="Vault password"
         autoComplete={mode === "create" ? "new-password" : "current-password"}
         required
-        className="rounded border px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+        className="border px-3 py-1.5 text-sm outline-none focus:ring-1 focus:ring-black"
       />
       {error && <p className="text-xs text-red-600">{error}</p>}
       <button
         type="submit"
         disabled={pending || password.length === 0}
-        className="rounded bg-blue-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+        className="bg-black px-3 py-1.5 text-sm font-medium text-white hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {pending ? "…" : submitLabel}
       </button>
