@@ -34,10 +34,10 @@ export async function setupVault(password: string): Promise<void> {
   const kek = await deriveKEK(password, salt);
 
   const { raw } = await generateRawDEK();
-  const { wrapped_key, iv } = await wrapDEK(raw, kek);
+  const { wrappedKey, iv } = await wrapDEK(raw, kek);
 
   await api.setWrappedKey({
-    wrapped_key,
+    wrappedKey,
     salt: toBase64(salt),
     iv,
   });
@@ -63,7 +63,7 @@ export async function unlockVault(password: string): Promise<void> {
   const kek = await deriveKEK(password, salt);
 
   // Throws DOMException on wrong password
-  const dek = await unwrapDEK(stored.wrapped_key, stored.iv, kek);
+  const dek = await unwrapDEK(stored.wrappedKey, stored.iv, kek);
 
   await cacheDEK(dek);
   currentDEK = dek;
@@ -98,14 +98,14 @@ export async function changePassword(currentPassword: string, newPassword: strin
   const oldKek = await deriveKEK(currentPassword, oldSalt);
 
   // This throws on wrong current password
-  const rawDek = await unwrapRawDEK(stored.wrapped_key, stored.iv, oldKek);
+  const rawDek = await unwrapRawDEK(stored.wrappedKey, stored.iv, oldKek);
 
   const newSalt = generateSalt();
   const newKek = await deriveKEK(newPassword, newSalt);
-  const { wrapped_key, iv } = await wrapDEK(rawDek, newKek);
+  const { wrappedKey, iv } = await wrapDEK(rawDek, newKek);
 
   await api.changeWrappedKey({
-    wrapped_key,
+    wrappedKey,
     salt: toBase64(newSalt),
     iv,
   });

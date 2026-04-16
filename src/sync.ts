@@ -84,7 +84,7 @@ async function pullChanges() {
 
     await trx
       .updateTable("client_state")
-      .set({ last_server_seq: remoteChanges.max_seq, hlc_wall: newWall, hlc_count: newCount })
+      .set({ last_server_seq: remoteChanges.maxSeq, hlc_wall: newWall, hlc_count: newCount })
       .execute();
   });
 }

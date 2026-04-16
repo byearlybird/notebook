@@ -71,10 +71,10 @@ export async function deriveKEK(password: string, salt: Uint8Array): Promise<Cry
 export async function wrapDEK(
   rawDek: ArrayBuffer,
   kek: CryptoKey,
-): Promise<{ wrapped_key: string; iv: string }> {
+): Promise<{ wrappedKey: string; iv: string }> {
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const ciphertext = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, kek, rawDek);
-  return { wrapped_key: toBase64(ciphertext), iv: toBase64(iv) };
+  return { wrappedKey: toBase64(ciphertext), iv: toBase64(iv) };
 }
 
 /**

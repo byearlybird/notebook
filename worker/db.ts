@@ -6,7 +6,7 @@ export type ChangeLog = {
 
 export type UserKey = {
   user_id: string;
-  wrapped_key: string;
+  wrappedKey: string;
   salt: string;
   iv: string;
 };

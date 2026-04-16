@@ -3,7 +3,7 @@ import { oc } from "@orpc/contract";
 
 const pushChangesContract = oc
   .input(z.object({ changes: z.array(z.string()) }))
-  .output(z.object({ seqs: z.array(z.number()), max_seq: z.number() }));
+  .output(z.object({ seqs: z.array(z.number()), maxSeq: z.number() }));
 
 const pullChangesContract = oc
   .input(
@@ -15,18 +15,18 @@ const pullChangesContract = oc
   .output(
     z.object({
       changes: z.array(z.object({ seq: z.number(), cyphertext: z.string() })),
-      max_seq: z.number(),
-      has_more: z.boolean(),
+      maxSeq: z.number(),
+      hasMore: z.boolean(),
     }),
   );
 
 const wrappedKeySchema = z.object({
-  wrapped_key: z.string(),
+  wrappedKey: z.string(),
   salt: z.string(),
   iv: z.string(),
 });
 
-const getWrappedKeyContract = oc.input(z.object({})).output(wrappedKeySchema.nullable());
+const getWrappedKeyContract = oc.output(wrappedKeySchema.nullable());
 
 const setWrappedKeyContract = oc.input(wrappedKeySchema).output(z.object({ success: z.boolean() }));
 

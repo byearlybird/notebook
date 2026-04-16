@@ -15,11 +15,11 @@ const pushChanges = os.pushChanges.handler(async ({ input, context: { db, userId
   const results = await db.batch<Pick<ChangeLog, "seq">>(batch);
 
   const seqs = results.flatMap((r) => r.results.map((row) => row.seq));
-  const max_seq = seqs[seqs.length - 1] ?? 0;
+  const maxSeq = seqs[seqs.length - 1] ?? 0;
 
   return {
     seqs,
-    max_seq,
+    maxSeq,
   };
 });
 
@@ -41,27 +41,27 @@ const pullChanges = os.pullChanges.handler(async ({ input, context: { db, userId
 
   return {
     changes: changes.map((r) => ({ seq: r.seq, cyphertext: r.cyphertext })),
-    max_seq: maxSeq,
-    has_more: hasMore,
+    maxSeq,
+    hasMore,
   };
 });
 
 const getWrappedKey = os.getWrappedKey.handler(async ({ context: { db, userId } }) => {
   const row = await db
-    .prepare("SELECT wrapped_key, salt, iv FROM user_keys WHERE user_id = ?")
+    .prepare("SELECT wrapped_key AS wrappedKey, salt, iv FROM user_keys WHERE user_id = ?")
     .bind(userId)
-    .first<Pick<UserKey, "wrapped_key" | "salt" | "iv">>();
+    .first<Pick<UserKey, "wrappedKey" | "salt" | "iv">>();
 
   return row ?? null;
 });
 
 const setWrappedKey = os.setWrappedKey.handler(
-  async ({ input: { wrapped_key, salt, iv }, context: { db, userId } }) => {
+  async ({ input: { wrappedKey, salt, iv }, context: { db, userId } }) => {
     const result = await db
       .prepare(
         "INSERT INTO user_keys (user_id, wrapped_key, salt, iv) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING",
       )
-      .bind(userId, wrapped_key, salt, iv)
+      .bind(userId, wrappedKey, salt, iv)
       .run();
 
     if (result.meta.changes === 0) {
@@ -73,12 +73,12 @@ const setWrappedKey = os.setWrappedKey.handler(
 );
 
 const changeWrappedKey = os.changeWrappedKey.handler(
-  async ({ input: { wrapped_key, salt, iv }, context: { db, userId } }) => {
+  async ({ input: { wrappedKey, salt, iv }, context: { db, userId } }) => {
     const result = await db
       .prepare(
         "UPDATE user_keys SET wrapped_key = ?, salt = ?, iv = ?, updated_at = datetime('now') WHERE user_id = ?",
       )
-      .bind(wrapped_key, salt, iv, userId)
+      .bind(wrappedKey, salt, iv, userId)
       .run();
 
     if (result.meta.changes === 0) {
