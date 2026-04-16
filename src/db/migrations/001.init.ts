@@ -8,10 +8,11 @@ export const M001_init: Migration = {
     // 1. client_state — singleton row holds the local clock and node identity
     await sql`
       CREATE TABLE IF NOT EXISTS client_state (
-        id      INTEGER PRIMARY KEY CHECK (id = 1),
+        id              INTEGER PRIMARY KEY CHECK (id = 1),
         last_server_seq INTEGER NOT NULL DEFAULT 0,
-        clock   INTEGER NOT NULL DEFAULT 0,
-        node_id TEXT    NOT NULL DEFAULT (hex(randomblob(16)))
+        hlc_wall        INTEGER NOT NULL DEFAULT 0,
+        hlc_count       INTEGER NOT NULL DEFAULT 0,
+        node_id         TEXT    NOT NULL DEFAULT (hex(randomblob(16)))
       )
     `.execute(db);
 
@@ -23,7 +24,7 @@ export const M001_init: Migration = {
       .ifNotExists()
       .addColumn("table_name", "text", (cb) => cb.notNull())
       .addColumn("row_id", "text", (cb) => cb.notNull())
-      .addColumn("clock", "integer", (cb) => cb.notNull())
+      .addColumn("hlc", "text", (cb) => cb.notNull())
       .addPrimaryKeyConstraint("sync_changes_pk", ["table_name", "row_id"])
       .execute();
 

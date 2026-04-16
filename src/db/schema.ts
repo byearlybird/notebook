@@ -1,13 +1,13 @@
 type ClientState = {
   last_server_seq: number;
-  clock: number;
+  hlc_wall: number;
+  hlc_count: number;
   node_id: string;
 };
 
 export type SyncableRow = {
   id: string;
-  clock: number;
-  node_id: string;
+  hlc: string;
   is_deleted: number;
 };
 
@@ -21,7 +21,7 @@ type Note = SyncableRow & {
 type SyncChanges = {
   table_name: keyof DBSchema;
   row_id: string;
-  clock: number;
+  hlc: string;
 };
 
 export type DBSchema = {

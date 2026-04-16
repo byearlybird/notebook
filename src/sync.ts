@@ -1,5 +1,6 @@
 import { api } from "./api";
 import { db } from "./db/client";
+import { mergeHlc, parseHlc } from "./db/hlc";
 import type { DBSchema, SyncableRow } from "./db/schema";
 
 type SyncPayload<T extends SyncableRow> = {
@@ -22,8 +23,15 @@ async function pullChanges() {
   });
 
   await db.transaction().execute(async (trx) => {
+    let maxRemoteHlc = "";
+
     for (const payload of payloads) {
       const { tableName, rowId, data } = payload;
+
+      if (data.hlc > maxRemoteHlc) {
+        maxRemoteHlc = data.hlc;
+      }
+
       const existing = await trx
         .selectFrom(tableName)
         .selectAll()
@@ -35,11 +43,8 @@ async function pullChanges() {
         continue;
       }
 
-      const existingIsNewer = existing && existing.clock > data.clock;
-      const existingIsSameButHigherNodeId =
-        existing && existing.clock === data.clock && existing.node_id > data.node_id;
-
-      if (existingIsNewer || existingIsSameButHigherNodeId) {
+      // Higher HLC string wins; equal HLC means identical event (idempotent)
+      if (existing.hlc >= data.hlc) {
         continue;
       }
 
@@ -53,7 +58,29 @@ async function pullChanges() {
         .execute();
     }
 
-    await trx.updateTable("client_state").set({ last_server_seq: remoteChanges.max_seq }).execute();
+    const { hlc_wall: localWall, hlc_count: localCount } = await trx
+      .selectFrom("client_state")
+      .select(["hlc_wall", "hlc_count"])
+      .executeTakeFirstOrThrow();
+
+    let newWall = localWall;
+    let newCount = localCount;
+
+    if (maxRemoteHlc !== "") {
+      const { wall: remoteWall, count: remoteCount } = parseHlc(maxRemoteHlc);
+      ({ wall: newWall, count: newCount } = mergeHlc(
+        localWall,
+        localCount,
+        remoteWall,
+        remoteCount,
+        Date.now(),
+      ));
+    }
+
+    await trx
+      .updateTable("client_state")
+      .set({ last_server_seq: remoteChanges.max_seq, hlc_wall: newWall, hlc_count: newCount })
+      .execute();
   });
 }
 
@@ -100,7 +127,7 @@ async function pushChanges() {
           .selectFrom("notes")
           .select("notes.id")
           .whereRef("notes.id", "=", "sync_changes.row_id")
-          .whereRef("notes.clock", "=", "sync_changes.clock"),
+          .whereRef("notes.hlc", "=", "sync_changes.hlc"),
       ),
     )
     .execute();
