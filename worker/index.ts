@@ -3,7 +3,6 @@ import { RPCHandler } from "@orpc/server/fetch";
 import { onError } from "@orpc/server";
 import { ORPCError } from "@orpc/server";
 import { appContract } from "./contract";
-import { migrateToLatest } from "./migrator";
 import { authenticateRequest } from "./auth";
 import type { ChangeLog, UserKey } from "./db";
 
@@ -108,16 +107,6 @@ const handler = new RPCHandler(router, {
 export default {
   async fetch(request, env): Promise<Response> {
     const db = env.DB;
-    console.log("Running migrations...");
-    const { error, results } = await migrateToLatest(db);
-    for (const r of results) {
-      console.log(`Migration "${r.migrationName}": ${r.status}`);
-    }
-    if (error) {
-      console.error("Migration failed:", error);
-      return new Response("Migration failed", { status: 500 });
-    }
-    console.log("Migrations complete.");
 
     let userId: string;
     try {
