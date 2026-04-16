@@ -117,7 +117,6 @@ async function pushChanges() {
   }
 
   await api.pushChanges({
-    req_id: crypto.randomUUID(),
     changes: payloads,
   });
 

@@ -17,24 +17,31 @@ const pushChanges = os.pushChanges.handler(async ({ input, context: { db, userId
   const max_seq = seqs[seqs.length - 1] ?? 0;
 
   return {
-    push_id: crypto.randomUUID(),
     seqs,
     max_seq,
   };
 });
 
 const pullChanges = os.pullChanges.handler(async ({ input, context: { db, userId } }) => {
-  const { results: changes } = await db
-    .prepare("SELECT seq, cyphertext FROM changes WHERE seq > ? AND user_id = ? ORDER BY seq")
-    .bind(input.since, userId)
-    .all<Pick<ChangeLog, "seq" | "cyphertext">>();
+  const query = input.limit
+    ? "SELECT seq, cyphertext FROM changes WHERE seq > ? AND user_id = ? ORDER BY seq LIMIT ?"
+    : "SELECT seq, cyphertext FROM changes WHERE seq > ? AND user_id = ? ORDER BY seq";
 
-  const max_seq = changes.length > 0 ? changes[changes.length - 1].seq : input.since;
+  const stmt = input.limit
+    ? db.prepare(query).bind(input.since, userId, input.limit + 1)
+    : db.prepare(query).bind(input.since, userId);
+
+  const { results: changes } = await stmt.all<Pick<ChangeLog, "seq" | "cyphertext">>();
+
+  const hasMore = input.limit != null && changes.length > input.limit;
+  if (hasMore) changes.pop();
+
+  const maxSeq = changes.length > 0 ? changes[changes.length - 1].seq : input.since;
 
   return {
     changes: changes.map((r) => ({ seq: r.seq, cyphertext: r.cyphertext })),
-    max_seq,
-    has_more: false,
+    max_seq: maxSeq,
+    has_more: hasMore,
   };
 });
 
