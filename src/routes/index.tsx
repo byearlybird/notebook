@@ -4,8 +4,7 @@ import { useAuth } from "@clerk/react";
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { db } from "../db/client";
 import { useQuery } from "../db/context";
-import { fullSync } from "../sync";
-import { isVaultUnlocked, lockVault, tryRestoreFromCache } from "../vault";
+import { useSync } from "../sync-context";
 import { VaultPrompt } from "../components/VaultPrompt";
 
 export const Route = createFileRoute("/")({
@@ -14,7 +13,7 @@ export const Route = createFileRoute("/")({
 
 function IndexPage() {
   const { isSignedIn } = useAuth();
-  const [vaultUnlocked, setVaultUnlocked] = useState(isVaultUnlocked());
+  const { isUnlocked, lock, tryRestore, sync } = useSync();
   const [showVaultPrompt, setShowVaultPrompt] = useState(false);
   const vaultButtonRef = useRef<HTMLButtonElement>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
@@ -25,11 +24,9 @@ function IndexPage() {
 
   useEffect(() => {
     if (!isSignedIn) return;
-    if (vaultUnlocked) return;
-    tryRestoreFromCache().then((restored) => {
-      if (restored) setVaultUnlocked(true);
-    });
-  }, [isSignedIn, vaultUnlocked]);
+    if (isUnlocked) return;
+    tryRestore();
+  }, [isSignedIn, isUnlocked, tryRestore]);
 
   useEffect(() => {
     if (renamingId) renamingInputRef.current?.focus();
@@ -54,9 +51,7 @@ function IndexPage() {
 
   const todos = useMemo(
     () =>
-      selectedCategoryId
-        ? allTodos?.filter((t) => t.category_id === selectedCategoryId)
-        : allTodos,
+      selectedCategoryId ? allTodos?.filter((t) => t.category_id === selectedCategoryId) : allTodos,
     [allTodos, selectedCategoryId],
   );
 
@@ -78,7 +73,11 @@ function IndexPage() {
   }
 
   async function toggleTodo(id: string, completed: number) {
-    await db.updateTable("todos").set({ completed: completed ? 0 : 1 }).where("id", "=", id).execute();
+    await db
+      .updateTable("todos")
+      .set({ completed: completed ? 0 : 1 })
+      .where("id", "=", id)
+      .execute();
   }
 
   async function moveTodo(id: string, categoryId: string | null) {
@@ -90,7 +89,12 @@ function IndexPage() {
     if (!name?.trim()) return;
     await db
       .insertInto("categories")
-      .values({ id: crypto.randomUUID(), name: name.trim(), created_at: new Date().toISOString() } as any)
+      .values({
+        id: crypto.randomUUID(),
+        name: name.trim(),
+        created_at: new Date().toISOString(),
+        is_deleted: 0,
+      })
       .execute();
   }
 
@@ -104,12 +108,11 @@ function IndexPage() {
   }
 
   async function handleLockVault() {
-    await lockVault();
-    setVaultUnlocked(false);
+    await lock();
     setShowVaultPrompt(false);
   }
 
-  const syncEnabled = isSignedIn && vaultUnlocked;
+  const syncEnabled = isSignedIn && isUnlocked;
   const selectedCategory = categories?.find((c) => c.id === selectedCategoryId);
 
   return (
@@ -121,14 +124,14 @@ function IndexPage() {
           {isSignedIn && (
             <>
               <button
-                onClick={fullSync}
+                onClick={sync}
                 disabled={!syncEnabled}
                 title={!syncEnabled ? "Unlock vault to sync" : undefined}
                 className="border px-3 py-1 text-xs disabled:opacity-40 hover:bg-neutral-100 disabled:cursor-not-allowed"
               >
                 Sync
               </button>
-              {!vaultUnlocked ? (
+              {!isUnlocked ? (
                 <div className="relative">
                   <button
                     ref={vaultButtonRef}
@@ -139,12 +142,7 @@ function IndexPage() {
                   </button>
                   {showVaultPrompt && (
                     <div className="absolute right-0 top-full z-10 mt-1">
-                      <VaultPrompt
-                        onUnlocked={() => {
-                          setVaultUnlocked(true);
-                          setShowVaultPrompt(false);
-                        }}
-                      />
+                      <VaultPrompt onUnlocked={() => setShowVaultPrompt(false)} />
                     </div>
                   )}
                 </div>
@@ -234,7 +232,9 @@ function IndexPage() {
                   onChange={() => toggleTodo(todo.id, todo.completed)}
                   className="w-4 h-4 accent-black shrink-0"
                 />
-                <span className={`flex-1 text-sm ${todo.completed === 1 ? "line-through text-neutral-400" : ""}`}>
+                <span
+                  className={`flex-1 text-sm ${todo.completed === 1 ? "line-through text-neutral-400" : ""}`}
+                >
                   {todo.content}
                 </span>
                 <select

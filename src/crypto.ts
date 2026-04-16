@@ -5,12 +5,14 @@ const IDB_DEK_KEY = "dek";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
-function toBase64(buf: ArrayBuffer | Uint8Array<ArrayBuffer>): string {
+export function toBase64(
+  buf: ArrayBuffer | Uint8Array<ArrayBuffer> | Uint8Array<ArrayBufferLike>,
+): string {
   const bytes = buf instanceof ArrayBuffer ? new Uint8Array(buf) : buf;
   return btoa(String.fromCharCode(...bytes));
 }
 
-function fromBase64(b64: string): Uint8Array<ArrayBuffer> {
+export function fromBase64(b64: string): Uint8Array<ArrayBuffer> {
   const str = atob(b64);
   const arr = new Uint8Array(str.length);
   for (let i = 0; i < str.length; i++) arr[i] = str.charCodeAt(i);

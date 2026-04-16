@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { api } from "../api";
-import { setupVault, unlockVault } from "../vault";
+import { useSync } from "../sync-context";
 
 type Mode = "loading" | "create" | "unlock";
 
@@ -9,6 +8,7 @@ type Props = {
 };
 
 export function VaultPrompt({ onUnlocked }: Props) {
+  const { setup, unlock, checkVaultExists } = useSync();
   const [mode, setMode] = useState<Mode>("loading");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -16,10 +16,8 @@ export function VaultPrompt({ onUnlocked }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    api.getWrappedKey({}).then((result) => {
-      setMode(result === null ? "create" : "unlock");
-    });
-  }, []);
+    checkVaultExists().then((exists) => setMode(exists ? "unlock" : "create"));
+  }, [checkVaultExists]);
 
   useEffect(() => {
     if (mode !== "loading") {
@@ -33,9 +31,9 @@ export function VaultPrompt({ onUnlocked }: Props) {
     setPending(true);
     try {
       if (mode === "create") {
-        await setupVault(password);
+        await setup(password);
       } else {
-        await unlockVault(password);
+        await unlock(password);
       }
       setPassword("");
       onUnlocked();
@@ -60,7 +58,10 @@ export function VaultPrompt({ onUnlocked }: Props) {
   const submitLabel = mode === "create" ? "Create" : "Unlock";
 
   return (
-    <form onSubmit={handleSubmit} className="flex w-64 flex-col gap-3 border bg-white p-4 shadow-md">
+    <form
+      onSubmit={handleSubmit}
+      className="flex w-64 flex-col gap-3 border bg-white p-4 shadow-md"
+    >
       <div>
         <p className="text-sm font-semibold">{title}</p>
         <p className="mt-0.5 text-xs text-neutral-500">{description}</p>

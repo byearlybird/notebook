@@ -1,29 +1,28 @@
-import { api } from "./api";
 import { db } from "./db/client";
 import { mergeHlc, parseHlc } from "./db/hlc";
 import type { DBSchema, SyncableRow } from "./db/schema";
 import { encrypt, decrypt } from "./crypto";
-import { getDEK, isVaultUnlocked } from "./vault";
+import type { ChangeTransport } from "./transport";
+import type { Selectable } from "kysely";
 
-type SyncPayload<T extends SyncableRow> = {
+type SyncPayload<T extends Selectable<SyncableRow>> = {
   tableName: keyof DBSchema;
   rowId: string;
   data: T;
 };
 
-async function pullChanges() {
+async function pullChanges(dek: CryptoKey, transport: ChangeTransport) {
   const { last_server_seq } = await db
     .selectFrom("client_state")
     .select("last_server_seq")
     .executeTakeFirstOrThrow();
 
-  const remoteChanges = await api.pullChanges({ since: last_server_seq });
+  const remoteChanges = await transport.pullChanges(last_server_seq);
 
-  const dek = getDEK();
   const payloads = await Promise.all(
     remoteChanges.changes.map(async ({ cyphertext }) => {
       const plaintext = await decrypt(cyphertext, dek);
-      return JSON.parse(plaintext) as SyncPayload<SyncableRow>;
+      return JSON.parse(plaintext) as SyncPayload<Selectable<SyncableRow>>;
     }),
   );
 
@@ -33,8 +32,8 @@ async function pullChanges() {
     for (const payload of payloads) {
       const { tableName, rowId, data } = payload;
 
-      if (data.hlc > maxRemoteHlc) {
-        maxRemoteHlc = data.hlc;
+      if (String(data.hlc) > maxRemoteHlc) {
+        maxRemoteHlc = String(data.hlc);
       }
 
       const existing = await trx
@@ -49,7 +48,7 @@ async function pullChanges() {
       }
 
       // Higher HLC string wins; equal HLC means identical event (idempotent)
-      if (existing.hlc >= data.hlc) {
+      if (String(existing.hlc) >= String(data.hlc)) {
         continue;
       }
 
@@ -57,6 +56,8 @@ async function pullChanges() {
         .updateTable(tableName)
         .set({
           ...data,
+          hlc: String(data.hlc),
+          is_deleted: Number(data.is_deleted),
           id: rowId,
         })
         .where("id", "=", rowId)
@@ -89,7 +90,7 @@ async function pullChanges() {
   });
 }
 
-async function pushChanges() {
+async function pushChanges(dek: CryptoKey, transport: ChangeTransport) {
   const changes = await db.selectFrom("sync_changes").selectAll().execute();
   if (changes.length === 0) {
     return;
@@ -112,19 +113,16 @@ async function pushChanges() {
 
     pushed.push({ table_name, row_id, hlc: row.hlc });
 
-    const payload: SyncPayload<SyncableRow> = {
+    const payload: SyncPayload<Selectable<SyncableRow>> = {
       tableName: table_name,
       rowId: row_id,
       data: row,
     };
 
-    const dek = getDEK();
     payloads.push(await encrypt(JSON.stringify(payload), dek));
   }
 
-  await api.pushChanges({
-    changes: payloads,
-  });
+  await transport.pushChanges(payloads);
 
   for (const entry of pushed) {
     await db
@@ -136,8 +134,8 @@ async function pushChanges() {
   }
 }
 
-export const fullSync = async () => {
-  if (!isVaultUnlocked()) return;
-  await pullChanges();
-  await pushChanges();
-};
+export async function fullSync(dek: CryptoKey | null, transport: ChangeTransport): Promise<void> {
+  if (!dek) return;
+  await pullChanges(dek, transport);
+  await pushChanges(dek, transport);
+}

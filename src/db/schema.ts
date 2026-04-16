@@ -1,3 +1,5 @@
+import type { ColumnType } from "kysely";
+
 type ClientState = {
   last_server_seq: number;
   hlc_wall: number;
@@ -7,8 +9,8 @@ type ClientState = {
 
 export type SyncableRow = {
   id: string;
-  hlc: string;
-  is_deleted: number;
+  hlc: ColumnType<string, string | undefined, string | undefined>;
+  is_deleted: ColumnType<number, number | undefined, number | undefined>;
 };
 
 type Todo = SyncableRow & {
