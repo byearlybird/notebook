@@ -20,7 +20,24 @@ const pullChangesContract = oc
     }),
   );
 
+const wrappedKeySchema = z.object({
+  wrapped_key: z.string(),
+  salt: z.string(),
+  iv: z.string(),
+});
+
+const getWrappedKeyContract = oc.input(z.object({})).output(wrappedKeySchema.nullable());
+
+const setWrappedKeyContract = oc.input(wrappedKeySchema).output(z.object({ success: z.boolean() }));
+
+const changeWrappedKeyContract = oc
+  .input(wrappedKeySchema)
+  .output(z.object({ success: z.boolean() }));
+
 export const appContract = {
   pushChanges: pushChangesContract,
   pullChanges: pullChangesContract,
+  getWrappedKey: getWrappedKeyContract,
+  setWrappedKey: setWrappedKeyContract,
+  changeWrappedKey: changeWrappedKeyContract,
 };

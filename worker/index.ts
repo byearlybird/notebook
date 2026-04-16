@@ -1,10 +1,11 @@
 import { implement } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import { onError } from "@orpc/server";
+import { ORPCError } from "@orpc/server";
 import { appContract } from "./contract";
 import { migrateToLatest } from "./migrator";
 import { authenticateRequest } from "./auth";
-import type { ChangeLog } from "./db";
+import type { ChangeLog, UserKey } from "./db";
 
 const os = implement(appContract).$context<{ db: D1Database; userId: string }>();
 
@@ -45,9 +46,55 @@ const pullChanges = os.pullChanges.handler(async ({ input, context: { db, userId
   };
 });
 
+const getWrappedKey = os.getWrappedKey.handler(async ({ context: { db, userId } }) => {
+  const row = await db
+    .prepare("SELECT wrapped_key, salt, iv FROM user_keys WHERE user_id = ?")
+    .bind(userId)
+    .first<Pick<UserKey, "wrapped_key" | "salt" | "iv">>();
+
+  return row ?? null;
+});
+
+const setWrappedKey = os.setWrappedKey.handler(
+  async ({ input: { wrapped_key, salt, iv }, context: { db, userId } }) => {
+    const result = await db
+      .prepare(
+        "INSERT INTO user_keys (user_id, wrapped_key, salt, iv) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING",
+      )
+      .bind(userId, wrapped_key, salt, iv)
+      .run();
+
+    if (result.meta.changes === 0) {
+      throw new ORPCError("CONFLICT", { message: "Vault key already exists for this user" });
+    }
+
+    return { success: true };
+  },
+);
+
+const changeWrappedKey = os.changeWrappedKey.handler(
+  async ({ input: { wrapped_key, salt, iv }, context: { db, userId } }) => {
+    const result = await db
+      .prepare(
+        "UPDATE user_keys SET wrapped_key = ?, salt = ?, iv = ?, updated_at = datetime('now') WHERE user_id = ?",
+      )
+      .bind(wrapped_key, salt, iv, userId)
+      .run();
+
+    if (result.meta.changes === 0) {
+      throw new ORPCError("NOT_FOUND", { message: "No vault key found for this user" });
+    }
+
+    return { success: true };
+  },
+);
+
 const router = os.router({
   pushChanges,
   pullChanges,
+  getWrappedKey,
+  setWrappedKey,
+  changeWrappedKey,
 });
 
 const handler = new RPCHandler(router, {
@@ -63,13 +110,12 @@ export default {
     const db = env.DB;
     console.log("Running migrations...");
     const { error, results } = await migrateToLatest(db);
-    if (results) {
-      for (const r of results) {
-        console.log(`Migration "${r.migrationName}": ${r.status}`);
-      }
+    for (const r of results) {
+      console.log(`Migration "${r.migrationName}": ${r.status}`);
     }
     if (error) {
       console.error("Migration failed:", error);
+      return new Response("Migration failed", { status: 500 });
     }
     console.log("Migrations complete.");
 

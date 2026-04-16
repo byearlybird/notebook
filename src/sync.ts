@@ -2,6 +2,8 @@ import { api } from "./api";
 import { db } from "./db/client";
 import { mergeHlc, parseHlc } from "./db/hlc";
 import type { DBSchema, SyncableRow } from "./db/schema";
+import { encrypt, decrypt } from "./crypto";
+import { getDEK, isVaultUnlocked } from "./vault";
 
 type SyncPayload<T extends SyncableRow> = {
   tableName: keyof DBSchema;
@@ -17,10 +19,13 @@ async function pullChanges() {
 
   const remoteChanges = await api.pullChanges({ since: last_server_seq });
 
-  const payloads = remoteChanges.changes.map(({ cyphertext }) => {
-    const payload = JSON.parse(cyphertext) as SyncPayload<SyncableRow>;
-    return payload;
-  });
+  const dek = getDEK();
+  const payloads = await Promise.all(
+    remoteChanges.changes.map(async ({ cyphertext }) => {
+      const plaintext = await decrypt(cyphertext, dek);
+      return JSON.parse(plaintext) as SyncPayload<SyncableRow>;
+    }),
+  );
 
   await db.transaction().execute(async (trx) => {
     let maxRemoteHlc = "";
@@ -113,7 +118,8 @@ async function pushChanges() {
       data: row,
     };
 
-    payloads.push(JSON.stringify(payload));
+    const dek = getDEK();
+    payloads.push(await encrypt(JSON.stringify(payload), dek));
   }
 
   await api.pushChanges({
@@ -131,6 +137,7 @@ async function pushChanges() {
 }
 
 export const fullSync = async () => {
+  if (!isVaultUnlocked()) return;
   await pullChanges();
   await pushChanges();
 };

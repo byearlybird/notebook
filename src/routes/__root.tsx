@@ -1,6 +1,7 @@
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
-import { Show, SignInButton, SignOutButton, SignUpButton, UserButton } from "@clerk/react";
+import { Show, SignInButton, SignUpButton, UserButton, useClerk } from "@clerk/react";
 import { migrator } from "../db/migrator";
+import { lockVault } from "../vault";
 
 let hasMigrated = false;
 
@@ -10,7 +11,18 @@ export const Route = createRootRoute({
     await migrator.migrateToLatest();
     hasMigrated = true;
   },
-  component: () => (
+  component: RootComponent,
+});
+
+function RootComponent() {
+  const { signOut } = useClerk();
+
+  async function handleSignOut() {
+    await lockVault();
+    await signOut();
+  }
+
+  return (
     <div className="min-h-screen">
       <nav className="flex items-center gap-4 border-b p-4">
         <Link to="/" className="[&.active]:font-bold">
@@ -26,7 +38,7 @@ export const Route = createRootRoute({
           </Show>
           <Show when="signed-in">
             <UserButton />
-            <SignOutButton />
+            <button onClick={handleSignOut}>Sign out</button>
           </Show>
         </div>
       </nav>
@@ -34,5 +46,5 @@ export const Route = createRootRoute({
         <Outlet />
       </main>
     </div>
-  ),
-});
+  );
+}

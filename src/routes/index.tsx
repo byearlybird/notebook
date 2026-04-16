@@ -1,8 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useReactiveQuery } from "sqlocal/react";
 import { useAuth } from "@clerk/react";
+import { useState, useEffect, useRef } from "react";
 import { db, sqlocal } from "../db/client";
 import { fullSync } from "../sync";
+import { isVaultUnlocked, lockVault, tryRestoreFromCache } from "../vault";
+import { VaultPrompt } from "../components/VaultPrompt";
 
 export const Route = createFileRoute("/")({
   component: IndexPage,
@@ -10,6 +13,19 @@ export const Route = createFileRoute("/")({
 
 function IndexPage() {
   const { isSignedIn } = useAuth();
+  const [vaultUnlocked, setVaultUnlocked] = useState(isVaultUnlocked());
+  const [showVaultPrompt, setShowVaultPrompt] = useState(false);
+  const vaultButtonRef = useRef<HTMLButtonElement>(null);
+
+  // On mount (or sign-in), try to restore the DEK from IndexedDB silently
+  useEffect(() => {
+    if (!isSignedIn) return;
+    if (vaultUnlocked) return;
+    tryRestoreFromCache().then((restored) => {
+      if (restored) setVaultUnlocked(true);
+    });
+  }, [isSignedIn, vaultUnlocked]);
+
   const { data: notes } = useReactiveQuery(
     sqlocal,
     db
@@ -45,28 +61,75 @@ function IndexPage() {
       .execute();
   }
 
+  async function handleLockVault() {
+    await lockVault();
+    setVaultUnlocked(false);
+    setShowVaultPrompt(false);
+  }
+
+  const syncEnabled = isSignedIn && vaultUnlocked;
+  const syncTitle = !isSignedIn
+    ? "Sign in to enable sync"
+    : !vaultUnlocked
+      ? "Enter your vault password to enable sync"
+      : undefined;
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold">Notes</h1>
-      <button
-        className="mt-4 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-        onClick={addNote}
-      >
-        Add Note
-      </button>
-      <button
-        className="mt-4 ml-2 rounded bg-gray-500 px-4 py-2 text-white hover:bg-gray-600"
-        onClick={logSyncChanges}
-      >
-        Log sync_changes
-      </button>
-      <button
-        className="mt-4 ml-2 rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
-        onClick={fullSync}
-        disabled={!isSignedIn}
-      >
-        Sync
-      </button>
+      <div className="mt-4 flex flex-wrap items-start gap-2">
+        <button
+          className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+          onClick={addNote}
+        >
+          Add Note
+        </button>
+        <button
+          className="rounded bg-gray-500 px-4 py-2 text-white hover:bg-gray-600"
+          onClick={logSyncChanges}
+        >
+          Log sync_changes
+        </button>
+        <button
+          className="rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={fullSync}
+          disabled={!syncEnabled}
+          title={syncTitle}
+        >
+          Sync
+        </button>
+
+        {isSignedIn && !vaultUnlocked && (
+          <div className="relative">
+            <button
+              ref={vaultButtonRef}
+              className="rounded border px-4 py-2 text-sm hover:bg-gray-50"
+              onClick={() => setShowVaultPrompt((v) => !v)}
+            >
+              🔒 Unlock Vault
+            </button>
+            {showVaultPrompt && (
+              <div className="absolute left-0 top-full z-10 mt-1">
+                <VaultPrompt
+                  onUnlocked={() => {
+                    setVaultUnlocked(true);
+                    setShowVaultPrompt(false);
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {isSignedIn && vaultUnlocked && (
+          <button
+            className="rounded border px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+            onClick={handleLockVault}
+          >
+            🔓 Lock Vault
+          </button>
+        )}
+      </div>
       <ul className="mt-4 space-y-2">
         {notes?.map((note) => (
           <li key={note.id} className="flex items-center justify-between rounded border p-3">

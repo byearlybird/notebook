@@ -4,7 +4,7 @@ import type { ContractRouterClient } from "@orpc/contract";
 import { appContract } from "../worker/contract";
 
 const link = new RPCLink({
-  url: "./api",
+  url: "http://localhost:5173/api",
 });
 
 export const api: ContractRouterClient<typeof appContract> = createORPCClient(link);
