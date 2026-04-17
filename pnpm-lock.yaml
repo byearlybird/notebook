@@ -32,6 +32,9 @@ importers:
       '@tanstack/react-router':
         specifier: ^1.168.21
         version: 1.168.21(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      idb-keyval:
+        specifier: ^6.2.2
+        version: 6.2.2
       kysely:
         specifier: ^0.28.16
         version: 0.28.16
@@ -1332,6 +1335,9 @@ packages:
 
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
+
+  idb-keyval@6.2.2:
+    resolution: {integrity: sha512-yjD9nARJ/jb1g+CvD0tlhUHOrJ9Sy0P8T9MF3YaLlHnSRpwPfpTX0XIvpmw3gAJUmEu3FiICLBDPXVwyEvrleg==}
 
   is-binary-path@2.1.0:
     resolution: {integrity: sha512-ZMERYes6pDydyuGidse7OsHxtbI7WVeUEozgR/g7rd0xUimYNlvZRE/K2MgZTjWy725IfelLeVcEM97mmtRGXw==}
@@ -2818,6 +2824,8 @@ snapshots:
   glob-to-regexp@0.4.1: {}
 
   graceful-fs@4.2.11: {}
+
+  idb-keyval@6.2.2: {}
 
   is-binary-path@2.1.0:
     dependencies:
