@@ -1,105 +1,53 @@
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect } from "react";
 import type { ReactNode } from "react";
-import { lockVault, setupVault, tryRestoreFromCache, unlockVault } from "./vault";
-import type { ChangeTransport, KeyTransport } from "./transport";
+import type { ChangeTransport } from "./transport";
 import { fullSync } from "./sync";
 import { useDB, useQuery } from "./db/context";
-import { useClerk } from "@clerk/react";
+import { useVault } from "./vault-context";
 
 const POLL_INTERVAL_MS = 30_000;
 
-type SyncState = {
-  dek: CryptoKey | null;
-  isUnlocked: boolean;
-  setup: (password: string) => Promise<void>;
-  unlock: (password: string) => Promise<void>;
-  lock: () => Promise<void>;
-  tryRestore: () => Promise<boolean>;
-  checkVaultExists: () => Promise<boolean>;
+type SyncContextValue = {
   sync: () => Promise<void>;
 };
 
-const SyncContext = createContext<SyncState | null>(null);
+const SyncContext = createContext<SyncContextValue | null>(null);
 
 export function SyncProvider({
-  keyTransport,
   changeTransport,
   children,
 }: {
-  keyTransport: KeyTransport;
   changeTransport: ChangeTransport;
   children: ReactNode;
 }) {
-  const [dek, setDek] = useState<CryptoKey | null>(null);
-  const { isSignedIn } = useClerk();
+  const { dek } = useVault();
   const db = useDB();
   const changes = useQuery(db.selectFrom("sync_changes").selectAll());
-
-  const setup = useCallback(
-    async (password: string) => {
-      setDek(await setupVault(password, keyTransport));
-    },
-    [keyTransport],
-  );
-
-  const unlock = useCallback(
-    async (password: string) => {
-      setDek(await unlockVault(password, keyTransport));
-    },
-    [keyTransport],
-  );
-
-  const lock = useCallback(async () => {
-    await lockVault();
-    setDek(null);
-  }, []);
-
-  const tryRestore = useCallback(async () => {
-    const restoredDek = await tryRestoreFromCache();
-    if (restoredDek) setDek(restoredDek);
-    return restoredDek !== null;
-  }, []);
-
-  const checkVaultExists = useCallback(
-    () => keyTransport.getWrappedKey().then((k) => k !== null),
-    [keyTransport],
-  );
 
   const sync = useCallback(() => fullSync(dek, changeTransport), [dek, changeTransport]);
 
   // Push local changes as they appear
   useEffect(() => {
-    if (!isSignedIn) return;
+    if (!dek) return;
     if (changes && changes.length > 0) fullSync(dek, changeTransport);
-  }, [changes, isSignedIn, dek, changeTransport]);
+  }, [changes, dek, changeTransport]);
 
   // Poll for remote changes
   useEffect(() => {
-    if (!isSignedIn) return;
+    if (!dek) return;
     fullSync(dek, changeTransport);
     const id = setInterval(() => fullSync(dek, changeTransport), POLL_INTERVAL_MS);
     return () => clearInterval(id);
-  }, [isSignedIn, dek, changeTransport]);
+  }, [dek, changeTransport]);
 
   return (
-    <SyncContext.Provider
-      value={{
-        dek,
-        isUnlocked: dek !== null,
-        setup,
-        unlock,
-        lock,
-        tryRestore,
-        checkVaultExists,
-        sync,
-      }}
-    >
+    <SyncContext.Provider value={{ sync }}>
       {children}
     </SyncContext.Provider>
   );
 }
 
-export function useSync(): SyncState {
+export function useSync(): SyncContextValue {
   const ctx = useContext(SyncContext);
   if (!ctx) throw new Error("useSync must be used within SyncProvider");
   return ctx;

@@ -1,8 +1,4 @@
-export type WrappedKey = {
-  key: string;
-  salt: string;
-  iv: string;
-};
+import type { WrappedKey } from "../transport";
 
 export type RemoteKeyPersister = {
   saveKey(key: WrappedKey): Promise<void>;

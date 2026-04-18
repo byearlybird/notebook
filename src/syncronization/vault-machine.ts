@@ -1,6 +1,7 @@
 import type { TransitionFn, Listener, Machine } from "../machine";
 import type { LocalKeyPersister } from "./local-key-persister";
-import type { RemoteKeyPersister, WrappedKey } from "./remote-key-persister";
+import type { RemoteKeyPersister } from "./remote-key-persister";
+import type { WrappedKey } from "../transport";
 import {
   generateRawDEK,
   generateSalt,
@@ -22,6 +23,7 @@ export type VaultState =
   | {
       type: "wrapped-key";
       wrappedKey: WrappedKey;
+      error?: Error;
     }
   | { type: "creating-key" }
   | {
@@ -37,7 +39,7 @@ export type VaultState =
       dek: CryptoKey;
     };
 
-type PublicVaultEvent =
+export type PublicVaultEvent =
   | { type: "load-key" }
   | { type: "decrypt-key"; passphrase: string }
   | { type: "create-key"; passphrase: string }
@@ -138,15 +140,15 @@ export const transition: TransitionFn<VaultState, VaultEvent, VaultCommand> = (s
       }
     case "decrypting-key":
       switch (event.type) {
+        case "decrypted-failed":
+          return {
+            accepted: true,
+            state: { type: "wrapped-key", wrappedKey: state.wrappedKey, error: event.error },
+          };
         case "decrypted-success":
           return {
             accepted: true,
             state: { type: "unlocked", dek: event.dek },
-          };
-        case "decrypted-failed":
-          return {
-            accepted: true,
-            state: { type: "wrapped-key", wrappedKey: state.wrappedKey },
           };
         default:
           return { accepted: false };
@@ -165,7 +167,11 @@ export const transition: TransitionFn<VaultState, VaultEvent, VaultCommand> = (s
     case "locking":
       switch (event.type) {
         case "lock-succeeded":
-          return { accepted: true, state: { type: "idle" } };
+          return {
+            accepted: true,
+            state: { type: "loading-key" },
+            command: { type: "load-key" },
+          };
         case "lock-failed":
           return { accepted: true, state: { type: "unlocked", dek: state.dek } };
         default:
@@ -228,7 +234,7 @@ export function createVaultMachine(
           const kek = await deriveKEK(command.passphrase, salt);
           const { key: dek, raw } = await generateRawDEK();
           const { wrappedKey, iv } = await wrapDEK(raw, kek);
-          await remoteKeys.saveKey({ key: wrappedKey, salt: toBase64(salt), iv });
+          await remoteKeys.saveKey({ wrappedKey, salt: toBase64(salt), iv });
           await localKeys.saveKey(dek);
           send({ type: "created-key", dek });
         } catch (e) {
@@ -243,7 +249,7 @@ export function createVaultMachine(
         try {
           const salt = fromBase64(command.wrappedKey.salt);
           const kek = await deriveKEK(command.passphrase, salt);
-          const dek = await unwrapDEK(command.wrappedKey.key, command.wrappedKey.iv, kek);
+          const dek = await unwrapDEK(command.wrappedKey.wrappedKey, command.wrappedKey.iv, kek);
           await localKeys.saveKey(dek);
           send({ type: "decrypted-success", dek });
         } catch (e) {

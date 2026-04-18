@@ -4,6 +4,7 @@ import { useAuth } from "@clerk/react";
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { db } from "../db/client";
 import { useQuery } from "../db/context";
+import { useVault } from "../vault-context";
 import { useSync } from "../sync-context";
 import { VaultPrompt } from "../components/VaultPrompt";
 
@@ -13,7 +14,8 @@ export const Route = createFileRoute("/")({
 
 function IndexPage() {
   const { isSignedIn } = useAuth();
-  const { isUnlocked, lock, tryRestore, sync } = useSync();
+  const { lock, isUnlocked, isLoading } = useVault();
+  const { sync } = useSync();
   const [showVaultPrompt, setShowVaultPrompt] = useState(false);
   const vaultButtonRef = useRef<HTMLButtonElement>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
@@ -22,11 +24,10 @@ function IndexPage() {
   const [newTodoContent, setNewTodoContent] = useState("");
   const renamingInputRef = useRef<HTMLInputElement>(null);
 
+  // Auto-close vault prompt when vault becomes unlocked (e.g. cache restore)
   useEffect(() => {
-    if (!isSignedIn) return;
-    if (isUnlocked) return;
-    tryRestore();
-  }, [isSignedIn, isUnlocked, tryRestore]);
+    if (isUnlocked) setShowVaultPrompt(false);
+  }, [isUnlocked]);
 
   useEffect(() => {
     if (renamingId) renamingInputRef.current?.focus();
@@ -107,8 +108,8 @@ function IndexPage() {
     setRenamingName("");
   }
 
-  async function handleLockVault() {
-    await lock();
+  function handleLockVault() {
+    lock();
     setShowVaultPrompt(false);
   }
 
@@ -135,10 +136,11 @@ function IndexPage() {
                 <div className="relative">
                   <button
                     ref={vaultButtonRef}
-                    className="border px-3 py-1 text-xs hover:bg-neutral-100"
+                    disabled={isLoading}
+                    className="border px-3 py-1 text-xs hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed"
                     onClick={() => setShowVaultPrompt((v) => !v)}
                   >
-                    Unlock Vault
+                    {isLoading ? "…" : "Unlock Vault"}
                   </button>
                   {showVaultPrompt && (
                     <div className="absolute right-0 top-full z-10 mt-1">

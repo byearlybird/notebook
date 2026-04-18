@@ -1,5 +1,6 @@
 import type { DispatchResult, Listener, Machine, TransitionFn } from "../machine";
-import type { RemoteKeyPersister, WrappedKey } from "./remote-key-persister";
+import type { RemoteKeyPersister } from "./remote-key-persister";
+import type { WrappedKey } from "../transport";
 
 type VaultState =
   | { type: "idle" }

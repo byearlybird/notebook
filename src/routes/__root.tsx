@@ -1,7 +1,7 @@
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
 import { Show, SignInButton, SignUpButton, UserButton, useClerk } from "@clerk/react";
 import { migrator } from "../db/migrator";
-import { useSync } from "../sync-context";
+import { useVault } from "../vault-context";
 
 let hasMigrated = false;
 
@@ -15,11 +15,11 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
-  const { lock } = useSync();
+  const { lock } = useVault();
   const { signOut } = useClerk();
 
   async function handleSignOut() {
-    await lock();
+    lock();
     await signOut();
   }
 

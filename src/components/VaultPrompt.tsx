@@ -1,61 +1,73 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useSync } from "../sync-context";
-
-type Mode = "loading" | "create" | "unlock";
+import React, { useEffect, useRef, useState } from "react";
+import { useVault } from "../vault-context";
 
 type Props = {
   onUnlocked: () => void;
 };
 
 export function VaultPrompt({ onUnlocked }: Props) {
-  const { setup, unlock, checkVaultExists } = useSync();
-  const [mode, setMode] = useState<Mode>("loading");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
+  const { state: vaultState, unlock, createKey, retryLoad } = useVault();
+  const [passphrase, setPassphrase] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Close the prompt when the vault becomes unlocked
   useEffect(() => {
-    checkVaultExists().then((exists) => setMode(exists ? "unlock" : "create"));
-  }, [checkVaultExists]);
+    if (vaultState.type === "unlocked") {
+      onUnlocked();
+    }
+  }, [vaultState.type, onUnlocked]);
 
+  // Focus the input when the form becomes interactive
   useEffect(() => {
-    if (mode !== "loading") {
+    if (vaultState.type === "no-key" || vaultState.type === "wrapped-key") {
       inputRef.current?.focus();
     }
-  }, [mode]);
+  }, [vaultState.type]);
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
-    setPending(true);
-    try {
-      if (mode === "create") {
-        await setup(password);
-      } else {
-        await unlock(password);
-      }
-      setPassword("");
-      onUnlocked();
-    } catch (err) {
-      if (mode === "unlock") {
-        setError("Incorrect password. Please try again.");
-      } else {
-        setError(err instanceof Error ? err.message : "Failed to set up vault.");
-      }
-    } finally {
-      setPending(false);
+    if (vaultState.type === "no-key") {
+      createKey(passphrase);
+    } else if (vaultState.type === "wrapped-key") {
+      unlock(passphrase);
     }
   }
 
-  if (mode === "loading") return null;
+  // Treat initial/loading/locking states as not-ready
+  if (
+    vaultState.type === "idle" ||
+    vaultState.type === "loading-key" ||
+    vaultState.type === "unlocked" ||
+    vaultState.type === "locking"
+  ) {
+    return null;
+  }
 
-  const title = mode === "create" ? "Create vault password" : "Enter vault password";
-  const description =
-    mode === "create"
-      ? "Your todos are encrypted before syncing. Choose a vault password to protect them."
-      : "Enter your vault password to enable sync.";
-  const submitLabel = mode === "create" ? "Create" : "Unlock";
+  // Load error: show a retry option
+  if (vaultState.type === "error") {
+    return (
+      <div className="flex w-64 flex-col gap-3 border bg-white p-4 shadow-md">
+        <p className="text-sm font-semibold">Failed to load vault</p>
+        <p className="text-xs text-red-600">{vaultState.error.message}</p>
+        <button
+          className="bg-black px-3 py-1.5 text-sm font-medium text-white hover:bg-neutral-800"
+          onClick={retryLoad}
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  const isCreate = vaultState.type === "no-key";
+  const isPending = vaultState.type === "creating-key" || vaultState.type === "decrypting-key";
+  const error = vaultState.type === "wrapped-key" ? vaultState.error?.message : null;
+
+  const title = isCreate ? "Create vault password" : "Enter vault password";
+  const description = isCreate
+    ? "Your todos are encrypted before syncing. Choose a vault password to protect them."
+    : "Enter your vault password to enable sync.";
+  const submitLabel = isCreate ? "Create" : "Unlock";
 
   return (
     <form
@@ -69,20 +81,20 @@ export function VaultPrompt({ onUnlocked }: Props) {
       <input
         ref={inputRef}
         type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        value={passphrase}
+        onChange={(e) => setPassphrase(e.target.value)}
         placeholder="Vault password"
-        autoComplete={mode === "create" ? "new-password" : "current-password"}
+        autoComplete={isCreate ? "new-password" : "current-password"}
         required
         className="border px-3 py-1.5 text-sm outline-none focus:ring-1 focus:ring-black"
       />
       {error && <p className="text-xs text-red-600">{error}</p>}
       <button
         type="submit"
-        disabled={pending || password.length === 0}
+        disabled={isPending || passphrase.length === 0}
         className="bg-black px-3 py-1.5 text-sm font-medium text-white hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {pending ? "…" : submitLabel}
+        {isPending ? "…" : submitLabel}
       </button>
     </form>
   );

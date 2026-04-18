@@ -8,70 +8,70 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as OtherRouteImport } from "./routes/other";
-import { Route as IndexRouteImport } from "./routes/index";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as OtherRouteImport } from './routes/other'
+import { Route as IndexRouteImport } from './routes/index'
 
 const OtherRoute = OtherRouteImport.update({
-  id: "/other",
-  path: "/other",
+  id: '/other',
+  path: '/other',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute;
-  "/other": typeof OtherRoute;
+  '/': typeof IndexRoute
+  '/other': typeof OtherRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute;
-  "/other": typeof OtherRoute;
+  '/': typeof IndexRoute
+  '/other': typeof OtherRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  "/": typeof IndexRoute;
-  "/other": typeof OtherRoute;
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/other': typeof OtherRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/other";
-  fileRoutesByTo: FileRoutesByTo;
-  to: "/" | "/other";
-  id: "__root__" | "/" | "/other";
-  fileRoutesById: FileRoutesById;
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths: '/' | '/other'
+  fileRoutesByTo: FileRoutesByTo
+  to: '/' | '/other'
+  id: '__root__' | '/' | '/other'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  OtherRoute: typeof OtherRoute;
+  IndexRoute: typeof IndexRoute
+  OtherRoute: typeof OtherRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/other": {
-      id: "/other";
-      path: "/other";
-      fullPath: "/other";
-      preLoaderRoute: typeof OtherRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+    '/other': {
+      id: '/other'
+      path: '/other'
+      fullPath: '/other'
+      preLoaderRoute: typeof OtherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   OtherRoute: OtherRoute,
-};
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
