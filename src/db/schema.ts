@@ -13,15 +13,38 @@ export type SyncableRow = {
   is_deleted: ColumnType<number, number | undefined, number | undefined>;
 };
 
-type Todo = SyncableRow & {
+type NoteTable = SyncableRow & {
   content: string;
-  completed: number;
-  category_id: string | null;
+  date: string;
   created_at: string;
+  content_edited_at: string | null;
+  label: string | null;
 };
 
-type Category = SyncableRow & {
+type TaskTable = SyncableRow & {
+  content: string;
+  date: string;
+  status: "incomplete" | "complete" | "cancelled" | "deferred";
+  created_at: string;
+  content_edited_at: string | null;
+  label: string | null;
+};
+
+type IntentionTable = SyncableRow & {
+  content: string;
+  month: string;
+  created_at: string;
+  content_edited_at: string | null;
+};
+
+type LabelTable = SyncableRow & {
   name: string;
+};
+
+type TimelineView = {
+  id: string;
+  type: "note" | "task";
+  content: string;
   created_at: string;
 };
 
@@ -32,8 +55,11 @@ type SyncChanges = {
 };
 
 export type DBSchema = {
-  todos: Todo;
-  categories: Category;
+  notes: NoteTable;
+  tasks: TaskTable;
+  intentions: IntentionTable;
+  timeline: TimelineView;
+  labels: LabelTable;
   sync_changes: SyncChanges;
   client_state: ClientState;
 };

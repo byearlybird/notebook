@@ -13,13 +13,16 @@
     "cf-typegen": "wrangler types"
   },
   "dependencies": {
+    "@base-ui/react": "^1.4.1",
     "@clerk/backend": "^3.2.11",
     "@clerk/react": "^6.4.1",
     "@nanostores/react": "^1.1.0",
     "@orpc/client": "^1.13.14",
     "@orpc/contract": "^1.13.14",
     "@orpc/server": "^1.13.14",
+    "@phosphor-icons/react": "^2.1.10",
     "@tanstack/react-router": "^1.168.21",
+    "clsx": "^2.1.1",
     "idb-keyval": "^6.2.2",
     "kysely": "^0.28.16",
     "nanostores": "^1.2.0",

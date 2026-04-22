@@ -1,7 +1,6 @@
 // oxlint-disable typescript/no-explicit-any
 import { sql } from "kysely";
 import type { Kysely, Migration } from "kysely";
-import { createSyncTable } from "./sync-helpers";
 
 export const M001_init: Migration = {
   async up(db: Kysely<any>) {
@@ -27,23 +26,5 @@ export const M001_init: Migration = {
       .addColumn("hlc", "text", (cb) => cb.notNull())
       .addPrimaryKeyConstraint("sync_changes_pk", ["table_name", "row_id"])
       .execute();
-
-    // 3. categories
-    await createSyncTable(db, "categories", (t) =>
-      t
-        .addColumn("id", "text", (cb) => cb.primaryKey())
-        .addColumn("name", "text", (cb) => cb.notNull())
-        .addColumn("created_at", "text", (cb) => cb.notNull()),
-    );
-
-    // 4. todos
-    await createSyncTable(db, "todos", (t) =>
-      t
-        .addColumn("id", "text", (cb) => cb.primaryKey())
-        .addColumn("content", "text", (cb) => cb.notNull())
-        .addColumn("completed", "integer", (cb) => cb.notNull().defaultTo(0))
-        .addColumn("category_id", "text", (cb) => cb.defaultTo(null))
-        .addColumn("created_at", "text", (cb) => cb.notNull()),
-    );
   },
 };
