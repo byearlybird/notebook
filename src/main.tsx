@@ -4,9 +4,6 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { ClerkProvider } from "@clerk/react";
 import { routeTree } from "./routeTree.gen";
 import { DBProvider } from "./db/context";
-import { VaultProvider } from "./vault-context";
-import { SyncProvider } from "./sync-context";
-import { keyTransport, changeTransport } from "./api";
 import "./index.css";
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
@@ -23,11 +20,7 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
       <DBProvider>
-        <VaultProvider keyTransport={keyTransport}>
-          <SyncProvider changeTransport={changeTransport}>
-            <RouterProvider router={router} />
-          </SyncProvider>
-        </VaultProvider>
+        <RouterProvider router={router} />
       </DBProvider>
     </ClerkProvider>
   </StrictMode>,

@@ -1,9 +1,13 @@
-import { db } from "./db/client";
-import { mergeHlc, parseHlc } from "./db/hlc";
-import type { DBSchema, SyncableRow } from "./db/schema";
-import { encrypt, decrypt } from "./crypto";
-import type { ChangeTransport } from "./transport";
+import { db } from "../db/client";
+import { mergeHlc, parseHlc } from "../db/hlc";
+import type { DBSchema, SyncableRow } from "../db/schema";
+import { encrypt, decrypt } from "../crypto";
 import type { Selectable } from "kysely";
+
+export type ChangeTransport = {
+  pullChanges(since: number): Promise<{ changes: { cyphertext: string }[]; maxSeq: number }>;
+  pushChanges(changes: string[]): Promise<void>;
+};
 
 type SyncPayload<T extends Selectable<SyncableRow>> = {
   tableName: keyof DBSchema;

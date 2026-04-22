@@ -1,33 +1,25 @@
 // oxlint-disable typescript/no-explicit-any
 import { createFileRoute } from "@tanstack/react-router";
-import { useAuth } from "@clerk/react";
+import { useStore } from "@nanostores/react";
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { db } from "../db/client";
 import { useQuery } from "../db/context";
-import { useVault } from "../vault-context";
-import { useSync } from "../sync-context";
-import { VaultPrompt } from "../components/VaultPrompt";
+import { $syncState, sync, lock, hasRemoteKey, createKey, loadRemoteKey } from "../stores/sync-client";
 
 export const Route = createFileRoute("/")({
   component: IndexPage,
 });
 
 function IndexPage() {
-  const { isSignedIn } = useAuth();
-  const { lock, isUnlocked, isLoading } = useVault();
-  const { sync } = useSync();
-  const [showVaultPrompt, setShowVaultPrompt] = useState(false);
-  const vaultButtonRef = useRef<HTMLButtonElement>(null);
+  const syncState = useStore($syncState);
+  const isSignedIn = syncState.status !== "unauthed";
+  const isUnlocked = syncState.status === "unlocked";
+  const isVaultLoading = syncState.status === "loading-key";
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renamingName, setRenamingName] = useState("");
   const [newTodoContent, setNewTodoContent] = useState("");
   const renamingInputRef = useRef<HTMLInputElement>(null);
-
-  // Auto-close vault prompt when vault becomes unlocked (e.g. cache restore)
-  useEffect(() => {
-    if (isUnlocked) setShowVaultPrompt(false);
-  }, [isUnlocked]);
 
   useEffect(() => {
     if (renamingId) renamingInputRef.current?.focus();
@@ -108,12 +100,23 @@ function IndexPage() {
     setRenamingName("");
   }
 
-  function handleLockVault() {
-    lock();
-    setShowVaultPrompt(false);
+  async function handleSync() {
+    await sync();
   }
 
-  const syncEnabled = isSignedIn && isUnlocked;
+  async function handleUnlockVault() {
+    const check = await hasRemoteKey();
+    if (check.result !== "success") return;
+    const passphrase = window.prompt(check.hasKey ? "Enter vault password:" : "Create vault password:");
+    if (!passphrase) return;
+    const res = check.hasKey ? await loadRemoteKey(passphrase) : await createKey(passphrase);
+    if (res.result === "error") window.alert(`Vault error: ${res.error.message}`);
+  }
+
+  function handleLockVault() {
+    lock();
+  }
+
   const selectedCategory = categories?.find((c) => c.id === selectedCategoryId);
 
   return (
@@ -125,29 +128,21 @@ function IndexPage() {
           {isSignedIn && (
             <>
               <button
-                onClick={sync}
-                disabled={!syncEnabled}
-                title={!syncEnabled ? "Unlock vault to sync" : undefined}
+                onClick={handleSync}
+                disabled={!isUnlocked}
+                title={!isUnlocked ? "Unlock vault to sync" : undefined}
                 className="border px-3 py-1 text-xs disabled:opacity-40 hover:bg-neutral-100 disabled:cursor-not-allowed"
               >
                 Sync
               </button>
               {!isUnlocked ? (
-                <div className="relative">
-                  <button
-                    ref={vaultButtonRef}
-                    disabled={isLoading}
-                    className="border px-3 py-1 text-xs hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed"
-                    onClick={() => setShowVaultPrompt((v) => !v)}
-                  >
-                    {isLoading ? "…" : "Unlock Vault"}
-                  </button>
-                  {showVaultPrompt && (
-                    <div className="absolute right-0 top-full z-10 mt-1">
-                      <VaultPrompt onUnlocked={() => setShowVaultPrompt(false)} />
-                    </div>
-                  )}
-                </div>
+                <button
+                  disabled={isVaultLoading}
+                  className="border px-3 py-1 text-xs hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                  onClick={handleUnlockVault}
+                >
+                  {isVaultLoading ? "…" : "Unlock Vault"}
+                </button>
               ) : (
                 <button
                   className="border px-3 py-1 text-xs hover:bg-neutral-100"
