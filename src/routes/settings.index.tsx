@@ -1,4 +1,5 @@
 import { Button } from "@/components/button";
+import { LabelRow } from "@/components/label-row";
 import { useDBQuery } from "@/hooks/use-db-query";
 import { labelsService } from "@/services/label-service";
 import { PlusIcon } from "@phosphor-icons/react";
@@ -12,6 +13,7 @@ function RouteComponent() {
   const labels = useDBQuery((db) =>
     db
       .selectFrom("labels")
+      .where("is_deleted", "=", 0)
       .orderBy("name", "asc")
       .selectAll()
       .select((eb) =>
@@ -50,13 +52,7 @@ function RouteComponent() {
       ) : (
         <ul className="space-y-1 py-2">
           {labels?.map((label) => (
-            <li
-              key={label.id}
-              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-neutral-900/50"
-            >
-              <span>{label.name}</span>
-              <span className="text-sm text-neutral-500">{label.item_count}</span>
-            </li>
+            <LabelRow key={label.id} label={label} />
           ))}
         </ul>
       )}

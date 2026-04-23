@@ -49,6 +49,7 @@ type TimelineView = {
   created_at: string;
   status: TaskTable["status"] | null;
   pinned: number;
+  label_name: string | null;
 };
 
 type SyncChanges = {
