@@ -1,9 +1,11 @@
 import { useMemo } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useStore } from "@nanostores/react";
 import { Page } from "@/components/page-layout";
 import { EntryGroup } from "@/components/entry-group";
 import { useEntries } from "@/hooks/use-entries";
 import { openEntryDetail } from "@/stores/entry-detail";
+import { $debouncedSearchTerm, $labelFilter } from "@/stores/entry-search";
 import type { DBSchema } from "@/db/schema";
 
 type TimelineView = DBSchema["timeline"];
@@ -13,7 +15,12 @@ export const Route = createFileRoute("/timeline")({
 });
 
 function TimelinePage() {
-  const entries = useEntries();
+  const searchTerm = useStore($debouncedSearchTerm);
+  const labelFilter = useStore($labelFilter);
+  const entries = useEntries({
+    searchTerm: searchTerm || undefined,
+    labelName: labelFilter?.name,
+  });
   const groupedEntries = useMemo(() => {
     const groups: Record<string, TimelineView[]> = {};
     for (const entry of entries ?? []) {

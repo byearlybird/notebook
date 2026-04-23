@@ -1,41 +1,31 @@
 import { Select } from "@base-ui/react/select";
-import { CheckIcon, TagSimpleIcon } from "@phosphor-icons/react";
-import type { DBSchema } from "@/db/schema";
-import { useDBQuery } from "@/hooks/use-db-query";
+import { useStore } from "@nanostores/react";
+import { CheckIcon, FunnelSimpleIcon } from "@phosphor-icons/react";
 import { useLabels } from "@/hooks/use-labels";
-import { labelsService } from "@/services/label-service";
+import { $labelFilter } from "@/stores/entry-search";
 import { Button } from "./button";
 
-type TimelineView = DBSchema["timeline"];
-type LabeledRow = { label: string | null };
-
-export function LabelPicker({ entry }: { entry: TimelineView }) {
+export function LabelFilter() {
+  const selected = useStore($labelFilter);
   const labels = useLabels();
-
-  const rows = useDBQuery((db) =>
-    entry.type === "note"
-      ? db.selectFrom("notes").select("label").where("id", "=", entry.id)
-      : db.selectFrom("tasks").select("label").where("id", "=", entry.id),
-  ) as LabeledRow[] | undefined;
-
-  const currentLabelId = rows?.[0]?.label ?? null;
-  const currentLabelName = labels.find((l) => l.id === currentLabelId)?.name;
 
   return (
     <Select.Root
-      value={currentLabelId}
-      onValueChange={(value) => {
-        labelsService.setEntryLabel(entry.type, entry.id, value as string | null);
+      value={selected?.id ?? null}
+      onValueChange={(id) => {
+        if (id === null) return $labelFilter.set(null);
+        const label = labels.find((l) => l.id === id);
+        if (label) $labelFilter.set({ id: label.id, name: label.name });
       }}
     >
-      <Select.Trigger render={<Button variant="outline" radius="inner" />}>
-        <TagSimpleIcon />
-        {currentLabelName && <span>{currentLabelName}</span>}
+      <Select.Trigger render={<Button variant="outline" radius="outermost" />}>
+        <FunnelSimpleIcon />
+        {selected && <span>{selected.name}</span>}
       </Select.Trigger>
       <Select.Portal>
         <Select.Positioner side="bottom" align="end" sideOffset={8}>
           <Select.Popup className="min-w-40 max-h-96 overflow-y-auto bg-neutral-800 outline outline-neutral-700 rounded-xl p-1 shadow-lg">
-            <LabelItem value={null} name="None" />
+            <LabelItem value={null} name="All labels" />
             {labels?.map((label) => (
               <LabelItem key={label.id} value={label.id} name={label.name} />
             ))}
