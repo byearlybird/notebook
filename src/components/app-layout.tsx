@@ -14,7 +14,7 @@ export function AppLayout(props: AppLayoutProps) {
   return (
     <>
       <header className="sm:hidden fixed top-0 inset-x-0 h-14 flex items-center justify-between px-2">
-        <Button variant="secondary" onClick={() => setDrawerOpen(true)}>
+        <Button variant="outline" onClick={() => setDrawerOpen(true)}>
           <ListIcon className="size-5" />
         </Button>
         <Button onClick={() => setCreateOpen(true)}>

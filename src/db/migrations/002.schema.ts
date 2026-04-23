@@ -11,7 +11,8 @@ export const M002_schema: Migration = {
         .addColumn("date", "text", (cb) => cb.notNull())
         .addColumn("created_at", "text", (cb) => cb.notNull())
         .addColumn("content_edited_at", "text", (cb) => cb.defaultTo(null))
-        .addColumn("label", "text", (cb) => cb.defaultTo(null)),
+        .addColumn("label", "text", (cb) => cb.defaultTo(null))
+        .addColumn("pinned", "integer", (cb) => cb.notNull().defaultTo(0)),
     );
 
     await createSyncTable(db, "tasks", (t) =>
@@ -42,9 +43,9 @@ export const M002_schema: Migration = {
 
     await sql`
       CREATE VIEW IF NOT EXISTS timeline AS
-      SELECT id, 'note' AS type, content, created_at FROM notes WHERE is_deleted = 0
+      SELECT id, 'note' AS type, content, created_at, NULL AS status, pinned FROM notes WHERE is_deleted = 0
       UNION ALL
-      SELECT id, 'task' AS type, content, created_at FROM tasks WHERE is_deleted = 0
+      SELECT id, 'task' AS type, content, created_at, status, 0 AS pinned FROM tasks WHERE is_deleted = 0
     `.execute(db);
   },
 };

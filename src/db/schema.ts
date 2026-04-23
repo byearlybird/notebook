@@ -13,15 +13,16 @@ export type SyncableRow = {
   is_deleted: ColumnType<number, number | undefined, number | undefined>;
 };
 
-type NoteTable = SyncableRow & {
+export type NoteTable = SyncableRow & {
   content: string;
   date: string;
   created_at: string;
   content_edited_at: string | null;
   label: string | null;
+  pinned: ColumnType<number, number | undefined, number>;
 };
 
-type TaskTable = SyncableRow & {
+export type TaskTable = SyncableRow & {
   content: string;
   date: string;
   status: "incomplete" | "complete" | "cancelled" | "deferred";
@@ -30,7 +31,7 @@ type TaskTable = SyncableRow & {
   label: string | null;
 };
 
-type IntentionTable = SyncableRow & {
+export type IntentionTable = SyncableRow & {
   content: string;
   month: string;
   created_at: string;
@@ -46,6 +47,8 @@ type TimelineView = {
   type: "note" | "task";
   content: string;
   created_at: string;
+  status: TaskTable["status"] | null;
+  pinned: number;
 };
 
 type SyncChanges = {

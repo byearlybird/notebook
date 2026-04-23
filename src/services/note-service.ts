@@ -2,6 +2,19 @@ import { db } from "@/db/client";
 import { toLocalISO } from "@/utils/dates";
 
 export const notesService = {
+  async togglePin(id: string) {
+    const note = await db
+      .selectFrom("notes")
+      .select("pinned")
+      .where("id", "=", id)
+      .executeTakeFirstOrThrow();
+
+    await db
+      .updateTable("notes")
+      .set({ pinned: note.pinned ? 0 : 1 })
+      .where("id", "=", id)
+      .execute();
+  },
   async createNote(content: string) {
     const now = new Date();
     const localISO = toLocalISO(now);

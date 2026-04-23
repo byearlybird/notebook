@@ -1,4 +1,5 @@
 import { db } from "@/db/client";
+import type { TaskTable } from "@/db/schema";
 import { toLocalISO } from "@/utils/dates";
 
 export const taskService = {
@@ -15,5 +16,21 @@ export const taskService = {
         created_at: localISO,
       })
       .execute();
+  },
+  async cycleStatus(id: string) {
+    const task = await db
+      .selectFrom("tasks")
+      .select("status")
+      .where("id", "=", id)
+      .executeTakeFirstOrThrow();
+
+    const next: Record<TaskTable["status"], TaskTable["status"]> = {
+      incomplete: "complete",
+      complete: "cancelled",
+      cancelled: "incomplete",
+      deferred: "incomplete",
+    };
+
+    await db.updateTable("tasks").set({ status: next[task.status] }).where("id", "=", id).execute();
   },
 };
