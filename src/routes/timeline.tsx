@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Page } from "@/components/page-layout";
 import { EntryGroup } from "@/components/entry-group";
 import { useEntries } from "@/hooks/use-entries";
-import { useEntryDetail } from "@/contexts/entry-detail-context";
+import { openEntryDetail } from "@/stores/entry-detail";
 import type { DBSchema } from "@/db/schema";
 
 type TimelineView = DBSchema["timeline"];
@@ -13,7 +13,6 @@ export const Route = createFileRoute("/timeline")({
 });
 
 function TimelinePage() {
-  const { openDetail } = useEntryDetail();
   const entries = useEntries();
   const groupedEntries = useMemo(() => {
     const groups: Record<string, TimelineView[]> = {};
@@ -33,7 +32,7 @@ function TimelinePage() {
           key={group.date}
           date={group.date}
           entries={group.entries}
-          onSelect={(entry) => openDetail(entry.id)}
+          onSelect={(entry) => openEntryDetail(entry.id)}
         />
       ))}
     </Page>

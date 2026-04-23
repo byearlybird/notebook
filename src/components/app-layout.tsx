@@ -4,7 +4,7 @@ import { Drawer } from "@base-ui/react/drawer";
 import { ListIcon, PlusIcon } from "@phosphor-icons/react";
 import { Button } from "./button";
 import { CreateDialog } from "./create-dialog";
-import { EntryDetailProvider } from "@/contexts/entry-detail-context";
+import { EntryDetail } from "./entry-detail";
 
 type AppLayoutProps = { sidebar: ReactNode; children: ReactNode };
 
@@ -13,7 +13,7 @@ export function AppLayout(props: AppLayoutProps) {
   const [createOpen, setCreateOpen] = useState(false);
 
   return (
-    <EntryDetailProvider>
+    <>
       <header className="sm:hidden fixed top-0 inset-x-0 h-14 flex items-center justify-between px-2">
         <Button variant="outline" onClick={() => setDrawerOpen(true)}>
           <ListIcon className="size-5" />
@@ -51,6 +51,7 @@ export function AppLayout(props: AppLayoutProps) {
       </Drawer.Root>
 
       <CreateDialog open={createOpen} onOpenChange={setCreateOpen} />
-    </EntryDetailProvider>
+      <EntryDetail />
+    </>
   );
 }

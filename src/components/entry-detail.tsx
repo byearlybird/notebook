@@ -9,22 +9,19 @@ import {
   XIcon,
   XSquareIcon,
 } from "@phosphor-icons/react";
+import { useStore } from "@nanostores/react";
 import type { DBSchema, TaskTable } from "@/db/schema";
 import { formatDateTime } from "@/utils/dates";
 import { notesService } from "@/services/note-service";
 import { taskService } from "@/services/task-service";
 import { useDBQuery } from "@/hooks/use-db-query";
+import { $selectedEntryId, closeEntryDetail } from "@/stores/entry-detail";
 import { Button } from "./button";
 
 type TimelineView = DBSchema["timeline"];
 
-type EntryDetailProps = {
-  id: string | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-};
-
-export function EntryDetail({ id, open, onOpenChange }: EntryDetailProps) {
+export function EntryDetail() {
+  const id = useStore($selectedEntryId);
   const results = useDBQuery((db) =>
     db
       .selectFrom("timeline")
@@ -34,7 +31,12 @@ export function EntryDetail({ id, open, onOpenChange }: EntryDetailProps) {
   const entry = results?.[0] ?? null;
 
   return (
-    <Drawer.Root open={open} onOpenChange={onOpenChange}>
+    <Drawer.Root
+      open={id !== null}
+      onOpenChange={(open) => {
+        if (!open) closeEntryDetail();
+      }}
+    >
       <Drawer.Portal>
         <Drawer.Backdrop className="fixed inset-0 bg-black/70 data-starting-style:opacity-0 data-ending-style:opacity-0 transition-opacity duration-300" />
         <Drawer.Viewport className="fixed inset-0 flex items-stretch justify-end">
