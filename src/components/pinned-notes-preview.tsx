@@ -9,11 +9,7 @@ type TimelineView = DBSchema["timeline"];
 
 export function PinnedNotesPreview({ children }: { children: ReactElement }) {
   const pinned = useDBQuery((db) =>
-    db
-      .selectFrom("timeline")
-      .selectAll()
-      .where("pinned", "=", 1)
-      .orderBy("created_at", "desc"),
+    db.selectFrom("timeline").selectAll().where("pinned", "=", 1).orderBy("created_at", "desc"),
   ) as TimelineView[] | undefined;
 
   return (
@@ -21,7 +17,7 @@ export function PinnedNotesPreview({ children }: { children: ReactElement }) {
       <Popover.Trigger openOnHover delay={150} closeDelay={150} render={children} />
       <Popover.Portal>
         <Popover.Positioner side="right" align="start" sideOffset={8}>
-          <Popover.Popup className="w-72 max-h-96 overflow-y-auto bg-neutral-800 outline outline-neutral-700 rounded-xl p-2 shadow-lg">
+          <Popover.Popup className="w-72 max-h-96 overflow-y-auto bg-neutral-800 outline outline-neutral-700 rounded-xl p-2 shadow-lg origin-left data-starting-style:opacity-0 data-starting-style:scale-95 data-ending-style:opacity-0 data-ending-style:scale-95 transition-all duration-100 ease-out">
             {pinned && pinned.length > 0 ? (
               pinned.map((note) => <PinnedRow key={note.id} note={note} />)
             ) : (

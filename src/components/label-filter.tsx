@@ -24,7 +24,7 @@ export function LabelFilter() {
       </Select.Trigger>
       <Select.Portal>
         <Select.Positioner side="bottom" align="end" sideOffset={8}>
-          <Select.Popup className="min-w-40 max-h-96 overflow-y-auto bg-neutral-800 outline outline-neutral-700 rounded-xl p-1 shadow-lg">
+          <Select.Popup className="min-w-40 max-h-96 overflow-y-auto bg-neutral-800 outline outline-neutral-700 rounded-xl p-1 shadow-lg origin-top data-starting-style:opacity-0 data-starting-style:scale-95 data-ending-style:opacity-0 data-ending-style:scale-95 transition-all duration-100 ease-out">
             <LabelItem value={null} name="All labels" />
             {labels?.map((label) => (
               <LabelItem key={label.id} value={label.id} name={label.name} />

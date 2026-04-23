@@ -15,7 +15,7 @@ export const notesService = {
       .where("id", "=", id)
       .execute();
   },
-  async createNote(content: string) {
+  async createNote(content: string, label: string | null = null) {
     const now = new Date();
     const localISO = toLocalISO(now);
     await db
@@ -23,6 +23,7 @@ export const notesService = {
       .values({
         id: crypto.randomUUID(),
         content,
+        label,
         date: localISO.slice(0, 10),
         created_at: localISO,
       })

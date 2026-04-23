@@ -1,40 +1,37 @@
 import { Select } from "@base-ui/react/select";
 import { CheckIcon, TagSimpleIcon } from "@phosphor-icons/react";
-import type { DBSchema } from "@/db/schema";
-import { useDBQuery } from "@/hooks/use-db-query";
 import { useLabels } from "@/hooks/use-labels";
-import { labelsService } from "@/services/label-service";
 import { Button } from "./button";
 
-type TimelineView = DBSchema["timeline"];
-type LabeledRow = { label: string | null };
+type LabelPickerProps = {
+  value: string | null;
+  onValueChange: (labelId: string | null) => void;
+  radius?: "inner" | "outermost";
+  placeholder?: string;
+};
 
-export function LabelPicker({ entry }: { entry: TimelineView }) {
+export function LabelPicker({
+  value,
+  onValueChange,
+  radius = "inner",
+  placeholder,
+}: LabelPickerProps) {
   const labels = useLabels();
-
-  const rows = useDBQuery((db) =>
-    entry.type === "note"
-      ? db.selectFrom("notes").select("label").where("id", "=", entry.id)
-      : db.selectFrom("tasks").select("label").where("id", "=", entry.id),
-  ) as LabeledRow[] | undefined;
-
-  const currentLabelId = rows?.[0]?.label ?? null;
-  const currentLabelName = labels.find((l) => l.id === currentLabelId)?.name;
+  const currentLabelName = labels.find((l) => l.id === value)?.name;
 
   return (
-    <Select.Root
-      value={currentLabelId}
-      onValueChange={(value) => {
-        labelsService.setEntryLabel(entry.type, entry.id, value as string | null);
-      }}
-    >
-      <Select.Trigger render={<Button variant="outline" radius="inner" />}>
+    <Select.Root value={value} onValueChange={(next) => onValueChange(next as string | null)}>
+      <Select.Trigger render={<Button variant="outline" radius={radius} />}>
         <TagSimpleIcon />
-        {currentLabelName && <span>{currentLabelName}</span>}
+        {currentLabelName ? (
+          <span>{currentLabelName}</span>
+        ) : placeholder ? (
+          <span>{placeholder}</span>
+        ) : null}
       </Select.Trigger>
       <Select.Portal>
         <Select.Positioner side="bottom" align="end" sideOffset={8}>
-          <Select.Popup className="min-w-40 max-h-96 overflow-y-auto bg-neutral-800 outline outline-neutral-700 rounded-xl p-1 shadow-lg">
+          <Select.Popup className="min-w-40 max-h-96 overflow-y-auto bg-neutral-800 outline outline-neutral-700 rounded-xl p-1 shadow-lg origin-top data-starting-style:opacity-0 data-starting-style:scale-95 data-ending-style:opacity-0 data-ending-style:scale-95 transition-all duration-100 ease-out">
             <LabelItem value={null} name="None" />
             {labels?.map((label) => (
               <LabelItem key={label.id} value={label.id} name={label.name} />
