@@ -4,6 +4,7 @@ import { formatTime } from "@/utils/dates";
 import { taskService } from "@/services/task-service";
 import { notesService } from "@/services/note-service";
 import type { MouseEventHandler } from "react";
+import clsx from "clsx";
 
 type TimelineView = DBSchema["timeline"];
 
@@ -15,7 +16,8 @@ export function Entry({
   status,
   pinned,
   onClick,
-}: TimelineView & { onClick?: () => void }) {
+  compact = false,
+}: TimelineView & { onClick?: () => void; compact?: boolean }) {
   return (
     <div
       className="rounded-xl px-2 py-4 mb-4 hover:bg-neutral-700/50 transition-all"
@@ -27,7 +29,7 @@ export function Entry({
       </div>
       <div className="flex gap-2.5 items-center">
         <div className="size-4" />
-        <div>{content}</div>
+        <div className={clsx(compact && "line-clamp-3")}>{content}</div>
       </div>
     </div>
   );

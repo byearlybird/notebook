@@ -3,9 +3,16 @@ import type { ComponentProps } from "react";
 
 type ButtonProps = ComponentProps<"button"> & {
   variant?: "primary" | "secondary" | "outline";
+  radius?: "outermost" | "inner";
 };
 
-export function Button({ children, className, variant = "primary", ...props }: ButtonProps) {
+export function Button({
+  children,
+  className,
+  variant = "primary",
+  radius = "inner",
+  ...props
+}: ButtonProps) {
   return (
     <button
       className={clsx(
@@ -13,6 +20,8 @@ export function Button({ children, className, variant = "primary", ...props }: B
         variant === "primary" && "bg-yellow-400 hover:bg-yellow-300 text-yellow-950",
         variant === "secondary" && "bg-neutral-700 text-neutral-300 hover:bg-neutral-600",
         variant === "outline" && "border border-neutral-700 hover:bg-neutral-100/10 text-white/70",
+        radius === "outermost" && "rounded-2xl",
+        radius === "inner" && "rounded-xl",
         className,
       )}
       {...props}

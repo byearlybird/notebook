@@ -17,7 +17,7 @@ export function EntryGroup({ date, entries, onSelect }: EntryGroupProps) {
         {formatDate(date)}
       </h2>
       {entries.map((entry) => (
-        <Entry key={entry.id} {...entry} onClick={() => onSelect?.(entry)} />
+        <Entry compact key={entry.id} {...entry} onClick={() => onSelect?.(entry)} />
       ))}
     </div>
   );

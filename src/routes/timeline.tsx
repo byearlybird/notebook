@@ -1,10 +1,10 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Page } from "@/components/page-layout";
 import { EntryGroup } from "@/components/entry-group";
-import { EntryDetail } from "@/components/entry-detail";
-import type { DBSchema } from "@/db/schema";
 import { useEntries } from "@/hooks/use-entries";
+import { useEntryDetail } from "@/contexts/entry-detail-context";
+import type { DBSchema } from "@/db/schema";
 
 type TimelineView = DBSchema["timeline"];
 
@@ -13,7 +13,7 @@ export const Route = createFileRoute("/timeline")({
 });
 
 function TimelinePage() {
-  const [selected, setSelected] = useState<TimelineView | null>(null);
+  const { openDetail } = useEntryDetail();
   const entries = useEntries();
   const groupedEntries = useMemo(() => {
     const groups: Record<string, TimelineView[]> = {};
@@ -33,16 +33,9 @@ function TimelinePage() {
           key={group.date}
           date={group.date}
           entries={group.entries}
-          onSelect={setSelected}
+          onSelect={(entry) => openDetail(entry.id)}
         />
       ))}
-      <EntryDetail
-        entry={selected}
-        open={selected !== null}
-        onOpenChange={(open) => {
-          if (!open) setSelected(null);
-        }}
-      />
     </Page>
   );
 }

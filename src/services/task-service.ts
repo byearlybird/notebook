@@ -33,4 +33,7 @@ export const taskService = {
 
     await db.updateTable("tasks").set({ status: next[task.status] }).where("id", "=", id).execute();
   },
+  async setStatus(id: string, status: TaskTable["status"]) {
+    await db.updateTable("tasks").set({ status }).where("id", "=", id).execute();
+  },
 };
