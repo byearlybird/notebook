@@ -9,6 +9,7 @@ import { EntryDetail } from "./entry-detail";
 import { LabelFilter } from "./label-filter";
 import { $searchTerm } from "@/stores/entry-search";
 import { usePriorTasks } from "@/hooks/use-prior-tasks";
+import { useMonthIntention } from "@/hooks/use-month-intention";
 
 type AppLayoutProps = { sidebar: ReactNode; children: ReactNode };
 
@@ -17,6 +18,7 @@ export function AppLayout(props: AppLayoutProps) {
   const [createOpen, setCreateOpen] = useState(false);
   const searchTerm = useStore($searchTerm);
   const hasPriorTasks = !!usePriorTasks()?.length;
+  const hasIntention = !!useMonthIntention();
 
   return (
     <>
@@ -25,7 +27,7 @@ export function AppLayout(props: AppLayoutProps) {
           <Button variant="outline" onClick={() => setDrawerOpen(true)}>
             <ListIcon className="size-5" />
           </Button>
-          {hasPriorTasks && (
+          {(hasPriorTasks || !hasIntention) && (
             <span className="absolute -top-1 -right-1 size-2.5 rounded-full bg-yellow-300 ring-2 ring-neutral-900" />
           )}
         </div>

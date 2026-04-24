@@ -6,12 +6,15 @@ import {
   GearIcon,
   PushPinSimpleIcon,
   ArrowSquareRightIcon,
+  StarIcon,
 } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 import { Button } from "./button";
 import { PinnedNotesPreview } from "./pinned-notes-preview";
 import { RolloverTasksPreview } from "./rollover-tasks-preview";
+import { IntentionPreview } from "./intention-preview";
 import { usePriorTasks } from "@/hooks/use-prior-tasks";
+import { useMonthIntention } from "@/hooks/use-month-intention";
 
 const navItems = linkOptions([
   { to: "/", label: "Today", Icon: SunHorizonIcon },
@@ -34,6 +37,8 @@ function NavButton({ to, children }: { to: LinkProps["to"]; children: ReactNode 
 export function Sidebar() {
   const priorTasks = usePriorTasks();
   const hasPriorTasks = !!priorTasks?.length;
+  const monthIntention = useMonthIntention();
+  const hasIntention = !!monthIntention;
 
   return (
     <div className="size-full space-y-2 z-50 flex flex-col px-2 rounded-xl">
@@ -56,7 +61,13 @@ export function Sidebar() {
           Prior tasks
         </Button>
       </RolloverTasksPreview>
-      <div className="mt-auto">
+      <IntentionPreview>
+        <Button variant="ghost">
+          <StarIcon className={!hasIntention ? "text-yellow-300" : undefined} />
+          Intention
+        </Button>
+      </IntentionPreview>
+      <div className="mt-auto border-t border-dashed border-neutral-700 pt-4">
         <Show when="signed-in">
           <NavButton to="/settings">
             <GearIcon />
