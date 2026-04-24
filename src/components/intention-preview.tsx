@@ -19,10 +19,10 @@ export function IntentionPreview({ children }: { children: ReactElement }) {
       <SidebarPopover trigger={children}>
         {intention ? (
           <div className="flex items-start gap-1 px-2 py-2">
-            <p className="flex-1 text-sm text-neutral-200">{intention.content}</p>
+            <p className="flex-1 text-sm text-foreground">{intention.content}</p>
             <button
               onClick={() => setEditOpen(true)}
-              className="shrink-0 p-1 rounded-lg text-white/70 hover:bg-neutral-100/10 transition-all"
+              className="shrink-0 p-1 rounded-lg text-foreground/70 hover:bg-foreground/10 transition-all"
             >
               <PencilSimpleIcon className="size-4" />
             </button>
@@ -30,7 +30,7 @@ export function IntentionPreview({ children }: { children: ReactElement }) {
         ) : (
           <button
             onClick={() => setEditOpen(true)}
-            className="w-full text-left px-2 py-3 text-sm text-neutral-500 hover:text-neutral-300 transition-colors"
+            className="w-full text-left px-2 py-3 text-sm text-foreground-muted hover:text-foreground transition-colors"
           >
             Set an intention for this month +
           </button>

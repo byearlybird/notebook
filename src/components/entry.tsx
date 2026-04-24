@@ -29,18 +29,18 @@ export function Entry({
 }: TimelineView & { onClick?: () => void; compact?: boolean }) {
   return (
     <div
-      className="rounded-xl px-2 py-4 mb-4 hover:bg-neutral-700/50 transition-all flex gap-2.5 items-start"
+      className="rounded-xl px-2 py-4 mb-4 hover:bg-foreground/10 transition-all flex gap-2.5 items-start"
       onClick={onClick}
     >
       <EntryGlyph id={id} type={type} status={status} pinned={pinned} />
       <div className="flex-1 flex flex-col gap-1.5">
-        <div className="text-xs text-neutral-400 flex items-center gap-1">
+        <div className="text-xs text-foreground-muted flex items-center gap-1">
           {formatTime(created_at)}
           {type === "note" && pinned === 1 && <PushPinSimpleIcon className="size-3" />}
         </div>
         <div className={clsx(compact && "line-clamp-3")}>{content}</div>
         {label_name && (
-          <div className="flex items-center gap-1 text-xs text-neutral-400">
+          <div className="flex items-center gap-1 text-xs text-foreground-muted">
             <TagSimpleIcon className="size-3" />
             {label_name}
           </div>
@@ -66,15 +66,15 @@ function EntryGlyph(props: {
   };
 
   return (
-    <button onClick={handleClick} className="rounded-lg hover:bg-neutral-50/10 p-0.5 -mt-0.5">
+    <button onClick={handleClick} className="rounded-lg hover:bg-foreground/5 p-0.5 -mt-0.5">
       {props.type === "note" ? (
         <CircleIcon className="size-4.5" />
       ) : props.status === "complete" ? (
-        <CheckSquareIcon className="size-4.5 text-yellow-200" />
+        <CheckSquareIcon className="size-4.5 text-accent" />
       ) : props.status === "cancelled" ? (
-        <XSquareIcon className="size-4.5 text-neutral-400" />
+        <XSquareIcon className="size-4.5 text-foreground-muted" />
       ) : props.status === "deferred" ? (
-        <ArrowSquareRightIcon className="size-4.5 text-neutral-400" />
+        <ArrowSquareRightIcon className="size-4.5 text-foreground-muted" />
       ) : (
         <SquareIcon className="size-4.5" />
       )}

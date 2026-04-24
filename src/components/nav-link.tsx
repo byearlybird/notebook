@@ -11,7 +11,7 @@ const NavLinkInner = React.forwardRef<HTMLDivElement, NavLinkInnerProps>(
     <div
       ref={ref}
       {...props}
-      className="flex items-center gap-2.5 px-3 py-2 w-full rounded-2xl hover:bg-neutral-700/50 data-[status=active]:bg-neutral-800 transition-all"
+      className="flex items-center gap-2.5 px-3 py-2 w-full rounded-2xl hover:bg-foreground/10 data-[status=active]:bg-surface transition-all"
     >
       <Icon className="size-4" />
       {label}

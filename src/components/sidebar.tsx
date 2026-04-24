@@ -1,5 +1,4 @@
 import { Link, linkOptions, useMatchRoute, type LinkProps } from "@tanstack/react-router";
-import { Show, SignInButton } from "@clerk/react";
 import {
   SunHorizonIcon,
   ListBulletsIcon,
@@ -28,6 +27,7 @@ function NavButton({ to, children }: { to: LinkProps["to"]; children: ReactNode 
   const match = useMatchRoute();
   return (
     <Button
+      align="start"
       nativeButton={false}
       variant={match({ to }) ? "outline" : "ghost"}
       render={(props) => <Link {...props} to={to} viewTransition />}
@@ -52,42 +52,38 @@ export function Sidebar() {
           {label}
         </NavButton>
       ))}
-      <div className="h-1 my-3 border-t border-dashed w-full border-neutral-700" />
+      <div className="h-1 my-3 border-t border-dashed w-full border-border" />
       <PinnedNotesPreview>
-        <Button variant="ghost">
+        <Button variant="ghost" align="start">
           <PushPinSimpleIcon />
           Pins
         </Button>
       </PinnedNotesPreview>
       <RolloverTasksPreview>
-        <Button variant="ghost">
-          <ArrowSquareRightIcon className={hasPriorTasks ? "text-yellow-300" : undefined} />
+        <Button variant="ghost" align="start">
+          <ArrowSquareRightIcon className={hasPriorTasks ? "text-accent" : undefined} />
           Prior tasks
         </Button>
       </RolloverTasksPreview>
       <IntentionPreview>
-        <Button variant="ghost">
-          <StarIcon className={!hasIntention ? "text-yellow-300" : undefined} />
+        <Button variant="ghost" align="start">
+          <StarIcon className={!hasIntention ? "text-accent" : undefined} />
           Intention
         </Button>
       </IntentionPreview>
 
-      <div className="mt-auto border-t border-dashed border-neutral-700 pt-2">
+      <div className="mt-auto space-y-2">
         {syncState.status !== "unlocked" && (
-          <p className="flex items-center gap-2 px-2.5 py-1 text-sm text-neutral-500">
+          <p className="border border-accent w-fit px-2 py-1 mx-auto rounded-full flex items-center justify-center gap-2 text-sm text-accent">
             <GlobeSimpleXIcon />
             Not syncing
           </p>
         )}
-        <Show when="signed-in">
-          <NavButton to="/settings">
-            <GearIcon />
-            Settings
-          </NavButton>
-        </Show>
-        <Show when="signed-out">
-          <SignInButton />
-        </Show>
+        <div className="border-t border-dashed border-border mt-4 space-y-2" />
+        <NavButton to="/settings">
+          <GearIcon />
+          Settings
+        </NavButton>
       </div>
     </div>
   );

@@ -22,7 +22,7 @@ export function Menu({ children }: { children: ReactNode }) {
   return (
     <BaseMenu.Portal>
       <BaseMenu.Positioner side="bottom" align="end" sideOffset={8}>
-        <BaseMenu.Popup className="min-w-36 bg-neutral-900 outline outline-neutral-800 rounded-xl p-1 shadow-lg origin-top data-starting-style:opacity-0 data-starting-style:scale-95 data-ending-style:opacity-0 data-ending-style:scale-95 transition-all duration-100 ease-out">
+        <BaseMenu.Popup className="min-w-36 bg-background outline outline-border rounded-xl p-1 shadow-lg origin-top data-starting-style:opacity-0 data-starting-style:scale-95 data-ending-style:opacity-0 data-ending-style:scale-95 transition-all duration-100 ease-out">
           {children}
         </BaseMenu.Popup>
       </BaseMenu.Positioner>
@@ -41,7 +41,7 @@ export function MenuItem({
 }) {
   return (
     <BaseMenu.Item
-      className={`rounded-lg px-2 py-1.5 text-sm cursor-default data-highlighted:bg-neutral-800 ${variant === "destructive" ? "text-red-400" : "text-neutral-200"}`}
+      className={`transition-all rounded-lg px-2 py-1.5 text-sm cursor-default ${variant === "destructive" ? "text-red-400 data-highlighted:bg-red-500 data-highlighted:text-white" : "text-foreground data-highlighted:bg-accent-hover/60"}`}
       onClick={onClick}
     >
       {children}

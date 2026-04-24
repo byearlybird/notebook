@@ -42,7 +42,7 @@ export function EntryDetail() {
         <Drawer.Portal>
           <Drawer.Backdrop className="fixed inset-0 bg-black/70 data-starting-style:opacity-0 data-ending-style:opacity-0 transition-opacity duration-300" />
           <Drawer.Viewport className="fixed inset-0 flex items-stretch justify-end p-2">
-            <Drawer.Popup className="relative w-full rounded-2xl sm:max-w-2/3 lg:max-w-1/2 h-full bg-neutral-800 outline outline-neutral-700 transition-transform duration-300 data-starting-style:translate-x-full data-ending-style:translate-x-full">
+            <Drawer.Popup className="relative w-full rounded-2xl sm:max-w-2/3 lg:max-w-1/2 h-full bg-surface outline outline-border transition-transform duration-300 data-starting-style:translate-x-full data-ending-style:translate-x-full">
               <Drawer.Content className="h-full flex flex-col">
                 {id && <EntryDetailContent id={id} onEditClick={setEditEntry} />}
               </Drawer.Content>
@@ -80,7 +80,7 @@ function EntryDetailContent({
 
   return (
     <>
-      <div className="px-4 py-3 flex items-center justify-between border-b border-dashed border-neutral-700">
+      <div className="px-4 py-3 flex items-center justify-between border-b border-dashed border-border">
         <Drawer.Title className="text-lg font-semibold font-serif">
           {formatDateTime(entry.created_at)}
         </Drawer.Title>
@@ -111,10 +111,10 @@ function EntryDetailContent({
 
       <div className="flex-1 overflow-y-auto px-4 py-5 flex flex-col gap-3">
         {entry.type === "task" && entry.status && <TaskStatusRow status={entry.status} />}
-        <p className="text-neutral-200">{entry.content}</p>
+        <p className="text-foreground">{entry.content}</p>
       </div>
 
-      <div className="border-t border-dashed border-neutral-700 p-4 flex items-center justify-between">
+      <div className="border-t border-dashed border-border p-4 flex items-center justify-between">
         <EntryLabelPicker entry={entry} />
         <div className="flex gap-2">
           <EntryActions entry={entry} />
@@ -138,13 +138,13 @@ function EntryLabelPicker({ entry }: { entry: TimelineView }) {
 function TaskStatusRow({ status }: { status: TaskTable["status"] }) {
   const label = status.charAt(0).toUpperCase() + status.slice(1);
   return (
-    <div className="flex gap-2 items-center text-sm text-neutral-400 mb-4">
+    <div className="flex gap-2 items-center text-sm text-foreground-muted mb-4">
       {status === "complete" ? (
-        <CheckSquareIcon className="size-4.5 text-yellow-200" />
+        <CheckSquareIcon className="size-4.5 text-accent" />
       ) : status === "cancelled" ? (
-        <XSquareIcon className="size-4.5 text-neutral-400" />
+        <XSquareIcon className="size-4.5 text-foreground-muted" />
       ) : status === "deferred" ? (
-        <ArrowSquareRightIcon className="size-4.5 text-neutral-400" />
+        <ArrowSquareRightIcon className="size-4.5 text-foreground-muted" />
       ) : (
         <SquareIcon className="size-4.5" />
       )}

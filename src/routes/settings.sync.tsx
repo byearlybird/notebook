@@ -165,7 +165,7 @@ function PasswordField({
         if (e.key === "Enter") onSubmit();
       }}
       placeholder={placeholder}
-      className="w-full bg-neutral-900 outline outline-neutral-700 rounded-xl px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:outline-neutral-500"
+      className="w-full bg-background outline outline-border rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-foreground-muted focus:outline-foreground-muted"
     />
   );
 }
@@ -182,8 +182,8 @@ function Section({
   return (
     <div className="space-y-4 max-w-sm">
       <div>
-        <h2 className="text-sm font-medium text-neutral-200">{title}</h2>
-        {description && <p className="text-sm text-neutral-500 mt-1">{description}</p>}
+        <h2 className="text-sm font-medium text-foreground">{title}</h2>
+        {description && <p className="text-sm text-foreground-muted mt-1">{description}</p>}
       </div>
       {children}
     </div>
@@ -198,7 +198,7 @@ function Message({
   tone?: "muted" | "error";
 }) {
   return (
-    <p className={tone === "error" ? "text-sm text-red-400" : "text-sm text-neutral-500"}>
+    <p className={tone === "error" ? "text-sm text-red-400" : "text-sm text-foreground-muted"}>
       {children}
     </p>
   );

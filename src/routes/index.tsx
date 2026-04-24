@@ -42,13 +42,13 @@ function IndexPage() {
       {entries.length === 0 && (
         <div className="flex items-center justify-center h-48">
           {intention ? (
-            <p className="text-2xl font-serif text-neutral-700 text-center px-4">
+            <p className="text-2xl font-serif text-foreground-muted text-center px-4">
               {intention.content}
             </p>
           ) : (
             <button
               onClick={() => setDialogOpen(true)}
-              className="text-sm text-neutral-600 hover:text-neutral-400 transition-colors"
+              className="text-sm text-foreground-muted hover:text-foreground-muted transition-colors"
             >
               Set an intention for this month +
             </button>

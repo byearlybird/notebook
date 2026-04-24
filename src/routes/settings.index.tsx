@@ -47,7 +47,7 @@ function RouteComponent() {
         onSave={(name) => labelsService.createLabel(name)}
       />
       {labels?.length === 0 ? (
-        <p className="px-5 py-3 min-h-36 flex items-center justify-center text-sm bg-neutral-900/30 rounded-xl text-center text-neutral-500">
+        <p className="px-5 py-3 min-h-36 flex items-center justify-center text-sm bg-background/30 rounded-xl text-center text-foreground-muted">
           No labels yet
         </p>
       ) : (

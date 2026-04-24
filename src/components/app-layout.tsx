@@ -7,6 +7,7 @@ import { Button } from "./button";
 import { CreateDialog } from "./create-dialog";
 import { EntryDetail } from "./entry-detail";
 import { LabelFilter } from "./label-filter";
+import { Input } from "./shared/input";
 import { $searchTerm } from "@/stores/entry-search";
 import { usePriorTasks } from "@/hooks/use-prior-tasks";
 import { useMonthIntention } from "@/hooks/use-month-intention";
@@ -28,12 +29,12 @@ export function AppLayout(props: AppLayoutProps) {
             <ListIcon className="size-5" />
           </Button>
           {(hasPriorTasks || !hasIntention) && (
-            <span className="absolute -top-1 -right-1 size-2.5 rounded-full bg-yellow-300 ring-2 ring-neutral-900" />
+            <span className="absolute -top-1 -right-1 size-2.5 rounded-full bg-accent ring-2 ring-background" />
           )}
         </div>
-        <input
+        <Input
           placeholder="Search"
-          className="flex-1 min-w-0 border border-neutral-700 rounded-xl min-h-9 px-2.5 text-neutral-200"
+          className="flex-1 min-w-0"
           value={searchTerm}
           onChange={(e) => $searchTerm.set(e.currentTarget.value)}
         />
@@ -49,9 +50,8 @@ export function AppLayout(props: AppLayoutProps) {
       <main className="pointer-events-none fixed top-14 sm:top-0 left-0 inset-y-0 right-0 px-2 pb-2 pt-1 sm:pt-2 sm:pl-[max(11rem,calc(50%-28rem))] sm:pr-[max(0.5rem,calc(50%-28rem))] flex flex-col gap-2">
         <div className="pointer-events-auto hidden sm:flex h-9 justify-between gap-2">
           <div className="flex gap-2">
-            <input
+            <Input
               placeholder="Search"
-              className="border border-neutral-700 rounded-xl min-h-9 px-2.5 text-neutral-200"
               value={searchTerm}
               onChange={(e) => $searchTerm.set(e.currentTarget.value)}
             />
@@ -61,7 +61,7 @@ export function AppLayout(props: AppLayoutProps) {
             Create entry <PlusIcon />
           </Button>
         </div>
-        <div className="pointer-events-auto max-w-4xl w-full bg-neutral-800 rounded-xl flex-1 min-h-0 overflow-auto p-2 outline outline-neutral-700">
+        <div className="pointer-events-auto max-w-4xl w-full bg-surface rounded-xl flex-1 min-h-0 overflow-auto p-2 outline outline-border">
           {props.children}
         </div>
       </main>
@@ -70,7 +70,7 @@ export function AppLayout(props: AppLayoutProps) {
         <Drawer.Portal>
           <Drawer.Backdrop className="fixed inset-0 bg-black/50 data-starting-style:opacity-0 data-ending-style:opacity-0 transition-opacity duration-300" />
           <Drawer.Viewport className="fixed inset-0 flex items-stretch justify-start p-2">
-            <Drawer.Popup className="w-4/5 bg-neutral-900 rounded-xl outline outline-neutral-800 transition-transform duration-300 data-starting-style:-translate-x-full data-ending-style:-translate-x-full">
+            <Drawer.Popup className="w-4/5 bg-background rounded-xl outline outline-border transition-transform duration-300 data-starting-style:-translate-x-full data-ending-style:-translate-x-full">
               <Drawer.Content className="h-full p-2">{props.sidebar}</Drawer.Content>
             </Drawer.Popup>
           </Drawer.Viewport>

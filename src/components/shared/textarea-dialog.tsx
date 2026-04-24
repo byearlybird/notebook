@@ -41,19 +41,19 @@ export function TextareaDialog({
         <Dialog.Viewport className="fixed inset-0 flex items-start justify-center pt-[8vh] sm:pt-[20vh] p-4">
           <Dialog.Popup
             className={clsx(
-              "w-full rounded-2xl bg-neutral-800 outline outline-neutral-700 data-starting-style:scale-95 data-starting-style:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0 transition-all duration-200 ease-out",
+              "w-full rounded-2xl bg-surface outline outline-border data-starting-style:scale-95 data-starting-style:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0 transition-all duration-200 ease-out",
               size === "default" && "max-w-md sm:max-w-xl p-6",
               size === "small" && "max-w-xs sm:max-w-sm p-4",
             )}
           >
             {title && (
-              <Dialog.Title className="text-sm font-medium text-neutral-400 mb-4">
+              <Dialog.Title className="text-sm font-medium text-foreground-muted mb-4">
                 {title}
               </Dialog.Title>
             )}
             <textarea
               className={clsx(
-                "w-full bg-transparent text-neutral-100 placeholder:text-neutral-500 resize-none outline-none text-sm leading-relaxed",
+                "w-full bg-transparent text-foreground placeholder:text-foreground-muted resize-none outline-none text-sm leading-relaxed",
                 title && size === "default" ? "mt-4" : null,
                 title && size === "small" ? "mt-2" : null,
                 size === "default" && "min-h-32 sm:min-h-48 mb-4 ",

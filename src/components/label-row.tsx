@@ -15,7 +15,7 @@ export function LabelRow({ label }: { label: LabelRowData }) {
         <span className="flex-1 flex items-baseline gap-2">
           <span>{label.name}</span>
           {!!label.item_count && (
-            <span className="text-xs text-neutral-500">{label.item_count}</span>
+            <span className="text-xs text-foreground-muted">{label.item_count}</span>
           )}
         </span>
         <MenuRoot>

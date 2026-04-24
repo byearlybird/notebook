@@ -3,9 +3,73 @@
 
 @theme {
   --font-sans: "Karla", sans-serif;
-  --font-serif: "Aleo", serif;
+  --font-serif: "Lora", serif;
+
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-foreground: var(--foreground);
+  --color-foreground-muted: var(--foreground-muted);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-foreground: var(--accent-foreground);
+}
+
+:root,
+:root[data-theme="dark"] {
+  --background: var(--color-neutral-900);
+  --surface: var(--color-neutral-800);
+  --border: var(--color-neutral-700);
+  --foreground: var(--color-neutral-200);
+  --foreground-muted: var(--color-neutral-500);
+}
+
+:root[data-theme="light"] {
+  --background: var(--color-neutral-200);
+  --surface: var(--color-neutral-100);
+  --border: var(--color-neutral-300);
+  --foreground: var(--color-neutral-900);
+  --foreground-muted: var(--color-neutral-500);
+}
+
+:root,
+:root[data-accent="yellow"] {
+  --accent-hover: oklch(0.905 0.182 98.111);
+  --accent: oklch(0.852 0.199 91.936);
+  --accent-foreground: oklch(0.286 0.066 53.813);
+}
+
+:root[data-accent="orange"] {
+  --accent-hover: oklch(0.901 0.096 70.378);
+  --accent: oklch(0.837 0.128 66.29);
+  --accent-foreground: oklch(0.266 0.079 36.259);
+}
+
+:root[data-accent="violet"] {
+  --accent-hover: oklch(0.890 0.057 293.283);
+  --accent: oklch(0.811 0.111 293.571);
+  --accent-foreground: oklch(0.283 0.141 291.089);
+}
+
+:root[data-accent="emerald"] {
+  --accent-hover: oklch(0.905 0.093 164.15);
+  --accent: oklch(0.845 0.143 164.978);
+  --accent-foreground: oklch(0.262 0.051 172.552);
+}
+
+:root[data-accent="sky"] {
+  --accent-hover: oklch(0.901 0.058 230.902);
+  --accent: oklch(0.828 0.111 230.318);
+  --accent-foreground: oklch(0.293 0.066 243.157);
+}
+
+:root[data-accent="rose"] {
+  --accent-hover: oklch(0.899 0.061 12.422);
+  --accent: oklch(0.81 0.117 11.638);
+  --accent-foreground: oklch(0.271 0.105 12.094);
 }
 
 body {
-  @apply bg-neutral-900 text-neutral-200 font-sans;
+  @apply bg-background text-foreground font-sans;
 }

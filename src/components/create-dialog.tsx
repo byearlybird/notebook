@@ -51,12 +51,12 @@ export function CreateDialog({ open, onOpenChange }: CreateDialogProps) {
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 bg-black/70 data-starting-style:opacity-0 data-ending-style:opacity-0 transition-opacity duration-200" />
         <Dialog.Viewport className="fixed inset-0 flex items-start justify-center pt-[8vh] sm:pt-[20vh] p-4">
-          <Dialog.Popup className="w-full max-w-md sm:max-w-xl rounded-2xl bg-neutral-800 outline outline-neutral-700 p-6 data-starting-style:scale-95 data-starting-style:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0 transition-all duration-200 ease-out">
+          <Dialog.Popup className="w-full max-w-md sm:max-w-xl rounded-2xl bg-surface outline outline-border p-6 data-starting-style:scale-95 data-starting-style:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0 transition-all duration-200 ease-out">
             <div className="-mx-2">
               <EntryTypeToggle value={entryType} onValueChange={handleTypeChange} />
             </div>
             <textarea
-              className="w-full mt-4 mb-6 bg-transparent text-neutral-100 placeholder:text-neutral-500 resize-none outline-none text-sm leading-relaxed min-h-32 sm:min-h-48"
+              className="w-full mt-4 mb-6 bg-transparent text-foreground placeholder:text-foreground-muted resize-none outline-none text-sm leading-relaxed min-h-32 sm:min-h-48"
               placeholder="What's on your mind?"
               value={content}
               onChange={(e) => setContent(e.target.value)}
@@ -123,7 +123,7 @@ function TypeToggle({
       value={value}
       className={clsx(
         "flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-sm font-medium transition-all cursor-pointer outline-none",
-        active ? "bg-neutral-900 text-neutral-200" : "text-neutral-500 hover:text-neutral-300",
+        active ? "bg-background text-foreground" : "text-foreground-muted hover:text-foreground",
       )}
     >
       {icon}

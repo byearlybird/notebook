@@ -17,7 +17,7 @@ export function PinnedNotesPreview({ children }: { children: ReactElement }) {
       {pinned && pinned.length > 0 ? (
         pinned.map((note) => <PinnedRow key={note.id} note={note} />)
       ) : (
-        <div className="px-2 py-3 text-sm text-neutral-500">No pinned notes</div>
+        <div className="px-2 py-3 text-sm text-foreground-muted">No pinned notes</div>
       )}
     </SidebarPopover>
   );
@@ -27,10 +27,10 @@ function PinnedRow({ note }: { note: TimelineView }) {
   return (
     <button
       onClick={() => openEntryDetail(note.id)}
-      className="w-full text-left rounded-lg px-2 py-2 hover:bg-neutral-800 transition-colors"
+      className="w-full text-left rounded-lg px-2 py-2 hover:bg-surface transition-colors"
     >
-      <div className="text-xs text-neutral-400 mb-0.5">{formatDateTime(note.created_at)}</div>
-      <div className="text-sm text-neutral-200 line-clamp-1">{note.content}</div>
+      <div className="text-xs text-foreground-muted mb-0.5">{formatDateTime(note.created_at)}</div>
+      <div className="text-sm text-foreground line-clamp-1">{note.content}</div>
     </button>
   );
 }
