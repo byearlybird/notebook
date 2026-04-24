@@ -1,11 +1,13 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useStore } from "@nanostores/react";
 import { Page, PageHeader, PageTitle } from "@/components/page-layout";
 import { Entry } from "@/components/entry";
+import { TextareaDialog } from "@/components/shared/textarea-dialog";
 import { useTodayDate } from "@/hooks/use-today-date";
 import { useEntriesOnDate } from "@/hooks/use-entries-on-date";
 import { useMonthIntention } from "@/hooks/use-month-intention";
-import { useSetIntention } from "@/hooks/use-set-intention";
+import { intentionService } from "@/services/intention-service";
 import { openEntryDetail } from "@/stores/entry-detail";
 import { formatDate } from "@/utils/dates";
 import { $debouncedSearchTerm, $labelFilter } from "@/stores/entry-search";
@@ -23,7 +25,11 @@ function IndexPage() {
     labelName: labelFilter?.name,
   });
   const intention = useMonthIntention();
-  const handleSetIntention = useSetIntention();
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  function handleSave(value: string) {
+    intentionService.setCurrentMonthIntention(value);
+  }
 
   return (
     <Page>
@@ -41,7 +47,7 @@ function IndexPage() {
             </p>
           ) : (
             <button
-              onClick={handleSetIntention}
+              onClick={() => setDialogOpen(true)}
               className="text-sm text-neutral-600 hover:text-neutral-400 transition-colors"
             >
               Set an intention for this month +
@@ -49,6 +55,15 @@ function IndexPage() {
           )}
         </div>
       )}
+      <TextareaDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        title="Set intention"
+        initialValue=""
+        placeholder="What's your intention for this month?"
+        size="small"
+        onSave={handleSave}
+      />
     </Page>
   );
 }

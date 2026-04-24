@@ -3,6 +3,16 @@ import type { TaskTable } from "@/db/schema";
 import { toLocalISO } from "@/utils/dates";
 
 export const taskService = {
+  async delete(id: string) {
+    await db.updateTable("tasks").set({ is_deleted: 1 }).where("id", "=", id).execute();
+  },
+  async updateContent(id: string, content: string) {
+    await db
+      .updateTable("tasks")
+      .set({ content, content_edited_at: toLocalISO(new Date()) })
+      .where("id", "=", id)
+      .execute();
+  },
   async createTask(content: string, label: string | null = null) {
     const now = new Date();
     const localISO = toLocalISO(now);

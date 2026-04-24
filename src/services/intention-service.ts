@@ -2,6 +2,10 @@ import { db } from "@/db/client";
 import { toLocalISO } from "@/utils/dates";
 
 export const intentionService = {
+  async setCurrentMonthIntention(content: string) {
+    const month = new Date().toISOString().slice(0, 7);
+    return intentionService.createIntention(content, month);
+  },
   async createIntention(content: string, month: string) {
     const now = new Date();
     const localISO = toLocalISO(now);

@@ -1,9 +1,9 @@
-import { Popover } from "@base-ui/react/popover";
 import type { ReactElement } from "react";
 import type { DBSchema } from "@/db/schema";
 import { useDBQuery } from "@/hooks/use-db-query";
 import { formatDateTime } from "@/utils/dates";
 import { openEntryDetail } from "@/stores/entry-detail";
+import { SidebarPopover } from "@/components/shared/sidebar-popover";
 
 type TimelineView = DBSchema["timeline"];
 
@@ -13,20 +13,13 @@ export function PinnedNotesPreview({ children }: { children: ReactElement }) {
   ) as TimelineView[] | undefined;
 
   return (
-    <Popover.Root>
-      <Popover.Trigger openOnHover delay={150} closeDelay={150} render={children} />
-      <Popover.Portal>
-        <Popover.Positioner side="right" align="start" sideOffset={8}>
-          <Popover.Popup className="w-72 max-h-96 overflow-y-auto bg-neutral-900 outline outline-neutral-800 rounded-xl p-2 shadow-lg origin-left data-starting-style:opacity-0 data-starting-style:scale-95 data-ending-style:opacity-0 data-ending-style:scale-95 transition-all duration-100 ease-out">
-            {pinned && pinned.length > 0 ? (
-              pinned.map((note) => <PinnedRow key={note.id} note={note} />)
-            ) : (
-              <div className="px-2 py-3 text-sm text-neutral-500">No pinned notes</div>
-            )}
-          </Popover.Popup>
-        </Popover.Positioner>
-      </Popover.Portal>
-    </Popover.Root>
+    <SidebarPopover trigger={children}>
+      {pinned && pinned.length > 0 ? (
+        pinned.map((note) => <PinnedRow key={note.id} note={note} />)
+      ) : (
+        <div className="px-2 py-3 text-sm text-neutral-500">No pinned notes</div>
+      )}
+    </SidebarPopover>
   );
 }
 

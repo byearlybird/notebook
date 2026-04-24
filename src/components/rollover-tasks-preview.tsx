@@ -1,10 +1,10 @@
-import { Popover } from "@base-ui/react/popover";
 import type { ReactElement } from "react";
 import type { DBSchema } from "@/db/schema";
 import { usePriorTasks } from "@/hooks/use-prior-tasks";
 import { formatDate } from "@/utils/dates";
 import { ArrowSquareRightIcon, CheckSquareIcon, XSquareIcon } from "@phosphor-icons/react";
 import { taskService } from "@/services/task-service";
+import { SidebarPopover } from "@/components/shared/sidebar-popover";
 
 type Task = DBSchema["tasks"];
 
@@ -12,20 +12,13 @@ export function RolloverTasksPreview({ children }: { children: ReactElement }) {
   const tasks = usePriorTasks();
 
   return (
-    <Popover.Root>
-      <Popover.Trigger openOnHover delay={150} closeDelay={150} render={children} />
-      <Popover.Portal>
-        <Popover.Positioner side="right" align="start" sideOffset={8}>
-          <Popover.Popup className="w-80 max-h-96 overflow-y-auto bg-neutral-900 outline outline-neutral-800 rounded-xl p-2 shadow-lg origin-left data-starting-style:opacity-0 data-starting-style:scale-95 data-ending-style:opacity-0 data-ending-style:scale-95 transition-all duration-100 ease-out">
-            {tasks && tasks.length > 0 ? (
-              tasks.map((task) => <RolloverTaskRow key={task.id} task={task} />)
-            ) : (
-              <div className="px-2 py-3 text-sm text-neutral-500">No prior tasks</div>
-            )}
-          </Popover.Popup>
-        </Popover.Positioner>
-      </Popover.Portal>
-    </Popover.Root>
+    <SidebarPopover trigger={children}>
+      {tasks && tasks.length > 0 ? (
+        tasks.map((task) => <RolloverTaskRow key={task.id} task={task} />)
+      ) : (
+        <div className="px-2 py-3 text-sm text-neutral-500">No prior tasks</div>
+      )}
+    </SidebarPopover>
   );
 }
 

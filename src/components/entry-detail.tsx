@@ -1,9 +1,13 @@
+import { useState } from "react";
 import { Drawer } from "@base-ui/react/drawer";
+import { MenuRoot, Menu, MenuTrigger, MenuItem } from "@/components/shared/menu";
+import { TextareaDialog } from "@/components/shared/textarea-dialog";
 import {
   ArrowCounterClockwiseIcon,
   ArrowSquareRightIcon,
   CheckIcon,
   CheckSquareIcon,
+  DotsThreeVerticalIcon,
   PushPinSimpleIcon,
   SquareIcon,
   XIcon,
@@ -25,29 +29,50 @@ type TimelineView = DBSchema["timeline"];
 
 export function EntryDetail() {
   const id = useStore($selectedEntryId);
+  const [editEntry, setEditEntry] = useState<TimelineView | null>(null);
 
   return (
-    <Drawer.Root
-      open={id !== null}
-      onOpenChange={(open) => {
-        if (!open) closeEntryDetail();
-      }}
-    >
-      <Drawer.Portal>
-        <Drawer.Backdrop className="fixed inset-0 bg-black/70 data-starting-style:opacity-0 data-ending-style:opacity-0 transition-opacity duration-300" />
-        <Drawer.Viewport className="fixed inset-0 flex items-stretch justify-end p-2">
-          <Drawer.Popup className="relative w-full rounded-2xl sm:max-w-2/3 lg:max-w-1/2 h-full bg-neutral-800 outline outline-neutral-700 transition-transform duration-300 data-starting-style:translate-x-full data-ending-style:translate-x-full">
-            <Drawer.Content className="h-full flex flex-col">
-              {id && <EntryDetailContent id={id} />}
-            </Drawer.Content>
-          </Drawer.Popup>
-        </Drawer.Viewport>
-      </Drawer.Portal>
-    </Drawer.Root>
+    <>
+      <Drawer.Root
+        open={id !== null}
+        onOpenChange={(open) => {
+          if (!open) closeEntryDetail();
+        }}
+      >
+        <Drawer.Portal>
+          <Drawer.Backdrop className="fixed inset-0 bg-black/70 data-starting-style:opacity-0 data-ending-style:opacity-0 transition-opacity duration-300" />
+          <Drawer.Viewport className="fixed inset-0 flex items-stretch justify-end p-2">
+            <Drawer.Popup className="relative w-full rounded-2xl sm:max-w-2/3 lg:max-w-1/2 h-full bg-neutral-800 outline outline-neutral-700 transition-transform duration-300 data-starting-style:translate-x-full data-ending-style:translate-x-full">
+              <Drawer.Content className="h-full flex flex-col">
+                {id && <EntryDetailContent id={id} onEditClick={setEditEntry} />}
+              </Drawer.Content>
+            </Drawer.Popup>
+          </Drawer.Viewport>
+        </Drawer.Portal>
+      </Drawer.Root>
+      <TextareaDialog
+        open={editEntry !== null}
+        onOpenChange={(open) => {
+          if (!open) setEditEntry(null);
+        }}
+        initialValue={editEntry?.content ?? ""}
+        onSave={(v) => {
+          if (!editEntry) return;
+          if (editEntry.type === "note") notesService.updateContent(editEntry.id, v);
+          else taskService.updateContent(editEntry.id, v);
+        }}
+      />
+    </>
   );
 }
 
-function EntryDetailContent({ id }: { id: string }) {
+function EntryDetailContent({
+  id,
+  onEditClick,
+}: {
+  id: string;
+  onEditClick: (entry: TimelineView) => void;
+}) {
   const results = useDBQuery((db) => db.selectFrom("timeline").selectAll().where("id", "=", id));
   const entry = results?.[0] ?? null;
 
@@ -59,9 +84,29 @@ function EntryDetailContent({ id }: { id: string }) {
         <Drawer.Title className="text-lg font-semibold font-serif">
           {formatDateTime(entry.created_at)}
         </Drawer.Title>
-        <Drawer.Close render={(props) => <Button {...props} variant="outline" radius="inner" />}>
-          <XIcon />
-        </Drawer.Close>
+        <div className="flex gap-2">
+          <MenuRoot>
+            <MenuTrigger variant="outline">
+              <DotsThreeVerticalIcon />
+            </MenuTrigger>
+            <Menu>
+              <MenuItem onClick={() => onEditClick(entry)}>Edit</MenuItem>
+              <MenuItem
+                variant="destructive"
+                onClick={() => {
+                  if (entry.type === "note") notesService.delete(entry.id);
+                  else taskService.delete(entry.id);
+                  closeEntryDetail();
+                }}
+              >
+                Delete
+              </MenuItem>
+            </Menu>
+          </MenuRoot>
+          <Drawer.Close render={(props) => <Button {...props} variant="outline" radius="inner" />}>
+            <XIcon />
+          </Drawer.Close>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-5 flex flex-col gap-3">

@@ -48,7 +48,7 @@ export function Sidebar() {
           {label}
         </NavButton>
       ))}
-      <div className="h-1 my-2 border-t border-dashed w-full border-neutral-700" />
+      <div className="h-1 my-3 border-t border-dashed w-full border-neutral-700" />
       <PinnedNotesPreview>
         <Button variant="ghost">
           <PushPinSimpleIcon />
@@ -67,7 +67,7 @@ export function Sidebar() {
           Intention
         </Button>
       </IntentionPreview>
-      <div className="mt-auto border-t border-dashed border-neutral-700 pt-4">
+      <div className="mt-auto border-t border-dashed border-neutral-700 pt-2">
         <Show when="signed-in">
           <NavButton to="/settings">
             <GearIcon />
