@@ -7,6 +7,7 @@ import { Button } from "./button";
 import { CreateDialog } from "./create-dialog";
 import { EntryDetail } from "./entry-detail";
 import { LabelFilter } from "./label-filter";
+import { OnboardingDialog } from "./onboarding-dialog";
 import { Input } from "./shared/input";
 import { $searchTerm } from "@/stores/entry-search";
 import { usePriorTasks } from "@/hooks/use-prior-tasks";
@@ -78,6 +79,7 @@ export function AppLayout(props: AppLayoutProps) {
       </Drawer.Root>
       <CreateDialog open={createOpen} onOpenChange={setCreateOpen} />
       <EntryDetail />
+      <OnboardingDialog />
     </>
   );
 }

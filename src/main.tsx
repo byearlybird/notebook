@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { ClerkProvider } from "@clerk/react";
 import { routeTree } from "./routeTree.gen";
-import { $userSettings, type Theme } from "./stores/userSettings";
+import { $userSettings, type Theme } from "./stores/user-settings";
 import "./index.css";
 
 const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
