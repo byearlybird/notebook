@@ -47,7 +47,7 @@
 }
 
 :root[data-accent="violet"] {
-  --accent-hover: oklch(0.890 0.057 293.283);
+  --accent-hover: oklch(0.89 0.057 293.283);
   --accent: oklch(0.811 0.111 293.571);
   --accent-foreground: oklch(0.283 0.141 291.089);
 }

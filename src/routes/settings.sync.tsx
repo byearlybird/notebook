@@ -2,13 +2,7 @@ import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/button";
-import {
-  $syncState,
-  createKey,
-  hasRemoteKey,
-  loadRemoteKey,
-  lock,
-} from "@/stores/sync-client";
+import { $syncState, createKey, hasRemoteKey, loadRemoteKey, lock } from "@/stores/sync-client";
 
 export const Route = createFileRoute("/settings/sync")({
   component: RouteComponent,
@@ -60,7 +54,8 @@ function LockedView() {
   }, []);
 
   if (remoteState === "checking") return <Message>Checking for existing vault…</Message>;
-  if (remoteState === "error") return <Message tone="error">Couldn't reach the sync server.</Message>;
+  if (remoteState === "error")
+    return <Message tone="error">Couldn't reach the sync server.</Message>;
   if (remoteState === "missing") return <CreateVaultForm />;
   return <UnlockVaultForm />;
 }

@@ -47,8 +47,7 @@ async function pullChanges(dek: CryptoKey, transport: ChangeTransport) {
     let maxRemoteHlc = "";
 
     for (const payload of payloads) {
-      const incomingHlc =
-        payload.type === "mutate" ? String(payload.data.hlc) : payload.hlc;
+      const incomingHlc = payload.type === "mutate" ? String(payload.data.hlc) : payload.hlc;
       if (incomingHlc > maxRemoteHlc) maxRemoteHlc = incomingHlc;
 
       if (payload.type === "tombstone") {
