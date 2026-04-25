@@ -1,0 +1,22 @@
+{
+  "name": "Journal",
+  "short_name": "Journal",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#262626",
+  "theme_color": "#262626",
+  "icons": [
+    {
+      "src": "/journal-icon-dark.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    },
+    {
+      "src": "/journal-icon-light.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    }
+  ]
+}
