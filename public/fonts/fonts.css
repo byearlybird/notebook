@@ -1,0 +1,28 @@
+@font-face {
+  font-family: 'Karla';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url(/fonts/karla-normal-latin.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Karla';
+  font-style: italic;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url(/fonts/karla-italic-latin.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(/fonts/lora-normal-latin.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(/fonts/lora-italic-latin.woff2) format('woff2');
+}
