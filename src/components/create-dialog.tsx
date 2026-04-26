@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog } from "@base-ui/react/dialog";
 import { ToggleGroup } from "@base-ui/react/toggle-group";
 import { Toggle } from "@base-ui/react/toggle";
@@ -22,6 +22,10 @@ export function CreateDialog({ open, onOpenChange }: CreateDialogProps) {
   const [entryType, setEntryType] = useState<EntryType>("note");
   const [labelId, setLabelId] = useState<string | null>(() => $labelFilter.get()?.id ?? null);
 
+  useEffect(() => {
+    if (open) setLabelId($labelFilter.get()?.id ?? null);
+  }, [open]);
+
   async function handleSubmit() {
     if (!content.trim()) return;
     if (entryType === "note") {
@@ -35,10 +39,7 @@ export function CreateDialog({ open, onOpenChange }: CreateDialogProps) {
   }
 
   function handleOpenChange(isOpen: boolean) {
-    if (!isOpen) {
-      setContent("");
-      setLabelId($labelFilter.get()?.id ?? null);
-    }
+    if (!isOpen) setContent("");
     onOpenChange(isOpen);
   }
 
