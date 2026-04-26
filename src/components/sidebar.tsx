@@ -9,7 +9,7 @@ import {
 } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 import { useStore } from "@nanostores/react";
-import { Button } from "./button";
+import { Button } from "./shared/button";
 import { PinnedNotesPreview } from "./pinned-notes-preview";
 import { RolloverTasksPreview } from "./rollover-tasks-preview";
 import { IntentionPreview } from "./intention-preview";

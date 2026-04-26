@@ -3,7 +3,7 @@ import { Dialog } from "@base-ui/react/dialog";
 import { SignIn, useAuth } from "@clerk/react";
 import { useStore } from "@nanostores/react";
 import { AccentPicker } from "./accent-picker";
-import { Button } from "./button";
+import { Button } from "./shared/button";
 import { ThemePicker } from "./theme-picker";
 import { Think } from "@/content/think";
 import { $userSettings } from "@/stores/user-settings";

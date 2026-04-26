@@ -2,7 +2,7 @@ import { useState } from "react";
 import { StarIcon } from "@phosphor-icons/react";
 import { useMonthIntention } from "@/hooks/use-month-intention";
 import { intentionService } from "@/services/intention-service";
-import { InputDialog } from "@/components/shared/input-dialog";
+import { PromptDialog } from "@/components/shared/prompt-dialog";
 
 export function IntentionPreview() {
   const intention = useMonthIntention();
@@ -23,7 +23,7 @@ export function IntentionPreview() {
           {intention ? intention.content : "Set an intention for the month"}
         </span>
       </button>
-      <InputDialog
+      <PromptDialog
         open={editOpen}
         onOpenChange={setEditOpen}
         title={intention ? "Edit intention" : "Set intention"}

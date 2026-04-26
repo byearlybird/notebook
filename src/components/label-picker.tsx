@@ -2,7 +2,7 @@ import { Select } from "@base-ui/react/select";
 import { CheckIcon, TagSimpleIcon } from "@phosphor-icons/react";
 import { useLabels } from "@/hooks/use-labels";
 import { openCreateLabel } from "@/stores/create-label";
-import { Button } from "./button";
+import { Button } from "./shared/button";
 
 type LabelPickerProps = {
   value: string | null;

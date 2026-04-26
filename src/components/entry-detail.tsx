@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Drawer } from "@base-ui/react/drawer";
 import { MenuRoot, Menu, MenuTrigger, MenuItem } from "@/components/shared/menu";
-import { TextareaDialog } from "@/components/shared/textarea-dialog";
+import { PromptDialog } from "@/components/shared/prompt-dialog";
 import {
   ArrowCounterClockwiseIcon,
   ArrowSquareRightIcon,
@@ -24,7 +24,7 @@ import { useEntry } from "@/hooks/use-entry";
 import { useTodayDate } from "@/hooks/use-today-date";
 import { labelsService } from "@/services/label-service";
 import { $selectedEntryId, closeEntryDetail } from "@/stores/entry-detail";
-import { Button } from "./button";
+import { Button } from "./shared/button";
 import { LabelPicker } from "./label-picker";
 
 type TimelineView = DBSchema["timeline"];
@@ -52,11 +52,12 @@ export function EntryDetail() {
           </Drawer.Viewport>
         </Drawer.Portal>
       </Drawer.Root>
-      <TextareaDialog
+      <PromptDialog
         open={editEntry !== null}
         onOpenChange={(open) => {
           if (!open) setEditEntry(null);
         }}
+        multiline
         initialValue={editEntry?.content ?? ""}
         onSave={(v) => {
           if (!editEntry) return;

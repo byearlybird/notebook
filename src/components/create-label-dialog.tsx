@@ -1,5 +1,5 @@
 import { useStore } from "@nanostores/react";
-import { InputDialog } from "@/components/shared/input-dialog";
+import { PromptDialog } from "@/components/shared/prompt-dialog";
 import { $createLabelOpen, closeCreateLabel } from "@/stores/create-label";
 import { labelsService } from "@/services/label-service";
 
@@ -7,7 +7,7 @@ export function CreateLabelDialog() {
   const open = useStore($createLabelOpen);
 
   return (
-    <InputDialog
+    <PromptDialog
       open={open}
       onOpenChange={(isOpen) => {
         if (!isOpen) closeCreateLabel();

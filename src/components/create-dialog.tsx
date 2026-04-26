@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { Dialog } from "@base-ui/react/dialog";
 import { ToggleGroup } from "@base-ui/react/toggle-group";
 import { Toggle } from "@base-ui/react/toggle";
 import { CircleIcon, SquareIcon } from "@phosphor-icons/react";
 import { clsx } from "clsx";
-import { Button } from "./button";
+import { Button } from "@/components/shared/button";
 import { LabelPicker } from "./label-picker";
+import { Dialog, DialogClose } from "./shared/dialog";
 import { notesService } from "@/services/note-service";
 import { taskService } from "@/services/task-service";
 import { $labelFilter } from "@/stores/entry-search";
@@ -48,39 +48,32 @@ export function CreateDialog({ open, onOpenChange }: CreateDialogProps) {
   }
 
   return (
-    <Dialog.Root open={open} onOpenChange={handleOpenChange}>
-      <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 bg-black/70 data-starting-style:opacity-0 data-ending-style:opacity-0 transition-opacity duration-200" />
-        <Dialog.Viewport className="fixed inset-x-1 top-1 sm:inset-0 sm:flex sm:items-start sm:justify-center sm:pt-[16vh] sm:p-4">
-          <Dialog.Popup className="w-full sm:max-w-xl rounded-2xl bg-surface outline outline-border p-6 data-starting-style:scale-95 data-starting-style:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0 transition-all duration-200 ease-out">
-            <div className="-mx-2">
-              <EntryTypeToggle value={entryType} onValueChange={handleTypeChange} />
-            </div>
-            <textarea
-              className="w-full mt-4 mb-6 bg-transparent text-foreground placeholder:text-foreground-muted resize-none outline-none text-base leading-relaxed min-h-32 sm:min-h-48 max-h-[33vh] sm:max-h-[50vh] overflow-y-auto field-sizing-content font-serif"
-              placeholder="What's on your mind?"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSubmit();
-              }}
-              autoFocus
-            />
-            <div className="flex items-center justify-between gap-2">
-              <LabelPicker value={labelId} onValueChange={setLabelId} radius="outermost" />
-              <div className="flex gap-2">
-                <Dialog.Close render={(props) => <Button variant="secondary" {...props} />}>
-                  Cancel
-                </Dialog.Close>
-                <Button onClick={handleSubmit} disabled={!content.trim()}>
-                  Done
-                </Button>
-              </div>
-            </div>
-          </Dialog.Popup>
-        </Dialog.Viewport>
-      </Dialog.Portal>
-    </Dialog.Root>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <div className="-mx-2">
+        <EntryTypeToggle value={entryType} onValueChange={handleTypeChange} />
+      </div>
+      <textarea
+        className="w-full mt-4 mb-4 bg-transparent text-foreground placeholder:text-foreground-muted resize-none outline-none text-base leading-relaxed min-h-32 sm:min-h-48 max-h-[33vh] sm:max-h-[50vh] overflow-y-auto field-sizing-content font-serif"
+        placeholder="What's on your mind?"
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSubmit();
+        }}
+        autoFocus
+      />
+      <div className="flex items-center justify-between gap-2">
+        <LabelPicker value={labelId} onValueChange={setLabelId} radius="outermost" />
+        <div className="flex gap-2">
+          <DialogClose render={(props) => <Button variant="secondary" {...props} />}>
+            Cancel
+          </DialogClose>
+          <Button onClick={handleSubmit} disabled={!content.trim()}>
+            Done
+          </Button>
+        </div>
+      </div>
+    </Dialog>
   );
 }
 

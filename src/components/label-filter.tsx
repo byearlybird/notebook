@@ -4,7 +4,7 @@ import { CheckIcon, FunnelSimpleIcon } from "@phosphor-icons/react";
 import { useLabels } from "@/hooks/use-labels";
 import { $labelFilter } from "@/stores/entry-search";
 import { openCreateLabel } from "@/stores/create-label";
-import { Button } from "./button";
+import { Button } from "./shared/button";
 
 export function LabelFilter() {
   const selected = useStore($labelFilter);

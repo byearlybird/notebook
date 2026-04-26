@@ -3,7 +3,7 @@ import { useStore } from "@nanostores/react";
 import type { ReactNode } from "react";
 import { Drawer } from "@base-ui/react/drawer";
 import { ListIcon, PlusIcon } from "@phosphor-icons/react";
-import { Button } from "./button";
+import { Button } from "./shared/button";
 import { CreateDialog } from "./create-dialog";
 import { CreateLabelDialog } from "./create-label-dialog";
 import { EntryDetail } from "./entry-detail";
