@@ -127,7 +127,7 @@ function EntryDetailContent({
         <button
           type="button"
           onClick={() => onEditClick(entry)}
-          className="absolute top-2 right-3 rounded-md bg-surface outline outline-border p-1 opacity-0 group-hover/content:opacity-100 hover:bg-foreground/5 transition-opacity cursor-pointer"
+          className="absolute top-2 right-3 rounded-md bg-surface outline outline-border p-1 opacity-0 group-hover/content:opacity-100 hover:bg-foreground/5 transition-opacity"
         >
           <PencilSimpleIcon className="size-4 text-foreground-muted" />
         </button>
