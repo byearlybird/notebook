@@ -8,6 +8,7 @@ import {
   CheckIcon,
   CheckSquareIcon,
   DotsThreeVerticalIcon,
+  PencilSimpleIcon,
   PushPinSimpleIcon,
   SquareIcon,
   XIcon,
@@ -94,7 +95,6 @@ function EntryDetailContent({
               <DotsThreeVerticalIcon />
             </MenuTrigger>
             <Menu>
-              <MenuItem onClick={() => onEditClick(entry)}>Edit</MenuItem>
               <MenuItem
                 variant="destructive"
                 onClick={() => {
@@ -113,9 +113,24 @@ function EntryDetailContent({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-5 flex flex-col gap-3">
-        {entry.type === "task" && entry.status && <TaskStatusRow status={entry.status} />}
-        <p className="text-foreground font-serif whitespace-pre-wrap">{entry.content}</p>
+      <div className="relative flex-1 min-h-0 flex flex-col group/content">
+        <div className="flex-1 overflow-y-auto px-4 py-5 flex flex-col gap-3">
+          {entry.type === "task" && entry.status && <TaskStatusRow status={entry.status} />}
+          <button
+            type="button"
+            onClick={() => onEditClick(entry)}
+            className="text-left text-foreground font-serif whitespace-pre-wrap rounded-lg -mx-2 px-2 py-1 hover:bg-foreground/5 transition-colors"
+          >
+            {entry.content}
+          </button>
+        </div>
+        <button
+          type="button"
+          onClick={() => onEditClick(entry)}
+          className="absolute top-2 right-3 rounded-md bg-surface outline outline-border p-1 opacity-0 group-hover/content:opacity-100 hover:bg-foreground/5 transition-opacity cursor-pointer"
+        >
+          <PencilSimpleIcon className="size-4 text-foreground-muted" />
+        </button>
       </div>
 
       <div className="border-t border-dashed border-border p-4 flex items-center justify-between">
