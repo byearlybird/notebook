@@ -53,7 +53,7 @@ export function TextareaDialog({
             )}
             <textarea
               className={clsx(
-                "w-full bg-transparent text-foreground placeholder:text-foreground-muted resize-none outline-none text-base leading-relaxed font-serif",
+                "w-full bg-transparent text-foreground placeholder:text-foreground-muted resize-none outline-none text-base leading-relaxed font-serif field-sizing-content max-h-[33vh] sm:max-h-[50vh] overflow-y-auto",
                 title && size === "default" ? "mt-4" : null,
                 title && size === "small" ? "mt-2" : null,
                 size === "default" && "min-h-32 sm:min-h-48 mb-4 ",
