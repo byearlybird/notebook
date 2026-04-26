@@ -3,6 +3,7 @@ import type { Kysely, Migration } from "kysely";
 import { createSyncTable } from "./sync-helpers";
 
 export const M002_schema: Migration = {
+  // oxlint-disable-next-line typescript/no-explicit-any
   async up(db: Kysely<any>) {
     await createSyncTable(db, "notes", (t) =>
       t

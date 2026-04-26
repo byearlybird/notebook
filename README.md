@@ -1,73 +1,37 @@
-# React + TypeScript + Vite
+# Journal
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A minimal, end-to-end-encrypted journaling app that syncs across devices without ever sending plaintext to a server.
 
-Currently, two official plugins are available:
+**Live:** [journal.byearlybird.com](https://journal.byearlybird.com)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## What it does
 
-## React Compiler
+- **Private by default.** Entries are encrypted in the browser before they leave the device. The server stores opaque ciphertext and never holds a key capable of reading it.
+- **Local-first.** Everything is written to a local SQLite database in the browser. The app works offline; sync is just a background concern.
+- **Multi-device sync.** Conflict resolution uses a hybrid logical clock with last-writer-wins semantics, so writes from any device merge cleanly without a coordinator.
+- **Installable.** Ships as a PWA with a native-feeling shell, dynamic theme color, and an iOS wrapper.
+- **Export your data.** One-click export of plaintext entries — no lock-in.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Stack
 
-## Expanding the ESLint configuration
+**Frontend**
+- React 19 + TanStack Router (file-based routing)
+- Tailwind v4, Base UI primitives, Phosphor icons
+- Nanostores for state, IndexedDB for key caching
+- SQLite in the browser via [`sqlocal`](https://github.com/DallasHoff/sqlocal) (OPFS-backed) with Kysely as the query builder
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+**Backend** (Cloudflare)
+- Workers + D1 (SQLite at the edge)
+- oRPC for end-to-end-typed RPC with Zod-validated contracts
+- Clerk for authentication
 
-```js
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
+**Crypto**
+- AES-256-GCM data encryption key, wrapped by a PBKDF2-derived key (600k iterations, SHA-256)
+- Only the wrapped key ever touches the server; the unwrapped key lives as a non-extractable `CryptoKey` in IndexedDB
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+**Tooling**
+- Vite 8, TypeScript (strict), oxlint + oxfmt, pnpm
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
-```
+## Architecture in one paragraph
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from "eslint-plugin-react-x";
-import reactDom from "eslint-plugin-react-dom";
-
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs["recommended-typescript"],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
-```
+The browser holds a SQLite database that is the source of truth for the user's data. Every mutation to a syncable table fires SQLite triggers that stamp the row with a hybrid logical clock and enqueue an entry in an outbox. A sync pass encrypts the outbox, pushes it to a Cloudflare Worker, and pulls remote changes back, decrypting and applying them under last-writer-wins. The Worker only ever sees ciphertext.
