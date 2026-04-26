@@ -40,7 +40,7 @@ function RouteComponent() {
           No labels yet
         </p>
       ) : (
-        <ul className="space-y-1 py-2">
+        <ul className="bg-background/50 rounded-xl overflow-hidden divide-y divide-border/50">
           {labels?.map((label) => (
             <LabelRow key={label.id} label={label} />
           ))}

@@ -11,7 +11,7 @@ export function LabelRow({ label }: { label: LabelRowData }) {
 
   return (
     <>
-      <li className="flex items-center gap-2 px-3 py-1">
+      <li className="flex items-center gap-2 px-3 py-2.5">
         <span className="flex-1 flex items-baseline gap-2">
           <span>{label.name}</span>
           {!!label.item_count && (
