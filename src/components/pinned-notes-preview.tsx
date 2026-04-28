@@ -30,7 +30,7 @@ function PinnedRow({ note }: { note: TimelineView }) {
       className="w-full text-left rounded-lg px-2 py-2 hover:bg-surface-tint transition-colors"
     >
       <div className="text-xs text-foreground-muted mb-0.5">{formatDateTime(note.created_at)}</div>
-      <div className="text-sm text-foreground line-clamp-1">{note.content}</div>
+      <div className="text-sm text-foreground line-clamp-2">{note.content}</div>
     </button>
   );
 }

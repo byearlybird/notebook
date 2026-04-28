@@ -22,6 +22,26 @@ export function formatWeekday(iso: string): string {
   );
 }
 
+export function formatWeekdayShort(iso: string): string {
+  return new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(
+    new Date(`${iso.slice(0, 10)}T00:00:00`),
+  );
+}
+
+export function formatMonthYear(iso: string): { month: string; year: string } {
+  const date = new Date(`${iso.slice(0, 10)}T00:00:00`);
+  return {
+    month: new Intl.DateTimeFormat("en-US", { month: "long" }).format(date),
+    year: new Intl.DateTimeFormat("en-US", { year: "numeric" }).format(date),
+  };
+}
+
+export function formatDayWeekday(iso: string): { day: number; weekday: string } {
+  const date = new Date(`${iso.slice(0, 10)}T00:00:00`);
+  const weekday = new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(date);
+  return { day: date.getDate(), weekday };
+}
+
 export function formatTime(iso: string): string {
   return new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" }).format(
     new Date(iso),

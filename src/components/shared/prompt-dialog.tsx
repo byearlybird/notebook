@@ -9,6 +9,7 @@ type PromptDialogProps = {
   initialValue?: string;
   placeholder?: string;
   multiline?: boolean;
+  maxLength?: number;
   submitLabel?: string;
   onSave: (value: string) => void;
 };
@@ -20,6 +21,7 @@ export function PromptDialog({
   initialValue = "",
   placeholder,
   multiline = false,
+  maxLength,
   submitLabel = "Save",
   onSave,
 }: PromptDialogProps) {
@@ -49,6 +51,7 @@ export function PromptDialog({
           className="w-full bg-transparent text-foreground placeholder:text-foreground-muted resize-none outline-none text-base leading-relaxed font-serif field-sizing-content min-h-32 sm:min-h-48 max-h-[33vh] sm:max-h-[50vh] overflow-y-auto mb-4"
           placeholder={placeholder}
           value={value}
+          maxLength={maxLength}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSave();
@@ -61,6 +64,7 @@ export function PromptDialog({
           className="w-full bg-transparent text-foreground placeholder:text-foreground-muted outline-none text-base leading-relaxed mb-4 font-serif"
           placeholder={placeholder}
           value={value}
+          maxLength={maxLength}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") handleSave();

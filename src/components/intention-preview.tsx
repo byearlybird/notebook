@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { StarIcon } from "@phosphor-icons/react";
 import { useMonthIntention } from "@/hooks/use-month-intention";
+import { useTodayDate } from "@/hooks/use-today-date";
 import { intentionService } from "@/services/intention-service";
 import { PromptDialog } from "@/components/shared/prompt-dialog";
 
 export function IntentionPreview() {
-  const intention = useMonthIntention();
+  const today = useTodayDate();
+  const intention = useMonthIntention(today.slice(0, 7));
   const [editOpen, setEditOpen] = useState(false);
 
   function handleSave(value: string) {
-    intentionService.setCurrentMonthIntention(value);
+    intentionService.createIntention(value, today.slice(0, 7));
   }
 
   return (
@@ -29,6 +31,7 @@ export function IntentionPreview() {
         title={intention ? "Edit intention" : "Set intention"}
         initialValue={intention?.content ?? ""}
         placeholder="What's your intention for this month?"
+        maxLength={48}
         onSave={handleSave}
       />
     </>

@@ -13,6 +13,7 @@ import { Input } from "./shared/input";
 import { $searchTerm } from "@/stores/entry-search";
 import { usePriorTasks } from "@/hooks/use-prior-tasks";
 import { useMonthIntention } from "@/hooks/use-month-intention";
+import { useTodayDate } from "@/hooks/use-today-date";
 
 type AppLayoutProps = { sidebar: ReactNode; children: ReactNode };
 
@@ -21,7 +22,8 @@ export function AppLayout(props: AppLayoutProps) {
   const [createOpen, setCreateOpen] = useState(false);
   const searchTerm = useStore($searchTerm);
   const hasPriorTasks = !!usePriorTasks()?.length;
-  const hasIntention = !!useMonthIntention();
+  const today = useTodayDate();
+  const hasIntention = !!useMonthIntention(today.slice(0, 7));
 
   return (
     <>

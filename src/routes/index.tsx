@@ -5,7 +5,7 @@ import { Entry } from "@/components/entry";
 import { useTodayDate } from "@/hooks/use-today-date";
 import { useEntriesOnDate } from "@/hooks/use-entries-on-date";
 import { openEntryDetail } from "@/stores/entry-detail";
-import { formatDate, formatWeekday } from "@/utils/dates";
+import { formatDate, formatWeekday, formatWeekdayShort } from "@/utils/dates";
 import { $debouncedSearchTerm, $labelFilter } from "@/stores/entry-search";
 import { NoteIcon } from "@phosphor-icons/react";
 
@@ -28,7 +28,8 @@ function IndexPage() {
         <PageTitle>
           {formatDate(date)}{" "}
           <span className="ms-2 font-normal text-foreground-muted text-sm">
-            {formatWeekday(date)}
+            <span className="sm:hidden">{formatWeekdayShort(date)}</span>
+            <span className="hidden sm:inline">{formatWeekday(date)}</span>
           </span>
         </PageTitle>
       </PageHeader>
