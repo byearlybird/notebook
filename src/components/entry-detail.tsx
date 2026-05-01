@@ -37,6 +37,7 @@ export function EntryDetail() {
     <>
       <Drawer.Root
         open={id !== null}
+        swipeDirection="right"
         onOpenChange={(open) => {
           if (!open) closeEntryDetail();
         }}
