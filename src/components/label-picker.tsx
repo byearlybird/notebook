@@ -7,22 +7,16 @@ import { Button } from "./shared/button";
 type LabelPickerProps = {
   value: string | null;
   onValueChange: (labelId: string | null) => void;
-  radius?: "inner" | "outermost";
   placeholder?: string;
 };
 
-export function LabelPicker({
-  value,
-  onValueChange,
-  radius = "inner",
-  placeholder,
-}: LabelPickerProps) {
+export function LabelPicker({ value, onValueChange, placeholder }: LabelPickerProps) {
   const labels = useLabels();
   const currentLabelName = labels.find((l) => l.id === value)?.name;
 
   return (
     <Select.Root value={value} onValueChange={(next) => onValueChange(next as string | null)}>
-      <Select.Trigger render={<Button variant="outline" radius={radius} />}>
+      <Select.Trigger render={<Button variant="outline" />}>
         <TagSimpleIcon />
         {currentLabelName ? (
           <span>{currentLabelName}</span>

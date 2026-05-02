@@ -12,7 +12,7 @@ export function MenuTrigger({
   variant?: "ghost" | "outline";
 }) {
   return (
-    <BaseMenu.Trigger render={<Button variant={variant} radius="inner" />}>
+    <BaseMenu.Trigger render={<Button variant={variant} />}>
       {children}
     </BaseMenu.Trigger>
   );

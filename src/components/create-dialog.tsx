@@ -86,7 +86,7 @@ export function CreateDialog({ open, onOpenChange }: CreateDialogProps) {
         />
       )}
       <div className="flex items-center justify-between gap-2">
-        <LabelPicker value={labelId} onValueChange={setLabelId} radius="outermost" />
+        <LabelPicker value={labelId} onValueChange={setLabelId} />
         <div className="flex gap-2">
           <DialogClose render={(props) => <Button variant="secondary" {...props} />}>
             Cancel

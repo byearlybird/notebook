@@ -19,7 +19,7 @@ export function LabelFilter() {
         if (label) $labelFilter.set({ id: label.id, name: label.name });
       }}
     >
-      <Select.Trigger render={<Button variant="outline" radius="inner" />}>
+      <Select.Trigger render={<Button variant="outline" />}>
         <FunnelSimpleIcon />
         {selected && <span>{selected.name}</span>}
       </Select.Trigger>

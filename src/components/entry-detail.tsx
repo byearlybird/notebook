@@ -114,7 +114,7 @@ function EntryDetailContent({
               </MenuItem>
             </Menu>
           </MenuRoot>
-          <Drawer.Close render={(props) => <Button {...props} variant="outline" radius="inner" />}>
+          <Drawer.Close render={(props) => <Button {...props} variant="outline" />}>
             <XIcon />
           </Drawer.Close>
         </div>
@@ -188,7 +188,7 @@ function EntryActions({ entry }: { entry: TimelineView }) {
   if (entry.type === "note") {
     const isPinned = entry.pinned === 1;
     return (
-      <Button radius="inner" variant="outline" onClick={() => notesService.togglePin(entry.id)}>
+      <Button variant="outline" onClick={() => notesService.togglePin(entry.id)}>
         <PushPinSimpleIcon weight={isPinned ? "fill" : "regular"} />
         {isPinned ? "Pinned" : "Pin"}
       </Button>
@@ -218,7 +218,6 @@ function TaskActions({ entry }: { entry: TimelineView }) {
     return (
       <>
         <Button
-          radius="inner"
           variant="outline"
           onClick={() => taskService.setStatus(entry.id, "cancelled")}
         >
@@ -226,17 +225,12 @@ function TaskActions({ entry }: { entry: TimelineView }) {
           Cancel
         </Button>
         {isPriorTask && (
-          <Button
-            radius="inner"
-            variant="outline"
-            onClick={() => taskService.rolloverTask(entry.id)}
-          >
+          <Button variant="outline" onClick={() => taskService.rolloverTask(entry.id)}>
             <ArrowSquareRightIcon />
             Defer
           </Button>
         )}
         <Button
-          radius="inner"
           variant="outline"
           onClick={() => taskService.setStatus(entry.id, "complete")}
         >
@@ -250,7 +244,6 @@ function TaskActions({ entry }: { entry: TimelineView }) {
   if (entry.status === "complete" || entry.status === "cancelled") {
     return (
       <Button
-        radius="inner"
         variant="outline"
         onClick={() => taskService.setStatus(entry.id, "incomplete")}
       >
