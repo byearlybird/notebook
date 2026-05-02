@@ -1,8 +1,8 @@
 const STOPS: { pos: number; color: string }[] = [
-  { pos: 0, color: "oklch(0.38 0.14 300)" },
-  { pos: 0.5, color: "oklch(0.72 0.03 80)" },
-  { pos: 0.8, color: "oklch(0.78 0.16 145)" },
-  { pos: 1, color: "oklch(0.85 0.16 90)" },
+  { pos: 0, color: "oklch(0.42 0.22 300)" },
+  { pos: 0.5, color: "oklch(0.74 0.08 80)" },
+  { pos: 0.8, color: "oklch(0.78 0.22 145)" },
+  { pos: 1, color: "oklch(0.88 0.21 90)" },
 ];
 
 export function moodColor(t: number) {
