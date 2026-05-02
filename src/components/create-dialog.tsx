@@ -18,6 +18,7 @@ import { notesService } from "@/services/note-service";
 import { taskService } from "@/services/task-service";
 import { moodService } from "@/services/mood-service";
 import { momentService } from "@/services/moment-service";
+import { deriveImages, type ImageDerivatives } from "@/utils/image-resize";
 import { moodLabel } from "@/utils/mood-label";
 import { $labelFilter } from "@/stores/entry-search";
 
@@ -33,8 +34,10 @@ export function CreateDialog({ open, onOpenChange }: CreateDialogProps) {
   const [entryType, setEntryType] = useState<EntryType>("note");
   const [mood, setMood] = useState(50);
   const [labelId, setLabelId] = useState<string | null>(() => $labelFilter.get()?.id ?? null);
-  const [imageBytes, setImageBytes] = useState<Uint8Array | null>(null);
+  const [derivatives, setDerivatives] = useState<ImageDerivatives | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [encoding, setEncoding] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -48,28 +51,49 @@ export function CreateDialog({ open, onOpenChange }: CreateDialogProps) {
   }, [imagePreviewUrl]);
 
   function clearImage() {
-    setImageBytes(null);
+    setDerivatives(null);
     setImagePreviewUrl(null);
+    setImageError(null);
+    setEncoding(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
   async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const buffer = await file.arrayBuffer();
-    setImageBytes(new Uint8Array(buffer));
+    setDerivatives(null);
+    setImageError(null);
+    setEncoding(true);
     setImagePreviewUrl((prev) => {
       if (prev) URL.revokeObjectURL(prev);
       return URL.createObjectURL(file);
     });
+    try {
+      const result = await deriveImages(file);
+      setDerivatives(result);
+    } catch {
+      setImageError("Couldn't process that image.");
+      setImagePreviewUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    } finally {
+      setEncoding(false);
+    }
   }
 
   async function handleSubmit() {
     if (entryType === "mood") {
       await moodService.createMood(mood, labelId);
     } else if (entryType === "moment") {
-      if (!content.trim() && !imageBytes) return;
-      await momentService.createMoment(content.trim(), imageBytes, labelId);
+      if (!content.trim() && !derivatives) return;
+      await momentService.createMoment(
+        content.trim(),
+        derivatives?.display ?? null,
+        derivatives?.thumbnail ?? null,
+        labelId,
+      );
     } else {
       if (!content.trim()) return;
       if (entryType === "note") {
@@ -102,7 +126,7 @@ export function CreateDialog({ open, onOpenChange }: CreateDialogProps) {
     entryType === "mood"
       ? false
       : entryType === "moment"
-        ? !content.trim() && !imageBytes
+        ? encoding || (!content.trim() && !derivatives)
         : !content.trim();
 
   return (
@@ -163,6 +187,9 @@ export function CreateDialog({ open, onOpenChange }: CreateDialogProps) {
                   <ImageIcon className="size-4" />
                   Add an image
                 </button>
+              )}
+              {imageError && (
+                <div className="mt-2 text-sm text-foreground-muted">{imageError}</div>
               )}
             </div>
           )}

@@ -77,17 +77,18 @@ export function Entry({
 
 function MomentThumbnail({ id }: { id: string }) {
   const moment = useEntry("moment", id);
+  const bytes = moment?.thumbnail ?? moment?.image ?? null;
   const [url, setUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!moment?.image) {
+    if (!bytes) {
       setUrl(null);
       return;
     }
-    const objectUrl = URL.createObjectURL(new Blob([new Uint8Array(moment.image)]));
+    const objectUrl = URL.createObjectURL(new Blob([new Uint8Array(bytes)]));
     setUrl(objectUrl);
     return () => URL.revokeObjectURL(objectUrl);
-  }, [moment?.image]);
+  }, [bytes]);
 
   if (!url) return null;
   return (

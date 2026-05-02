@@ -48,6 +48,7 @@ export type MoodTable = SyncableRow & {
 export type MomentTable = SyncableRow & {
   content: string;
   image: Uint8Array | null;
+  thumbnail: Uint8Array | null;
   date: string;
   created_at: string;
   content_edited_at: string | null;

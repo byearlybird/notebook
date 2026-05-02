@@ -219,7 +219,11 @@ function MomentImage({ id }: { id: string }) {
   }, [moment?.image]);
 
   if (!url) return null;
-  return <img src={url} alt="" className="max-h-96 rounded-lg border border-border self-start" />;
+  return (
+    <div className="aspect-square w-full max-w-96 self-center rounded-lg border border-border bg-surface-tint overflow-hidden">
+      <img src={url} alt="" className="w-full h-full object-contain" />
+    </div>
+  );
 }
 
 function MoodValueRow({ value }: { value: number }) {

@@ -4,7 +4,8 @@ import { toLocalISO } from "@/utils/dates";
 export const momentService = {
   async createMoment(
     content: string,
-    image: Uint8Array | null = null,
+    display: Uint8Array | null = null,
+    thumbnail: Uint8Array | null = null,
     label: string | null = null,
   ) {
     const localISO = toLocalISO(new Date());
@@ -13,7 +14,8 @@ export const momentService = {
       .values({
         id: crypto.randomUUID(),
         content,
-        image,
+        image: display,
+        thumbnail,
         label,
         date: localISO.slice(0, 10),
         created_at: localISO,
